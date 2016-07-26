@@ -28,7 +28,7 @@ class Validation
     **/
     public static function isNormalArray(array $arr, $minSize=0)
     {
-        return (self::isArray($arr, $minSize)) && count(array_filter(array_keys($arr), 'is_string')) == 0);
+        return (self::isArray($arr, $minSize) && count(array_filter(array_keys($arr), 'is_string'))) == 0;
     }
     /**
      * Checks to see if this an associative array and not an integer array
@@ -39,7 +39,7 @@ class Validation
     **/
     public static function isAssociativeArray(array $arr, $levels = 1)
     {
-        return (self::isArray($arr, $minSize)) && (count(array_filter(array_keys($arr), 'is_string')) > 0);
+        return (self::isArray($arr, $minSize) && count(array_filter(array_keys($arr), 'is_string'))) > 0;
     }
     /**
      *
