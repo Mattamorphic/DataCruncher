@@ -6,12 +6,12 @@
     },
     "autoload": {
         "psr-4": {
-            "mfmbarber\\CSV_Cruncher\\": "src/"
+            "mfmbarber\\Data_Cruncher\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "mfmbarber\\CSV_Cruncher\\Tests\\": "Tests/"
+            "mfmbarber\\Data_Cruncher\\Tests\\": "Tests/"
         }
     }
 }

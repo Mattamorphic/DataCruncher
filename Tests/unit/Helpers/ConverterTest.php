@@ -1,8 +1,8 @@
 <?php
 
-// namespace mfmbarber\CSV_Cruncher\Tests\Unit\Helpers;
-// use mfmbarber\CSV_Cruncher\Tests\Unit\Mocks as Mocks;
-// use mfmbarber\CSV_Cruncher\Helpers\Converter as Converter;
+// namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
+// use mfmbarber\Data_Cruncher\Tests\Unit\Mocks as Mocks;
+// use mfmbarber\Data_Cruncher\Helpers\Converter as Converter;
 //
 // class ConverterTest extends \PHPUnit_Framework_TestCase
 // {
@@ -86,7 +86,7 @@
 //         ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
 //         $customMocks = new Mocks();
 //         $sourceFile = $customMocks->createMockSourceFile($data);
-//         $converter = new mfmbarber\CSV_Cruncher\Helpers\Converter();
+//         $converter = new mfmbarber\Data_Cruncher\Helpers\Converter();
 //
 //         $result = $convert->fromSource($sourceFile)
 //             ->toJson()

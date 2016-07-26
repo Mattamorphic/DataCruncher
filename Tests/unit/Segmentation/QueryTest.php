@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Tests\Unit\Segmentation;
-use mfmbarber\CSV_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\CSV_Cruncher\Segmentation\Query as Query;
+namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
+use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
@@ -121,7 +121,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Unit test, date format or value in value clause of query is incorrect
      *
      * @test
-     * @expectedException        mfmbarber\CSV_Cruncher\Exceptions\InvalidDateValueException
+     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidDateValueException
      * @expectedExceptionMessage Couldn't create datetime object from value/dateFormat - please check
      *
      * @return null
@@ -148,7 +148,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong data type for the select method, throw error
      *
      * @test
-     * @expectedException        mfmbarber\CSV_Cruncher\Exceptions\ParameterTypeException
+     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
      * @expectedExceptionMessage The parameter type for this method was incorrect, expected a normal array
      *
      * @return null
@@ -176,7 +176,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong data type for the where method, throw error
      *
      * @test
-     * @expectedException        mfmbarber\CSV_Cruncher\Exceptions\ParameterTypeException
+     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
      * @expectedExceptionMessage The parameter type for this method was incorrect, expected a string field name
      *
      * @return null
@@ -203,7 +203,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given an incorrect condition throw an InvalidValueException
      *
      * @test
-     * @expectedException        mfmbarber\CSV_Cruncher\Exceptions\InvalidValueException
+     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidValueException
      *
      * @return null
     **/

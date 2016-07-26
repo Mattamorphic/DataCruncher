@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Tests;
+namespace mfmbarber\Data_Cruncher\Tests;
 
 class Mocks extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
     public function createMockSourceFile($data)
     {
         $sourceFile = $this->getMockBuilder(
-            'mfmbarber\CSV_Cruncher\Helpers\DataFile'
+            'mfmbarber\Data_Cruncher\Helpers\DataFile'
         )->setMethods(['exists', 'readable'])->getMock();
         $sourceFile->method('readable')->willReturn(true);
         $sourceFile->setSource('php://memory', ['modifier' => 'r']);
@@ -36,7 +36,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
     public function createMockOutFile()
     {
         $outFile = $this->getMockBuilder(
-            'mfmbarber\CSV_Cruncher\Helpers\DataFile'
+            'mfmbarber\Data_Cruncher\Helpers\DataFile'
         )->setMethods(['writable'])->getMock();
         $outFile->method('writable')->willReturn(true);
         $outFile->setSource('php://temp', ['modifier' => 'w']);

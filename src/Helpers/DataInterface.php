@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers;
 
 interface DataInterface
 {

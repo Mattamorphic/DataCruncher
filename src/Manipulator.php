@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\CSV_Cruncher;
+namespace mfmbarber\Data_Cruncher;
 
 class Manipulator
 {

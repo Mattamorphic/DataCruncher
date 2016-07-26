@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Segmentation;
-use mfmbarber\CSV_Cruncher\Exceptions as Exceptions;
-use mfmbarber\CSV_Cruncher\Segmentation\Query as Query;
+namespace mfmbarber\Data_Cruncher\Segmentation;
+use mfmbarber\Data_Cruncher\Exceptions as Exceptions;
+use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 class Split
 {

@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Tests\Unit\Analysis;
-use mfmbarber\CSV_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\CSV_Cruncher\Analysis\Statistics as Statistics;
+namespace mfmbarber\Data_Cruncher\Tests\Unit\Analysis;
+use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
 
 class StatisticsTest extends \PHPUnit_Framework_TestCase
 {

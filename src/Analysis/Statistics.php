@@ -1,8 +1,8 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\analysis;
-use mfmbarber\CSV_Cruncher\Config\Validation as Validation;
-use mfmbarber\CSV_Cruncher\Helpers\DataInterface as DataInterface;
-use mfmbarber\CSV_Cruncher\Exceptions;
+namespace mfmbarber\Data_Cruncher\analysis;
+use mfmbarber\Data_Cruncher\Config\Validation as Validation;
+use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Exceptions;
 
 class Statistics
 {

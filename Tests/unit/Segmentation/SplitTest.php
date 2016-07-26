@@ -1,8 +1,8 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Tests\Unit\Segmentation;
-use mfmbarber\CSV_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\CSV_Cruncher\Segmentation\Split as Split;
-use mfmbarber\CSV_Cruncher\Segmentation\Query as Query;
+namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
+use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
+use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 class SplitTest extends \PHPUnit_Framework_TestCase
 {
