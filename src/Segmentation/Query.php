@@ -112,7 +112,7 @@ class Query
                 }
             } elseif (is_string($value)) {
                 $datetime = Validation::getDateTime($value, $dateFormat);
-                if (!$datetime) {
+                if ($datetime) {
                     $this->_value = $datetime;
                     $valid = true;
                 }
