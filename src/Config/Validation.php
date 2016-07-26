@@ -21,23 +21,23 @@ class Validation
     ];
     /**
      * Checks to see if this is a normal numerical array and not associative
-     * @param array $arr     The array to check (this is type hinted)
+     * @param mixed $arr     The array to check (this is type hinted)
      * @param int   $minSize The minimum size for the array - this defaults to 0
      *
      * @return bool
     **/
-    public static function isNormalArray(array $arr, $minSize=0)
+    public static function isNormalArray($arr, $minSize=0)
     {
         return (self::isArray($arr, $minSize) && count(array_filter(array_keys($arr), 'is_string'))) == 0;
     }
     /**
      * Checks to see if this an associative array and not an integer array
-     * @param array $arr     The array to check (this is type hinted)
+     * @param mixed $arr     The array to check (this is type hinted)
      * @param int   $minSize The minimum size for the array - this defaults to 0
      *
      * @return bool
     **/
-    public static function isAssociativeArray(array $arr, $levels = 1)
+    public static function isAssociativeArray($arr, $levels = 1)
     {
         return (self::isArray($arr, $minSize) && count(array_filter(array_keys($arr), 'is_string'))) > 0;
     }
