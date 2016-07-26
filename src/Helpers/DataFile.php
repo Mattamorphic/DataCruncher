@@ -108,7 +108,7 @@ class DataFile implements DataInterface
             );
         }
     }
-    public function writeDataRow($row)
+    public function writeDataRow(array $row)
     {
         if ($this->_fp !== null) {
             fputcsv(
