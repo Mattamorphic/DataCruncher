@@ -4,7 +4,7 @@ use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 use mfmbarber\Data_Cruncher\Helpers\DataFile as DataFile;
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
-    const SMALL_TEST = './Tests/Integration/Segmentation/test_small.csv';
+    const SMALL_TEST = './Tests/integration/Segmentation/test_small.csv';
 
     /**
      * @test
