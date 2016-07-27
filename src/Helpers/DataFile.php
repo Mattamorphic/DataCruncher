@@ -25,13 +25,13 @@ class DataFile implements DataInterface
         if (isset($properties['modifier'])) {
             $modifier = strtolower($properties['modifier']);
         }
-        if (false !== strpos('r', $modifier) && !self::readable($filename)) {
-            if (!self::file_exists($filename)) {
+        if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
+            if (!$this->file_exists($filename)) {
                 throw new Exceptions\InvalidFileException("$filename doesn't exist, currently in " . getcwd());
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
-        if (false !== strpos('w', $modifier) && !self::writable($filename)) {
+        if (false !== strpos('w', $modifier) && !$this->writable($filename)) {
             throw new Exceptions\InvalidFileException("$filename is not writable");
         }
         $this->_filename = $filename;
@@ -43,7 +43,7 @@ class DataFile implements DataInterface
         }
     }
 
-    public static function file_exists($filename)
+    public function file_exists($filename)
     {
         return (bool) file_exists($filename);
     }
@@ -54,7 +54,7 @@ class DataFile implements DataInterface
      *
      * @return bool
     **/
-    public static function writable($filename)
+    public function writable($filename)
     {
         return (bool) is_writable($filename);
     }
@@ -65,7 +65,7 @@ class DataFile implements DataInterface
      *
      * @return bool
     **/
-    public static function readable($filename)
+    public function readable($filename)
     {
         return (bool) is_readable($filename);
     }
