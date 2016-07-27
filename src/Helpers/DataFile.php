@@ -25,10 +25,13 @@ class DataFile implements DataInterface
         if (isset($properties['modifier'])) {
             $modifier = strtolower($properties['modifier']);
         }
-        if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
+        if (!self::file_exists($filename)) {
+            throw new Exceptions\InvalidFileException("$filename doesn't exist");
+        }
+        if (false !== strpos('r', $modifier) && !self::readable($filename)) {
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
-        if (false !== strpos('w', $modifier) && !$this->writable($filename)) {
+        if (false !== strpos('w', $modifier) && !self::writable($filename)) {
             throw new Exceptions\InvalidFileException("$filename is not writable");
         }
         $this->_filename = $filename;
@@ -39,13 +42,32 @@ class DataFile implements DataInterface
             $this->_encloser = $properties['encloser'];
         }
     }
-    public function writable($filename)
+
+    public static function file_exists($filename)
     {
-        return is_writable($filename);
+        return (bool) file_exists($filename);
     }
-    public function readable($filename)
+
+    /**
+     * We abstract this method as we might change our check for writable in future
+     * @param string $filename  The name of the file to check is writable
+     *
+     * @return bool
+    **/
+    public static function writable($filename)
     {
-        return is_readable($filename);
+        return (bool) is_writable($filename);
+    }
+
+    /**
+     * We abstract this method as we might change our check for readable in future
+     * @param string $filename  The name of the file to check is writable
+     *
+     * @return bool
+    **/
+    public static function readable($filename)
+    {
+        return (bool) is_readable($filename);
     }
     /**
      * Returns the current filename tied to this object
