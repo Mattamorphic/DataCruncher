@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Tests\Unit\Segmentation;
-use mfmbarber\CSV_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\CSV_Cruncher\Segmentation\Merger as Merger;
+namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
+use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
 
 class MergerTest extends \PHPUnit_Framework_TestCase
 {

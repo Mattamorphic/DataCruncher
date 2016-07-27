@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Exceptions;
+namespace mfmbarber\Data_Cruncher\Exceptions;
 
 class InvalidFileException extends \Exception
 {

@@ -1,0 +1,12 @@
+language: php
+php:
+    - '5.6'
+    - '7.0'
+
+before_script:
+    - composer install
+    - find . -type f -name *.csv -exec chmod 777 {} +
+    
+script: phpunit --configuration phpunit.xml --coverage-text
+notifications:
+    email: mfmbarber@gmail.com

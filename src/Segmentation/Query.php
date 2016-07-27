@@ -1,8 +1,8 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Segmentation;
-use mfmbarber\CSV_Cruncher\Config\Validation as Validation;
-use mfmbarber\CSV_Cruncher\Helpers\DataInterface as DataInterface;
-use mfmbarber\CSV_Cruncher\Exceptions;
+namespace mfmbarber\Data_Cruncher\Segmentation;
+use mfmbarber\Data_Cruncher\Config\Validation as Validation;
+use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Exceptions;
 
 class Query
 {
@@ -112,7 +112,7 @@ class Query
                 }
             } elseif (is_string($value)) {
                 $datetime = Validation::getDateTime($value, $dateFormat);
-                if (false !== $datetime) {
+                if ($datetime) {
                     $this->_value = $datetime;
                     $valid = true;
                 }

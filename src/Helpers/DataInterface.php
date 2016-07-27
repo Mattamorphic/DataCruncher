@@ -1,12 +1,12 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers;
 
 interface DataInterface
 {
-    public function setSource($location, $properties);
+    public function setSource($location, array $properties);
     public function getSourceName();
     public function getNextDataRow();
-    public function writeDataRow($row);
+    public function writeDataRow(array $row);
     //public function sendRaw($type, $data);
     // public function connect();
     // public function disconnect();

@@ -1,7 +1,7 @@
 <?php
 // 
-// namespace mfmbarber\CSV_Cruncher\Helpers;
-// use mfmbarber\CSV_Cruncher\Exceptions;
+// namespace mfmbarber\Data_Cruncher\Helpers;
+// use mfmbarber\Data_Cruncher\Exceptions;
 //
 // class JSONConverter implements ConverterInterface
 // {

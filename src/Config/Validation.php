@@ -1,6 +1,6 @@
 <?php
-namespace mfmbarber\CSV_Cruncher\Config;
-use mfmbarber\CSV_Cruncher\Exceptions as CSV_Exceptions;
+namespace mfmbarber\Data_Cruncher\Config;
+use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
 
 class Validation
 {
@@ -21,36 +21,36 @@ class Validation
     ];
     /**
      * Checks to see if this is a normal numerical array and not associative
-     * @param array $arr     The array to check (this is type hinted)
+     * @param mixed $arr     The array to check (this is type hinted)
      * @param int   $minSize The minimum size for the array - this defaults to 0
      *
      * @return bool
     **/
-    public static function isNormalArray(array $arr, $minSize=0)
+    public static function isNormalArray($arr, $minSize=1)
     {
-        return (self::isArray($arr, $minSize)) && count(array_filter(array_keys($arr), 'is_string')) == 0);
+        return self::isArray($arr, $minSize) && (bool) !count(array_filter(array_keys($arr), 'is_string'));
     }
     /**
      * Checks to see if this an associative array and not an integer array
-     * @param array $arr     The array to check (this is type hinted)
+     * @param mixed $arr     The array to check (this is type hinted)
      * @param int   $minSize The minimum size for the array - this defaults to 0
      *
      * @return bool
     **/
-    public static function isAssociativeArray(array $arr, $levels = 1)
+    public static function isAssociativeArray($arr, $minSize=1)
     {
-        return (self::isArray($arr, $minSize)) && (count(array_filter(array_keys($arr), 'is_string')) > 0);
+        return self::isArray($arr, $minSize) && (count(array_filter(array_keys($arr), 'is_string')) > 0);
     }
     /**
      *
      *
     **/
-    public static function isArray($arr, $minSize=0)
+    public static function isArray($arr, $minSize=1)
     {
-        return (is_array($arr)) && (count($arr) >= $minSize);
+        return is_array($arr) && (count($arr) >= $minSize);
     }
     /**
-     *
+     * Is the given condition a valid condition
      *
     **/
     public static function validCondition($cond)
@@ -67,9 +67,9 @@ class Validation
     **/
     public static function getDateTime($value, $dateFormat)
     {
-        $dateFormat = trim(strtoupper($dateFormat));
+        $dateFormat = trim($dateFormat);
         // If they just need the year then assume from 01/01 of year
-        if ($dateFormat === 'Y' || $dateFormat === 'YY') {
+        if ($dateFormat === 'Y' || $dateFormat === 'YY' || $dateFormat === 'YYYY') {
             $dateObj = new \DateTime();
             try {
                 $dateObj->setDate($value, 1, 1);

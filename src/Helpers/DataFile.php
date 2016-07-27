@@ -1,7 +1,7 @@
 <?php
 
-namespace mfmbarber\CSV_Cruncher\Helpers;
-use mfmbarber\CSV_Cruncher\Exceptions;
+namespace mfmbarber\Data_Cruncher\Helpers;
+use mfmbarber\Data_Cruncher\Exceptions;
 
 class DataFile implements DataInterface
 {
@@ -26,6 +26,9 @@ class DataFile implements DataInterface
             $modifier = strtolower($properties['modifier']);
         }
         if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
+            if (!$this->fileExists($filename)) {
+                throw new Exceptions\InvalidFileException("$filename doesn't exist");
+            }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
         if (false !== strpos('w', $modifier) && !$this->writable($filename)) {
@@ -39,13 +42,32 @@ class DataFile implements DataInterface
             $this->_encloser = $properties['encloser'];
         }
     }
+
+    public function fileExists($filename)
+    {
+        return (bool) file_exists($filename);
+    }
+
+    /**
+     * We abstract this method as we might change our check for writable in future
+     * @param string $filename  The name of the file to check is writable
+     *
+     * @return bool
+    **/
     public function writable($filename)
     {
-        return is_writable($filename);
+        return (bool) is_writable($filename);
     }
+
+    /**
+     * We abstract this method as we might change our check for readable in future
+     * @param string $filename  The name of the file to check is writable
+     *
+     * @return bool
+    **/
     public function readable($filename)
     {
-        return is_readable($filename);
+        return (bool) is_readable($filename);
     }
     /**
      * Returns the current filename tied to this object
@@ -108,7 +130,7 @@ class DataFile implements DataInterface
             );
         }
     }
-    public function writeDataRow($row)
+    public function writeDataRow(array $row)
     {
         if ($this->_fp !== null) {
             fputcsv(
