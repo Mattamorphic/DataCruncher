@@ -78,7 +78,7 @@ class DataFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidFileException
-     * @expectedExceptionMessage FakeFile.csv is not readable
+     * @expectedExceptionMessage FakeFile.csv doesn't exist
      *
      * @return null
     **/

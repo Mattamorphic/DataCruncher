@@ -27,7 +27,7 @@ class DataFile implements DataInterface
         }
         if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
             if (!$this->fileExists($filename)) {
-                throw new Exceptions\InvalidFileException("$filename doesn't exist, currently in " . getcwd());
+                throw new Exceptions\InvalidFileException("$filename doesn't exist");
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }

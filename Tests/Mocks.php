@@ -15,7 +15,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
     {
         $sourceFile = $this->getMockBuilder(
             'mfmbarber\Data_Cruncher\Helpers\DataFile'
-        )->setMethods(['exists', 'readable'])->getMock();
+        )->setMethods(['fileExists', 'readable'])->getMock();
         $sourceFile->method('readable')->willReturn(true);
         $sourceFile->method('fileExists')->willReturn(true);
         $sourceFile->setSource('php://memory', ['modifier' => 'r']);
