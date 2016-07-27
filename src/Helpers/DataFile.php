@@ -27,7 +27,7 @@ class DataFile implements DataInterface
         }
         if (false !== strpos('r', $modifier) && !self::readable($filename)) {
             if (!self::file_exists($filename)) {
-                throw new Exceptions\InvalidFileException("$filename doesn't exist");
+                throw new Exceptions\InvalidFileException("$filename doesn't exist, currently in " . getcwd());
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
