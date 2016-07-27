@@ -25,10 +25,10 @@ class DataFile implements DataInterface
         if (isset($properties['modifier'])) {
             $modifier = strtolower($properties['modifier']);
         }
-        if (!self::file_exists($filename)) {
-            throw new Exceptions\InvalidFileException("$filename doesn't exist");
-        }
         if (false !== strpos('r', $modifier) && !self::readable($filename)) {
+            if (!self::file_exists($filename)) {
+                throw new Exceptions\InvalidFileException("$filename doesn't exist");
+            }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
         if (false !== strpos('w', $modifier) && !self::writable($filename)) {

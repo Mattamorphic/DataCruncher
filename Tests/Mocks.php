@@ -17,6 +17,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
             'mfmbarber\Data_Cruncher\Helpers\DataFile'
         )->setMethods(['exists', 'readable'])->getMock();
         $sourceFile->method('readable')->willReturn(true);
+        $sourceFile->method('file_exists')->willReturn(true);
         $sourceFile->setSource('php://memory', ['modifier' => 'r']);
         // Setup mocked data stream
         $sourceFile->open();
