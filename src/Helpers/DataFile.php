@@ -26,7 +26,7 @@ class DataFile implements DataInterface
             $modifier = strtolower($properties['modifier']);
         }
         if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
-            if (!$this->file_exists($filename)) {
+            if (!$this->fileExists($filename)) {
                 throw new Exceptions\InvalidFileException("$filename doesn't exist, currently in " . getcwd());
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
@@ -43,7 +43,7 @@ class DataFile implements DataInterface
         }
     }
 
-    public function file_exists($filename)
+    public function fileExists($filename)
     {
         return (bool) file_exists($filename);
     }
