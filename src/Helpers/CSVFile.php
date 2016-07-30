@@ -3,12 +3,13 @@
 namespace mfmbarber\Data_Cruncher\Helpers;
 use mfmbarber\Data_Cruncher\Exceptions;
 
-class DataFile implements DataInterface
+class CSVFile implements DataInterface
 {
     private $_headers = [];
     private $_filename = '';
     private $_delimiter = ',';
     private $_encloser = "\"";
+    private $_modifier = 'r';
     private $_fp = null;
 
     /**
@@ -21,17 +22,16 @@ class DataFile implements DataInterface
     **/
     public function setSource($filename, array $properties = [])
     {
-        $modifier = 'r';
         if (isset($properties['modifier'])) {
-            $modifier = strtolower($properties['modifier']);
+            $this->_modifier = strtolower($properties['modifier']);
         }
-        if (false !== strpos('r', $modifier) && !$this->readable($filename)) {
+        if (false !== strpos('r', $this->_modifier) && !$this->readable($filename)) {
             if (!$this->fileExists($filename)) {
                 throw new Exceptions\InvalidFileException("$filename doesn't exist");
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
-        if (false !== strpos('w', $modifier) && !$this->writable($filename)) {
+        if ((false !== strpos('w', $this->_modifier) || false !== strpos('a', $this->_modifier)) && !$this->writable($filename)) {
             throw new Exceptions\InvalidFileException("$filename is not writable");
         }
         $this->_filename = $filename;
@@ -41,8 +41,8 @@ class DataFile implements DataInterface
         if (isset($properties['encloser'])) {
             $this->_encloser = $properties['encloser'];
         }
-    }
 
+    }
     public function fileExists($filename)
     {
         return (bool) file_exists($filename);
@@ -110,11 +110,11 @@ class DataFile implements DataInterface
     public function open()
     {
         if ($this->_fp === null) {
-            $this->_fp = fopen($this->_filename, 'a+');
+            $this->_fp = fopen($this->_filename, $this->_modifier);
 
         } else {
             throw new Exceptions\FilePointerExistsException(
-                'A filepointer exists on this object, use DataFile::close to'
+                'A filepointer exists on this object, use CSVFile::close to'
                 .' close the current pointer '
             );
         }
@@ -125,7 +125,7 @@ class DataFile implements DataInterface
             rewind($this->_fp);
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use DataFile::open'
+                'The filepointer is null on this object, use CSVFile::open'
                 .' to open a new filepointer'
             );
         }
@@ -133,15 +133,10 @@ class DataFile implements DataInterface
     public function writeDataRow(array $row)
     {
         if ($this->_fp !== null) {
-            fputcsv(
-                $this->_fp,
-                array_values($row),
-                $this->_delimiter,
-                $this->_encloser
-            );
+            fputcsv($this->_fp, $row, $this->_delimiter, $this->_encloser);
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use DataFile::open'
+                'The filepointer is null on this object, use CSVFile::open'
                 .' to open a new filepointer'
             );
         }
@@ -158,7 +153,7 @@ class DataFile implements DataInterface
             $this->_fp = null;
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use DataFile::open'
+                'The filepointer is null on this object, use CSVFile::open'
                 .' to open a new filepointer'
             );
         }

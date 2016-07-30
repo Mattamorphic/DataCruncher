@@ -130,12 +130,6 @@ class Query
         }
         return $this;
     }
-    //
-    // public function convert($format)
-    // {
-    //     $this->_converter = new Converter($format);
-    // }
-
 
     /**
      * Execute the query, returning an array of arrays, where each sub array

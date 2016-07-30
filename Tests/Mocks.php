@@ -14,7 +14,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
     public function createMockSourceFile($data)
     {
         $sourceFile = $this->getMockBuilder(
-            'mfmbarber\Data_Cruncher\Helpers\DataFile'
+            'mfmbarber\Data_Cruncher\Helpers\CSVFile'
         )->setMethods(['fileExists', 'readable'])->getMock();
         $sourceFile->method('readable')->willReturn(true);
         $sourceFile->method('fileExists')->willReturn(true);
@@ -37,10 +37,28 @@ class Mocks extends \PHPUnit_Framework_TestCase
     public function createMockOutFile()
     {
         $outFile = $this->getMockBuilder(
-            'mfmbarber\Data_Cruncher\Helpers\DataFile'
+            'mfmbarber\Data_Cruncher\Helpers\CSVFile'
         )->setMethods(['writable'])->getMock();
         $outFile->method('writable')->willReturn(true);
         $outFile->setSource('php://temp', ['modifier' => 'w']);
         return $outFile;
+    }
+    /**
+    * Creates a MOCK of the Query class
+    *
+    * @return Query
+    **/
+    public function createMockQuery()
+    {
+        $query = $this->getMockBuilder(
+            'mfmbarber\Data_Cruncher\Segmentation\Query'
+        )->setMethods(['execute'])->getMock();
+        $query->method('execute')->willReturn(
+            [
+                ['name' => 'matthew', 'age' => 35],
+                ['name' => 'tony', 'age' => 25]
+            ]
+        );
+        return $query;
     }
 }

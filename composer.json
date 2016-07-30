@@ -6,12 +6,13 @@
     },
     "autoload": {
         "psr-4": {
-            "mfmbarber\\Data_Cruncher\\": "src/"
+            "mfmbarber\\Data_Cruncher\\": "src/",
+            "mfmbarber\\Example\\": "example/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "mfmbarber\\Data_Cruncher\\Tests\\": "Tests/"
+            "mfmbarber\\Data_Cruncher\\Tests\\": "tests/"
         }
     }
 }

@@ -1,9 +1,9 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
 use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\Data_Cruncher\Helpers\DataFile as DataFile;
+use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
 
-class DataFileTest extends \PHPUnit_Framework_TestCase
+class CSVFileTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * Tests that once assigned the source name can be retrieved
@@ -84,7 +84,7 @@ class DataFileTest extends \PHPUnit_Framework_TestCase
     **/
     public function invalidFileException()
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->setSource('FakeFile.csv', ['modifier' => 'r']);
     }
     /**
@@ -92,13 +92,13 @@ class DataFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use DataFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
      *
      * @return null
     **/
     public function closeInvalidFilePointerException()
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->close();
     }
     /**
@@ -106,13 +106,13 @@ class DataFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use DataFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
      *
      * @return null
     **/
     public function resetInvalidFilePointerException()
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->reset();
     }
     /**
@@ -120,13 +120,13 @@ class DataFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use DataFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
      *
      * @return null
     **/
     public function writeInvalidFilePointerException()
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->writeDataRow(['email' => 'test@test.com']);
     }
 
