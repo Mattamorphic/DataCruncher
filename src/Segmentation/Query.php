@@ -190,7 +190,7 @@ class Query
             }
             if ($valid) {
                 $validRowCount++;
-                if ($outfile === null) {
+                if (null === $outfile) {
                     $result[] = array_intersect_key($row, $this->_fields);
                 } else {
                     $outfile->writeDataRow(
@@ -200,12 +200,11 @@ class Query
             }
         }
         $this->_sourceFile->close();
-        if ($outfile !== null) {
-            $outfile->close();
-            return $validRowCount;
-        } else {
+        if (null === $outfile) {
             return $result;
         }
+        $outfile->close();
+        return $validRowCount;
     }
     /**
      * Checks to see if a row value is in query values

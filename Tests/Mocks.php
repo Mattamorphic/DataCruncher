@@ -18,7 +18,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
         )->setMethods(['fileExists', 'readable'])->getMock();
         $sourceFile->method('readable')->willReturn(true);
         $sourceFile->method('fileExists')->willReturn(true);
-        $sourceFile->setSource('php://memory', ['modifier' => 'r']);
+        $sourceFile->setSource('php://memory', ['modifier' => 'r+']);
         // Setup mocked data stream
         $sourceFile->open();
         foreach (explode("\n", $data) as $line) {
