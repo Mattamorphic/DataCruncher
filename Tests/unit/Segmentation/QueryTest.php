@@ -1,10 +1,55 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
-use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+
+use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
+
+use org\bovigo\vfs\vfsStream,
+    org\bovigo\vfs\vfsStreamDirectory;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
+
+    private $root;
+
+    private $mockSourceCSV;
+    private $mockOutCSV;
+
+    private function _generateMockFile($class_name)
+    {
+        $file = $this->getMockBuilder($class_name)
+        ->setMethods(['fileExists', 'readable', 'writable'])
+        ->getMock();
+        $file->method('readable')->willReturn(true);
+        $file->method('writable')->willReturn(true);
+        $file->method('fileExists')->willReturn(true);
+        return $file;
+    }
+
+    public function setUp()
+    {
+        $this->root = vfsStream::setup('home', 0777);
+        $file = vfsStream::url('home/test', 0777);
+        file_put_contents(
+            $file,
+            "email, name, colour, dob, age\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
+            ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
+        );
+        vfsStream::url('home/test_out', 0777);
+        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
+
+    }
+
+    public function tearDown() {
+        $this->mockSourceCSV = null;
+        $this->mockOutCSV = null;
+    }
     /**
      * Tests that query execution returns the appropriate array (structure /
      * values)
@@ -18,16 +63,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeQueryWorksCorrectly($query_data, $expected)
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
-
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select($query_data['select'])
             ->where($query_data['where'])
             ->condition($query_data['condition'])
@@ -54,13 +91,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeQueryDatesWorkCorrectly($query_data, $expected)
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/06/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
 
         // This improves readability over call_user_func_array
@@ -69,7 +99,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $matchVal = $query_data['value'][0];
         $matchFormat = $query_data['value'][1];
 
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select($query_data['select'])
             ->condition($query_data['condition'])
             ->where($whereField, $whereFormat)
@@ -92,16 +122,8 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeQueryDateThrowsException()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/06/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
-
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('after')
             ->where('dob', 'd/m/Y')
@@ -119,16 +141,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function selectThrowsParameterException()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/06/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
 
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select('dob')
             ->condition('equals')
             ->where('name')
@@ -147,16 +162,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function whereThrowsParameterException()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/06/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
 
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('equals')
             ->where(['name'])
@@ -173,16 +181,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function invalidConditionThrowsValueException()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/06/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $query = new Query();
 
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('might be like')
             ->where('name')
@@ -199,22 +200,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeWriteToFile()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
-        $outFile = $customMocks->createMockOutFile();
         $query = new Query();
 
-        $result = $query->fromSource($sourceFile)
+        $result = $query->fromSource($this->mockSourceCSV)
             ->select(['email'])
             ->where('name')
             ->condition('contains')
             ->value('matt')
-            ->execute($outFile);
+            ->execute($this->mockOutCSV);
 
         $this->assertEquals(
             2,
@@ -427,7 +420,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                     'select' => ['email'],
                     'where' => ['dob', 'd/m/Y'],
                     'condition' => 'on',
-                    'value' => ['01/06/2000', 'd/m/Y']
+                    'value' => ['01/01/2000', 'd/m/Y']
                 ],
                 [
                     ['email' => 'no_name@something.com']

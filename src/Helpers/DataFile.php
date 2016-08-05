@@ -1,9 +1,19 @@
 <?php
+/**
+ * Abstract Data File Handler (shared methods)
+ *
+ * @package Data_Cruncher
+ * @subpackage Helpers
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 
 namespace mfmbarber\Data_Cruncher\Helpers;
+
 use mfmbarber\Data_Cruncher\Exceptions;
 
-abstract class DataFile {
+abstract class DataFile
+{
     protected $_modifier = 'r';
     protected $_fp = null;
     protected $_filename = '';
@@ -26,8 +36,13 @@ abstract class DataFile {
             }
             throw new Exceptions\InvalidFileException("$filename is not readable");
         }
-        if ((false !== strpos('w', $this->_modifier) || false !== strpos('a', $this->_modifier)) && !$this->writable($filename)) {
-            throw new Exceptions\InvalidFileException("$filename is not writable");
+        if ((false !== strpos('w', $this->_modifier) || false !== strpos('a', $this->_modifier))) {
+            if (!file_exists($filename)) {
+                touch($filename);
+            }
+            if (!$this->writable($filename)) {
+                throw new Exceptions\InvalidFileException("$filename is not writable");
+            }
         }
         $this->_filename = $filename;
         if (isset($properties['delimiter'])) {
@@ -85,18 +100,23 @@ abstract class DataFile {
 
         } else {
             throw new Exceptions\FilePointerExistsException(
-                'A filepointer exists on this object, use CSVFile::close to'
+                'A filepointer exists on this object, use class::close to'
                 .' close the current pointer '
             );
         }
     }
+    /**
+     * Reset the file pointer to the start of the file
+     *
+     * @return void
+     */
     public function reset()
     {
         if ($this->_fp !== null) {
             rewind($this->_fp);
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use CSVFile::open'
+                'The filepointer is null on this object, use class::open'
                 .' to open a new filepointer'
             );
         }
@@ -104,7 +124,7 @@ abstract class DataFile {
     /**
      * Close closes the file pointer attribute
      *
-     * @return null
+     * @return void
     **/
     public function close()
     {
@@ -113,7 +133,7 @@ abstract class DataFile {
             $this->_fp = null;
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use CSVFile::open'
+                'The filepointer is null on this object, use class::open'
                 .' to open a new filepointer'
             );
         }

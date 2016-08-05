@@ -1,5 +1,14 @@
 <?php
+/**
+ * Statistics Processor
+ *
+ * @package Data_Cruncher
+ * @subpackage Analysis
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 namespace mfmbarber\Data_Cruncher\analysis;
+
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
 use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
@@ -73,8 +82,8 @@ class Statistics
     **/
     public function groupNumeric($step)
     {
-        if (!is_numeric($step)) {
-            // TODO : Throw Exception
+        if (!is_numeric($step) || !is_int($step)) {
+            throw new InvalidArgumentException('Step must be an integer');
         }
         $this->_option = $step;
         $this->_function = function ($value, $step) {
@@ -107,7 +116,6 @@ class Statistics
             return $date->format($format);
         };
         return $this;
-
     }
     /**
      * Execute the statistics calculation given the parameters are set
@@ -117,37 +125,19 @@ class Statistics
      *
      * @return array
     **/
-    public function execute(DataInterface $outfile = null)
+    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = null)
     {
         // TODO :: Validation of object vars.
         $result = [];
-        try {
-            $this->_sourceFile->open();
-        } catch (Exceptions\FilePointerExistsException $e) {
-             // The stream is already open
-        }
+        Validation::openDataFile($this->_sourceFile, $node_name, $start_element);
         if ($outfile !== null) {
-            try {
-                $outfile->open();
-            } catch (Exceptions\FilePointerExistsException $e){
-                // The stream is already open
-            }
+            Validation::openDataFile($outfile, $node_name, $start_element);
         }
         $rowTotal = 0; // count the rows
         while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
             $rowTotal++;
-            // invoke the closure assigned to the attribute (our statistics func)
-            $key = $this->_function
-                ->__invoke($row[$this->_field], $this->_option);
-            if (false !== $key) {
-                if (!array_key_exists($key, $result)) {
-                    $result[$key] = 0;
-                }
-                $result[$key]++;
-            }
+            $this->_processRow($result, $row);
         }
-
-
         if ($this->_type == 'PERCENT') {
             foreach ($result as $key => $value) {
                 $result[$key] = (100 / $rowTotal) * $value;
@@ -155,7 +145,6 @@ class Statistics
         }
         $this->_sourceFile->close();
         if ($outfile !== null) {
-            // write to outfile
             $outfile->writeDataRow(['key', $this->_type]);
             foreach ($result as $key => $value) {
                 $row = [
@@ -168,5 +157,17 @@ class Statistics
             return true;
         }
         return $result;
+    }
+
+    private function _processRow(array &$result, array $row)
+    {
+        // invoke the closure assigned to the attribute (our statistics func)
+        $key = $this->_function->__invoke($row[$this->_field], $this->_option);
+        if (false !== $key) {
+            if (!array_key_exists($key, $result)) {
+                $result[$key] = 0;
+            }
+            $result[$key]++;
+        }
     }
 }

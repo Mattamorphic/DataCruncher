@@ -1,6 +1,14 @@
 <?php
-
+/**
+ * CSVFile Handler
+ *
+ * @package Data_Cruncher
+ * @subpackage Helpers
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 namespace mfmbarber\Data_Cruncher\Helpers;
+
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class CSVFile extends DataFile implements DataInterface
@@ -36,10 +44,14 @@ class CSVFile extends DataFile implements DataInterface
     public function writeDataRow(array $row)
     {
         if ($this->_fp !== null) {
+            if ($this->_headers === []) {
+                $this->_headers = array_keys($row);
+                fputcsv($this->_fp, $this->_headers, $this->_delimiter, $this->_encloser);
+            }
             fputcsv($this->_fp, $row, $this->_delimiter, $this->_encloser);
         } else {
             throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use CSVFile::open'
+                'The filepointer is null on this object, use class::open'
                 .' to open a new filepointer'
             );
         }

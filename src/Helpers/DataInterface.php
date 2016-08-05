@@ -1,4 +1,12 @@
 <?php
+/**
+ * Interface for all data files
+ *
+ * @package Data_Cruncher
+ * @subpackage Helpers
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 namespace mfmbarber\Data_Cruncher\Helpers;
 
 interface DataInterface

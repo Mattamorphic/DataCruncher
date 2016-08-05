@@ -1,10 +1,35 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
-use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
+
 use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class CSVFileTest extends \PHPUnit_Framework_TestCase
 {
+    private $root;
+
+    private $mockSourceCSV;
+
+    public function setUp()
+    {
+        $this->root = vfsStream::setup('home', 0777);
+        $file = vfsStream::url('home/test', 0777);
+        file_put_contents(
+            $file,
+            "email, name, colour, dob, age\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
+        );
+        $this->mockSourceCSV = new CSVFile();
+        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+    }
+
+    public function tearDown()
+    {
+        $this->mockSourceCSV = null;
+    }
     /**
      * Tests that once assigned the source name can be retrieved
      *
@@ -14,14 +39,11 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      **/
     public function getSourceNameWorksCorrectly()
     {
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile("test\ntest");
         $this->assertEquals(
-            $sourceFile->getSourceName(),
-            'php://memory',
+            $this->mockSourceCSV->getSourceName(),
+            'vfs://home/test',
             'Name isn\'t set correctly'
         );
-
     }
     /**
      * Unit test, retrieving associative array of headers & values from a
@@ -33,18 +55,16 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      **/
     public function getNextRowsCorrectly()
     {
-
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $result = [];
-        while ([] !== ($row = $sourceFile->getNextDataRow())) {
+        try {
+            $this->mockSourceCSV->open();
+        } catch (Exceptions\FilePointerExistsException $e) {
+            // The stream is already open
+        }
+        while ([] !== ($row = $this->mockSourceCSV->getNextDataRow())) {
             $result[] = $row;
         }
-        $sourceFile->close();
+        $this->mockSourceCSV->close();
         $this->assertEquals(
             [
                 [
@@ -92,7 +112,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/
@@ -106,7 +126,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/
@@ -120,7 +140,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      *
      * @test
      * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
-     * @expectedExceptionMessage The filepointer is null on this object, use CSVFile::open to open a new filepointer
+     * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/

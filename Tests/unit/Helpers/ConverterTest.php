@@ -14,7 +14,7 @@
 //                ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
 //                ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
 //         $customMocks = new Mocks();
-//         $sourceFile = $customMocks->createMockSourceFile($data);
+//         $sourceFile = $customMocks->createMockSourceFile('mfmbarber\Data_Cruncher\Helpers\CSVFile', $data);
 //
 //         $expected = '
 //             [
@@ -85,7 +85,7 @@
 //         ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
 //         ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
 //         $customMocks = new Mocks();
-//         $sourceFile = $customMocks->createMockSourceFile($data);
+//         $sourceFile = $customMocks->createMockSourceFile('mfmbarber\Data_Cruncher\Helpers\CSVFile', $data);
 //         $converter = new mfmbarber\Data_Cruncher\Helpers\Converter();
 //
 //         $result = $convert->fromSource($sourceFile)

@@ -33,7 +33,8 @@ class Manipulator
      *
      * @return null
     **/
-    public function setDataSource($location, array $properties) {
+    public function setDataSource($location, array $properties)
+    {
         $this->_dataSource->setSource($location, $properties);
         $this->_query->fromSource($this->_dataSource);
     }
