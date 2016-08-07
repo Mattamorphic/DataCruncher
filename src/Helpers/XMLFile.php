@@ -86,7 +86,7 @@ class XMLFile extends DataFile implements DataInterface
         } else {
             throw new Exceptions\FilePointerExistsException(
                 'A filepointer exists on this object, use class::close to'
-                .' close the current pointer '
+                .' close the current pointer'
             );
         }
     }
