@@ -48,13 +48,6 @@ class Merger
         return $this;
     }
     /**
-     */
-    public function deduplicate()
-    {
-        // TODO : Implement this.
-        return $this;
-    }
-    /**
      * Runs the merging of the data sets
      *
      * @param DataInterface $outfile        A file to write the output to
