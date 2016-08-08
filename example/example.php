@@ -11,18 +11,29 @@ use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
 
 use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
 
-$manip = new Manipulator(new CSVFile(), new Query());
-$outFile = new XMLFile();
-$outFile->setSource('example/output.xml', ['modifier' => 'w']);
+// $manip = new Manipulator(new CSVFile(), new Query());
+// $outFile = new XMLFile();
+// $outFile->setSource('example/output.xml', ['modifier' => 'w']);
 
-$manip->setDataSource('example/example.csv', []);
+// $manip->setDataSource('example/example.csv', []);
 
-$res = $manip->query()
-->select(['name', 'email', 'age'])
-->where('email')
-->condition('CONTAINS')
-->value('@')
-->execute($outFile, 'person', 'people');
+// $res = $manip->query()
+// ->select(['name', 'email', 'age'])
+// ->where('email')
+// ->condition('CONTAINS')
+// ->value('@')
+// ->execute($outFile, 'person', 'people');
 
-print_r($res);
+// print_r($res);
 
+
+$merger = new Merger();
+$source_a = new XMLFile();
+$source_a->setSource('example/example.xml', []);
+$source_b = new XMLFile();
+$source_b->setSource('example/example2.xml', []);
+$result = $merger->fromSource($source_a)
+            ->fromSource($source_b)
+            ->on('name')
+            ->execute(null, 'food', 'breakfast_menu');
+print_r($result);

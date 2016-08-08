@@ -56,6 +56,13 @@ class CSVFile extends DataFile implements DataInterface
             );
         }
     }
+
+    public function reset()
+    {
+        $this->_headers = [];
+        parent::reset();
+    }
+
     /**
      * _getcsv is a private method that uses the file pointer to get the next
      * line

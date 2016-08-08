@@ -16,6 +16,7 @@ class XMLFile extends DataFile implements DataInterface
     private $node_name;
     private $start_element;
     private $_read;
+    private $_fields = [];
     /**
      * Returns the next row of data from a file, if there are no rows locale_accept_from_http
      * this returns false
@@ -28,6 +29,9 @@ class XMLFile extends DataFile implements DataInterface
         while ($this->_fp->name === $this->node_name) {
             $row = $this->_toArray(new \SimpleXMLElement($this->_fp->readOuterXML()));
             break;
+        }
+        if ($this->_fields === []) {
+            $this->_fields = array_keys($row);
         }
         $this->_fp->next($this->node_name);
         return $row;
@@ -51,6 +55,9 @@ class XMLFile extends DataFile implements DataInterface
             }
             $this->_fp->endElement();
             $this->_fp->flush();
+            if ($this->_fields === []) {
+                $this->_fields = array_keys($row);
+            }
             return true;
         } else {
             throw new Exceptions\FilePointerInvalidException(
