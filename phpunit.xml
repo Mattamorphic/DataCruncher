@@ -7,7 +7,7 @@
 >
     <testsuites>
         <testsuite name="CSV_Cruncher">
-            <directory>Tests</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
     <logging>

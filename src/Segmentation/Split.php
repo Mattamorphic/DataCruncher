@@ -5,13 +5,11 @@ use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 class Split
 {
-    public function __construct()
-    {
+    private $_sourceFile;
 
-    }
     public function fromSource($source)
     {
-        $this->_source = $source;
+        $this->_sourceFile= $source;
         return $this;
     }
     public function horizontal($size)
@@ -43,8 +41,23 @@ class Split
     //     return $this;
     // }
 
-    public function execute($outFiles = [])
+    public function execute($outfiles = [])
     {
+        try {
+            $this->_sourceFile->open();
+        } catch (Exceptions\FilePointerExistsException $e){
+            // The stream is already open
+        }
+        if ($outfiles !== []) {
+            array_walk($outfiles, function ($outfile) {
+                try {
+                    $outfile->open();
+                } catch (Exceptions\FilePointerExistsException $e){
+                    // The stream is already open
+                }
+                $outfile->writeDataRow(array_keys($this->_fields));
+            });
+        }
         if ($this->_direction === 'VERTICAL') {
             $result = array_fill(0, count($this->_groups)-1, []);
         } else if ($this->_direction === 'BILATERAL'){
@@ -54,7 +67,7 @@ class Split
             $result = [];
             $set = [];
         }
-        while ([] !== ($row = $this->_source->getNextDataRow())) {
+        while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
             switch ($this->_direction) {
                 case 'HORIZONTAL':
                     $set[] = $row;

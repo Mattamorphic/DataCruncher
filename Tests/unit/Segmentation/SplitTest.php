@@ -1,26 +1,59 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
-use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
+use org\bovigo\vfs\vfsStream,
+    org\bovigo\vfs\vfsStreamDirectory;
+
 class SplitTest extends \PHPUnit_Framework_TestCase
 {
+    private $root;
+
+    private $mockSourceCSV;
+    private $mockOutCSV;
+
+    private function _generateMockFile($class_name)
+    {
+        $file = $this->getMockBuilder($class_name)
+        ->setMethods(['fileExists', 'readable', 'writable'])
+        ->getMock();
+        $file->method('readable')->willReturn(true);
+        $file->method('writable')->willReturn(true);
+        $file->method('fileExists')->willReturn(true);
+        return $file;
+    }
+
+    public function setUp() {
+        $this->root = vfsStream::setup('home', 0777);
+        $file = vfsStream::url('home/test', 0777);
+        file_put_contents($file,
+            "email, name, colour, dob, age\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
+            ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
+        );
+        vfsStream::url('home/test_out', 0777);
+        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'r']);
+
+    }
+
+    public function tearDown() {
+        $this->mockSourceCSV = null;
+        $this->mockOutCSV = null;
+    }
     /**
      * @test
     **/
     public function executeSplitWorksCorrectlyHorizontal()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $split = new Split();
 
-        $result = $split->fromSource($sourceFile)
+        $result = $split->fromSource($this->mockSourceCSV)
             ->horizontal(2)
             ->execute();
 
@@ -69,15 +102,8 @@ class SplitTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeSplitWorksCorrectlyVertical()
     {
-        $data = "email, name, colour, dob, age\n"
-        ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-        ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-        ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-        ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
-        $customMocks = new Mocks();
-        $sourceFile = $customMocks->createMockSourceFile($data);
         $split = new Split();
-        $result = $split->fromSource($sourceFile)
+        $result = $split->fromSource($this->mockSourceCSV)
             ->vertical(['email, name', 'email, age'])
             ->execute();
         $expected = [
@@ -136,7 +162,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
     //     ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
     //     ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
     //     $customMocks = new Mocks();
-    //     $sourceFile = $customMocks->createMockSourceFile($data);
+    //     $sourceFile = $customMocks->createMockSourceFile('mfmbarber\Data_Cruncher\Helpers\CSVFile', $data);
     //     $split = new Split();
     //     $result = $split->fromSource($sourceFile)
     //         ->bilateral(['email, name', 'email, age'], 2)
