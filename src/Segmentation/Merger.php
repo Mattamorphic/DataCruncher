@@ -83,7 +83,7 @@ class Merger
             }
         );
         if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element);
+            Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
         $result = [];
         while (count($this->_sources) > 0) {

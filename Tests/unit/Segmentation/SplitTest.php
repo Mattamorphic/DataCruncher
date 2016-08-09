@@ -151,23 +151,4 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             'The vertical split wasn\'t correct'
         );
     }
-    // /**
-    //  * @test
-    // **/
-    // public function executeSplitWorksCorrectlyBilateral()
-    // {
-    //     $data = "email, name, colour, dob, age\n"
-    //     ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-    //     ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-    //     ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-    //     ."no_name@something.com, , \"green\", 01/01/2000, fifteen";
-    //     $customMocks = new Mocks();
-    //     $sourceFile = $customMocks->createMockSourceFile('mfmbarber\Data_Cruncher\Helpers\CSVFile', $data);
-    //     $split = new Split();
-    //     $result = $split->fromSource($sourceFile)
-    //         ->bilateral(['email, name', 'email, age'], 2)
-    //         ->execute();
-    //     print_r($result);
-    //     $this->assertFalse(true);
-    // }
 }

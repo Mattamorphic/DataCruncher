@@ -143,7 +143,7 @@ class Query
         if (!is_int($size)) {
             throw new InvalidArgumentException(
                 'The size provided for the limit must be'
-                .' an integer - provided was : '.gettype($size) 
+                .' an integer - provided was : '.gettype($size)
             );
         }
         $this->_limit = $size;
@@ -162,9 +162,9 @@ class Query
     {
         $result = [];
         $validRowCount = 0;
-        Validation::openDataFile($this->_source);
+        Validation::openDataFile($this->_source, $node_name, $start_element);
         if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element);
+            Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
         while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
