@@ -117,7 +117,16 @@ class Split
         }
         return $result;
     }
-    private function _openOutFiles(&$outfiles)
+    /**
+     * Opens an array of data sources 
+     * @param array     $outfiles       to open (by reference)
+     * @param string    $node_name      are the names of the nodes if the file being opened is xml
+     * @param string    $start_elemnent is the parent element of the data nodes if the file is xml 
+     *
+     * @throws InvalidArgumentException
+     * @return Boolean
+    **/
+    private function _openOutFiles(&$outfiles, $node_name = '', $start_element = '')
     {
         if ($outfiles == []) {
             return false;
@@ -144,7 +153,14 @@ class Split
         }
         return true;
     }
-
+    /**
+     * Set groupings creates an array of arrays, where each array represents a vertical group 
+     * 
+     * @param array     $groupings  Can be an array of comma seperated field names, 
+     *                              or of arrays where each field within represents a field name
+     *
+     * @return array  
+    **/
     private function _setGroupings($groupings)
     {
         $groups = [];
