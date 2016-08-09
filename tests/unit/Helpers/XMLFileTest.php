@@ -99,7 +99,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
     **/
-    public function getNextDataRowWorksCorrectly()
+    public function getNextDataRow()
     {
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
         $this->assertEquals(
@@ -133,7 +133,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      *
      * @return void
      */
-    public function writeDataRowWorksCorrectly()
+    public function writeDataRow()
     {
         $this->mockOutXML->open(false, 'test', 'data');
         $this->mockOutXML->writeDataRow(

@@ -61,7 +61,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @return null
     **/
-    public function executeQueryWorksCorrectly($query_data, $expected)
+    public function executeQuery($query_data, $expected)
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -80,7 +80,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
      **/
-    public function limitQueryWorksCorrectly()
+    public function limitQuery()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -236,7 +236,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
     /**
-     * Data provider for executeContainsWorksCorrectly
+     * Data provider for executeContains
      *
      * @return array
     **/

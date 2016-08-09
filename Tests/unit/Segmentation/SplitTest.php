@@ -186,4 +186,30 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             "Outfile doesn't contain correct data"
         );
     }
+    
+    /**
+     * @test
+    **/
+    public function splittingVerticalWritesLinesToFile()
+    {
+        $split = new Split();
+        $outfiles = [$this->mockOutFiles[0], $this->mockOutFiles[1]];
+        $result = $split->fromSource($this->mockSourceCSV)
+            ->vertical(
+                [
+                    ['email', 'name'],
+                    ['email', 'age']
+                ]
+            )
+            ->execute($outfiles);
+        $this->assertEquals(
+            file_get_contents($outfiles[1]->getSourceName()),
+            "email,age\n"
+            ."mfmbarber@test.com,28\n"
+            ."matt.barber@test.com,35\n"
+            ."tony.stark@avengers.com,25\n"
+            ."no_name@something.com,fifteen\n",
+            "Outfile doesn't contain correct data"
+        );
+    }
 }

@@ -37,7 +37,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      *
      * @return null
      **/
-    public function getSourceNameWorksCorrectly()
+    public function getSourceName()
     {
         $this->assertEquals(
             $this->mockSourceCSV->getSourceName(),

@@ -139,7 +139,7 @@ class Split
         if ($this->_direction === 'HORIZONTAL' && $count !== $this->_size) {
             $error = true;
         }
-        if ($this->_direction === 'VERTICAL' && $count != count($this->_groupings)) {
+        if ($this->_direction === 'VERTICAL' && $count != count($this->_groups)) {
             $error = true;
         }
         if ($error) {
