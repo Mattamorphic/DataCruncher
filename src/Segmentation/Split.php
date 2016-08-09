@@ -74,7 +74,7 @@ class Split
         $ticker = false; // horizontal ticker
 
         Validation::openDataFile($this->_source, $node_name, $start_element);
-        if (!($writeOutFiles = $this->_openOutFiles($outfiles, $node_name, $start_element, true))) {
+        if (($writeOutFiles = $this->_openOutFiles($outfiles, $node_name, $start_element, true))) {
             $result = array_fill(0, count($outfiles), 0);
         }
         if ($this->_direction === 'VERTICAL') {
@@ -136,7 +136,7 @@ class Split
         if ($count <= 1) {
             $error = true;
         }
-        if ($this->_direction === 'HORIZONTAL' && $count !== 2) {
+        if ($this->_direction === 'HORIZONTAL' && $count !== $this->_size) {
             $error = true;
         }
         if ($this->_direction === 'VERTICAL' && $count != count($this->_groupings)) {

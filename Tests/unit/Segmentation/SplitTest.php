@@ -1,55 +1,51 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
+
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
+use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
 
-use org\bovigo\vfs\vfsStream,
-    org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class SplitTest extends \PHPUnit_Framework_TestCase
 {
     private $root;
 
     private $mockSourceCSV;
-    private $mockOutCSV;
+    private $mockOutFiles = [];
 
-    private function _generateMockFile($class_name)
+    public function setUp()
     {
-        $file = $this->getMockBuilder($class_name)
-        ->setMethods(['fileExists', 'readable', 'writable'])
-        ->getMock();
-        $file->method('readable')->willReturn(true);
-        $file->method('writable')->willReturn(true);
-        $file->method('fileExists')->willReturn(true);
-        return $file;
-    }
-
-    public function setUp() {
         $this->root = vfsStream::setup('home', 0777);
         $file = vfsStream::url('home/test', 0777);
-        file_put_contents($file,
+        file_put_contents(
+            $file,
             "email, name, colour, dob, age\n"
             ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
             ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
             ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
-        vfsStream::url('home/test_out', 0777);
-        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockSourceCSV = new CSVFile();
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
-        $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'r']);
-
+        foreach (range(0, 4) as $number) {
+            vfsStream::url("home/test_out_$number", 0777);
+            $outfile = new CSVFile();
+            $outfile->setSource("vfs://home/test_out_$number", ['modifier' => 'w']);
+            $this->mockOutFiles[] = $outfile;
+        }
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         $this->mockSourceCSV = null;
-        $this->mockOutCSV = null;
+        $this->mockOutFiles = [];
     }
     /**
      * @test
     **/
-    public function executeSplitWorksCorrectlyHorizontal()
+    public function executeSplitHorizontal()
     {
         $split = new Split();
 
@@ -100,7 +96,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
     /**
      * @test
     **/
-    public function executeSplitWorksCorrectlyVertical()
+    public function executeSplitVertical()
     {
         $split = new Split();
         $result = $split->fromSource($this->mockSourceCSV)
@@ -149,6 +145,45 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             $result,
             $expected,
             'The vertical split wasn\'t correct'
+        );
+    }
+    /**
+     * @test
+    **/
+    public function splittingHorizontalReturnsRowCountPerFile()
+    {
+        $split = new Split();
+        $outfiles = [$this->mockOutFiles[0], $this->mockOutFiles[1]];
+        $result = $split->fromSource($this->mockSourceCSV)
+            ->horizontal(2)
+            ->execute($outfiles);
+        $this->assertEquals(
+            $result,
+            [
+                0 => 2,
+                1 => 2
+            ],
+            'Expected result not returned'
+        );
+    }
+
+    /**
+     * @test
+    **/
+    public function splittingHorizontalWritesLinesToFile()
+    {
+        $split = new Split();
+        $outfiles = [$this->mockOutFiles[0], $this->mockOutFiles[1]];
+        $result = $split->fromSource($this->mockSourceCSV)
+            ->horizontal(2)
+            ->execute($outfiles);
+        
+        $this->assertEquals(
+            file_get_contents($outfiles[0]->getSourceName()),
+            "email,name,colour,dob,age\n"
+            ."mfmbarber@test.com,matt,\"black, green, blue\",24/11/1987,28\n"
+            ."matt.barber@test.com,matthew,\"red, green\",01/12/1980,35\n",
+            "Outfile doesn't contain correct data"
         );
     }
 }
