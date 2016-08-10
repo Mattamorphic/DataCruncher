@@ -9,7 +9,7 @@ before_script:
     - mkdir build
     
 script: 
-    - phpunit --configuration phpunit.xml --coverage-text --coverage-clover ./build/clover.xml
+    - phpunit --configuration phpunit.xml.dist --coverage-text --coverage-clover ./build/clover.xml -v
 
 after_script: 
     - php vendor/bin/coveralls -v
