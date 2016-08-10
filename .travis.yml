@@ -5,7 +5,6 @@ php:
 
 before_script:
     - composer install
-    - satooshi/php-coveralls:dev-master
     - find . -type f -name *.csv -exec chmod 777 {} +
     - mkdir build
     
