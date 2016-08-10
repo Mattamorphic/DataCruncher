@@ -6,8 +6,8 @@
     bootstrap="vendor/autoload.php"
 >
     <testsuites>
-        <testsuite name="CSV_Cruncher">
-            <directory>tests</directory>
+        <testsuite name="Data_Cruncher">
+            <directory>./tests/**/*.php</directory>
         </testsuite>
     </testsuites>
     <logging>
@@ -19,6 +19,7 @@
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory>./vendor</directory>
             <directory>./tests</directory>
+            <directory>./example</directory>
         </whitelist>
     </filter>
 </phpunit>
