@@ -43,10 +43,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
         $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
         $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
-
     }
 
-    public function tearDown() {
+    public function tearDown()
+    {
         $this->mockSourceCSV = null;
         $this->mockOutCSV = null;
     }
@@ -61,7 +61,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @return null
     **/
-    public function executeQueryWorksCorrectly($query_data, $expected)
+    public function executeQuery($query_data, $expected)
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -75,6 +75,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             $expected,
             $result,
             "Execute did not return the expected results"
+        );
+    }
+    /**
+     * @test
+     **/
+    public function limitQuery()
+    {
+        $query = new Query();
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['email'])
+            ->where('email')
+            ->condition('contains')
+            ->value('test.com')
+            ->limit(1)
+            ->execute();
+
+        $this->assertEquals(
+            count($result),
+            1,
+            'Result returned more than 10'
         );
     }
 
@@ -216,7 +236,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
     /**
-     * Data provider for executeContainsWorksCorrectly
+     * Data provider for executeContains
      *
      * @return array
     **/

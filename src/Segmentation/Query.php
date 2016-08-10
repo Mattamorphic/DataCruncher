@@ -16,22 +16,23 @@ use mfmbarber\Data_Cruncher\Exceptions;
 
 class Query
 {
-    private $_sourceFile = null;
+    private $_source = null;
     private $_fields = [];
     private $_where = '';
     private $_condition = '';
     private $_value = '';
+    private $_limit = -1;
     
     /**
      * Sets the data source for the query
      *
-     * @param DataInterface $sourceFile The data source for the query
+     * @param DataInterface $source The data source for the query
      *
      * @return Query
     **/
-    public function fromSource(DataInterface $sourceFile)
+    public function fromSource(DataInterface $source)
     {
-        $this->_sourceFile = $sourceFile;
+        $this->_source = $source;
         return $this;
     }
     /**
@@ -137,6 +138,17 @@ class Query
         }
         return $this;
     }
+    public function limit($size)
+    {
+        if (!is_int($size)) {
+            throw new InvalidArgumentException(
+                'The size provided for the limit must be'
+                .' an integer - provided was : '.gettype($size)
+            );
+        }
+        $this->_limit = $size;
+        return $this;
+    }
 
     /**
      * Execute the query, returning an array of arrays, where each sub array
@@ -150,11 +162,11 @@ class Query
     {
         $result = [];
         $validRowCount = 0;
-        Validation::openDataFile($this->_sourceFile);
+        Validation::openDataFile($this->_source, $node_name, $start_element);
         if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element);
+            Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
-        while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
+        while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
             $rowValue = trim($row[$this->_where]);
             switch ($this->_condition) {
@@ -199,9 +211,12 @@ class Query
                         array_intersect_key($row, $this->_fields)
                     );
                 }
+                if ($this->_limit > 0 && $validRowCount === $this->_limit) {
+                    break;
+                }
             }
         }
-        $this->_sourceFile->close();
+        $this->_source->close();
         if (null === $outfile) {
             return $result;
         }
@@ -322,5 +337,4 @@ class Query
         }
         return $result;
     }
-
 }
