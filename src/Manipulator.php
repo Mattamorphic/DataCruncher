@@ -36,7 +36,12 @@ class Manipulator
     public function setDataSource($location, array $properties)
     {
         $this->_dataSource->setSource($location, $properties);
-        $this->_query->fromSource($this->_dataSource);
+        if (isset($this->_query)) {
+            $this->_query->fromSource($this->_dataSource);
+        }
+        if (isset($this->_statistics)) {
+            $this->_statistics->fromSource($this->_dataSource);
+        }
     }
 
     /**
@@ -46,7 +51,7 @@ class Manipulator
     **/
     public function getDataSourceLocation()
     {
-        $this->_dataSource->getSourceName();
+        return $this->_dataSource->getSourceName();
     }
 
     /**

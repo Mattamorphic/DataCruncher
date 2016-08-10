@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Exceptions
+namespace mfmbarber\Data_Cruncher\Exceptions;
 
-class AttributeNotSet extends \Exception
+class AttributeNotSetException extends \Exception
 {
 
 }

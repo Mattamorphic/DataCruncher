@@ -47,7 +47,7 @@ class Validation
      *
      * @return bool
     **/
-    public static function isAssociativeArray($arr, $minSize=1)
+    public static function isAssociativeArray($arr, $minSize = 1)
     {
         return self::isArray($arr, $minSize) && (count(array_filter(array_keys($arr), 'is_string')) > 0);
     }
@@ -73,7 +73,7 @@ class Validation
      * @param string $value      The date time value we want to use as the basis
      * @param string $dateFormat The format of our value
      *
-     * @return bool
+     * @return mixed
     **/
     public static function getDateTime($value, $dateFormat)
     {

@@ -83,7 +83,7 @@ class Statistics
     public function groupNumeric($step)
     {
         if (!is_numeric($step) || !is_int($step)) {
-            throw new InvalidArgumentException('Step must be an integer');
+            throw new \InvalidArgumentException('Step must be an integer');
         }
         $this->_option = $step;
         $this->_function = function ($value, $step) {
@@ -145,10 +145,9 @@ class Statistics
         }
         $this->_sourceFile->close();
         if ($outfile !== null) {
-            $outfile->writeDataRow(['key', $this->_type]);
             foreach ($result as $key => $value) {
                 $row = [
-                    'key' => $key,
+                    $this->_field => $key,
                     $this->_type => $value
                 ];
                 $outfile->writeDataRow($row);

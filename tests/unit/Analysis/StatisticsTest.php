@@ -93,6 +93,21 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             "Execute did not return the expected results"
         );
     }
+
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     * @expectedMessage Step must be an integer
+    **/
+    public function executeNumericGroupingThrowsException()
+    {
+        $stats = new Statistics();
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->setField('age')
+            ->groupNumeric('a')
+            ->execute();
+    }
     /**
      * Tests the execution of percentages grouping the values in a field
      * by date
@@ -118,6 +133,25 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             ],
             $result,
             "Execute did not return the expected results"
+        );
+    }
+    /**
+     * @test
+    **/
+    public function executePercentageOutfile()
+    {
+        $stats = new Statistics();
+        $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->setField('dob')
+            ->groupDate('d/m/Y', 'Y')
+            ->execute($this->mockOutCSV);
+        
+
+        $this->assertEquals(
+            file_get_contents($this->mockOutCSV->getSourceName()),
+            "dob,PERCENT\n1987,25\n1980,25\n1990,25\n2000,25\n",
+            file_get_contents($this->mockOutCSV->getSourceName())
         );
     }
 
