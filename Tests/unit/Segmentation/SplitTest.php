@@ -212,4 +212,43 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             "Outfile doesn't contain correct data"
         );
     }
+    /**
+     * @test
+     * @expectedException           InvalidArgumentException
+     * @expectedExceptionMessage    Ensure 2 outputs are provided for vertical split, and x for horizontal split
+    **/
+    public function incorrectAmountOfOutfilesThrowsException()
+    {
+        $split = new Split();
+        $outfiles = [$this->mockOutFiles[0]];
+        $result = $split->fromSource($this->mockSourceCSV)
+            ->horizontal(2)
+            ->execute($outfiles);
+    }
+
+    /**
+     * @test
+     * @expectedException           InvalidArgumentException
+     * @expectedExceptionMessage    Size expected to be an integer
+     **/
+    public function sizeMustBeAnIntegerThrowsException()
+    {
+        $split = new Split();
+        $split->fromSource($this->mockSourceCSV)
+           ->horizontal('a')
+           ->execute();
+    }
+
+    /**
+     * @test
+     * @expectedException           InvalidArgumentException
+     * @expectedExceptionMessage    Ensure 2 outputs are provided for vertical split, and x for horizontal split
+    **/
+    public function amountOfOutfilesMustMatchGroupingsThrowsException()
+    {
+        $split = new Split();
+        $split->fromSource($this->mockSourceCSV)
+            ->vertical([['email', 'name'], ['email', 'age']])
+            ->execute([$this->mockOutFiles[0]]);
+    }
 }

@@ -39,7 +39,10 @@ class Split
     public function horizontal($size)
     {
         $this->_direction = 'HORIZONTAL';
-        $this->_size = $size;
+        if (!is_int($size)) {
+            throw new \InvalidArgumentException("Size expected to be an integer");
+        }
+        $this->_size = (int) $size;
         return $this;
     }
 
@@ -145,7 +148,7 @@ class Split
         if ($error) {
             throw new \InvalidArgumentException(
                 "Ensure 2 outputs are provided for vertical split, and x "
-                ."for horizontal split, where x is the amount of groupings"
+                ."for horizontal split"
             );
         }
         foreach ($outfiles as &$outfile) {
