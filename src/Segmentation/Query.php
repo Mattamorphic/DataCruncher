@@ -1,32 +1,38 @@
 <?php
+/**
+ * Query Processor
+ *
+ * @package Data_Cruncher
+ * @subpackage Segmentation
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
+
 namespace mfmbarber\Data_Cruncher\Segmentation;
+
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
 use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Query
 {
-    private $_sourceFile = null;
+    private $_source = null;
     private $_fields = [];
     private $_where = '';
     private $_condition = '';
     private $_value = '';
-    private $_converter = null;
-
-    public function setConverter(ConverterInterface $converter) {
-        $this->_converter = $converter;
-        return $this;
-    }
+    private $_limit = -1;
+    
     /**
      * Sets the data source for the query
      *
-     * @param DataInterface $sourceFile The data source for the query
+     * @param DataInterface $source The data source for the query
      *
      * @return Query
     **/
-    public function fromSource(DataInterface $sourceFile)
+    public function fromSource(DataInterface $source)
     {
-        $this->_sourceFile = $sourceFile;
+        $this->_source = $source;
         return $this;
     }
     /**
@@ -41,7 +47,8 @@ class Query
         if (!Validation::isNormalArray($fields, 1)) {
             throw new Exceptions\ParameterTypeException(
                 'The parameter type for this method was incorrect, '
-                .'expected a normal array');
+                .'expected a normal array'
+            );
         }
         $this->_fields = array_flip($fields);
         return $this;
@@ -58,7 +65,7 @@ class Query
         $condition = strtoupper($condition);
         if (!Validation::validCondition($condition)) {
             throw new Exceptions\InvalidValueException(
-                "Condition invalid, must be on of : \n"
+                "Condition invalid, must be one of : \n"
                 .implode(",\n", Validation::$conditions)
             );
         }
@@ -78,7 +85,8 @@ class Query
         if (!is_string($field)) {
             throw new Exceptions\ParameterTypeException(
                 'The parameter type for this method was incorrect, '
-                .'expected a string field name');
+                .'expected a string field name'
+            );
         }
         $this->_where = $field;
         if ($dateFormat !== null) {
@@ -125,17 +133,22 @@ class Query
             }
         } elseif (is_numeric($value)) {
             $this->_value = (float) $value;
-        } else{
+        } else {
             $this->_value = $value;
         }
         return $this;
     }
-    //
-    // public function convert($format)
-    // {
-    //     $this->_converter = new Converter($format);
-    // }
-
+    public function limit($size)
+    {
+        if (!is_int($size)) {
+            throw new InvalidArgumentException(
+                'The size provided for the limit must be'
+                .' an integer - provided was : '.gettype($size)
+            );
+        }
+        $this->_limit = $size;
+        return $this;
+    }
 
     /**
      * Execute the query, returning an array of arrays, where each sub array
@@ -145,73 +158,70 @@ class Query
      *
      * @return array
     **/
-    public function execute(DataInterface $outfile = null)
+    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = '')
     {
         $result = [];
         $validRowCount = 0;
-        try {
-            $this->_sourceFile->open();
-        } catch (Exceptions\FilePointerExistsException $e){
-            // The stream is already open
-        }
+        Validation::openDataFile($this->_source, $node_name, $start_element);
         if ($outfile !== null) {
-            try {
-                $outfile->open();
-            } catch (Exceptions\FilePointerExistsException $e){
-                // The stream is already open
-            }
-            $outfile->writeDataRow(array_keys($this->_fields));
+            Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
-        while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
+        while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
             $rowValue = trim($row[$this->_where]);
             switch ($this->_condition) {
-            case 'EQUALS':
-            case 'GREATER':
-            case 'LESS':
-            case 'NOT':
-                $valid = $this->_equality(
-                    $this->_condition, $rowValue, $this->_value
-                );
-                break;
-            case 'AFTER':
-            case 'BEFORE':
-            case 'ON':
-            case 'BETWEEN':
-            case 'NOT_BETWEEN':
-                $valid = $this->_date(
-                    $this->_condition, $rowValue, $this->_value
-                );
-                break;
-            case 'EMPTY':
-            case 'NOT_EMPTY':
-                $valid = $this->_empty($this->_condition, $rowValue);
-                break;
-            case 'CONTAINS':
-                $valid = $this->_contains($rowValue, $this->_value);
-                break;
-            case 'IN':
-                $valid = $this->_in($rowValue, $this->_value);
-                break;
+                case 'EQUALS':
+                case 'GREATER':
+                case 'LESS':
+                case 'NOT':
+                    $valid = $this->_equality(
+                        $this->_condition,
+                        $rowValue,
+                        $this->_value
+                    );
+                    break;
+                case 'AFTER':
+                case 'BEFORE':
+                case 'ON':
+                case 'BETWEEN':
+                case 'NOT_BETWEEN':
+                    $valid = $this->_date(
+                        $this->_condition,
+                        $rowValue,
+                        $this->_value
+                    );
+                    break;
+                case 'EMPTY':
+                case 'NOT_EMPTY':
+                    $valid = $this->_empty($this->_condition, $rowValue);
+                    break;
+                case 'CONTAINS':
+                    $valid = $this->_contains($rowValue, $this->_value);
+                    break;
+                case 'IN':
+                    $valid = $this->_in($rowValue, $this->_value);
+                    break;
             }
             if ($valid) {
                 $validRowCount++;
-                if ($outfile === null) {
+                if (null === $outfile) {
                     $result[] = array_intersect_key($row, $this->_fields);
                 } else {
                     $outfile->writeDataRow(
                         array_intersect_key($row, $this->_fields)
                     );
                 }
+                if ($this->_limit > 0 && $validRowCount === $this->_limit) {
+                    break;
+                }
             }
         }
-        $this->_sourceFile->close();
-        if ($outfile !== null) {
-            $outfile->close();
-            return $validRowCount;
-        } else {
+        $this->_source->close();
+        if (null === $outfile) {
             return $result;
         }
+        $outfile->close();
+        return $validRowCount;
     }
     /**
      * Checks to see if a row value is in query values
@@ -327,5 +337,4 @@ class Query
         }
         return $result;
     }
-
 }

@@ -1,5 +1,15 @@
 <?php
+/**
+ * Validation and Reusable Functions
+ *
+ * @package Data_Cruncher
+ * @subpackage Config
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 namespace mfmbarber\Data_Cruncher\Config;
+
+use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
 
 class Validation
@@ -26,7 +36,7 @@ class Validation
      *
      * @return bool
     **/
-    public static function isNormalArray($arr, $minSize=1)
+    public static function isNormalArray($arr, $minSize = 1)
     {
         return self::isArray($arr, $minSize) && (bool) !count(array_filter(array_keys($arr), 'is_string'));
     }
@@ -45,7 +55,7 @@ class Validation
      *
      *
     **/
-    public static function isArray($arr, $minSize=1)
+    public static function isArray($arr, $minSize = 1)
     {
         return is_array($arr) && (count($arr) >= $minSize);
     }
@@ -80,5 +90,26 @@ class Validation
             $dateObj = \DateTime::createFromFormat($dateFormat, $value);
         }
         return $dateObj;
+    }
+    /**
+     * Given a data file object, open this - by reference
+     *
+     * @param DataInterface &$file          The file to open
+     * @param string        $node_name      The name of the nodes we want to look at
+     * @param string        $start_element  The name of the element that is at the root
+     *
+     * @return void
+     */
+    public static function openDataFile(DataInterface &$file, $node_name = '', $start_element = null, $write = false)
+    {
+        try {
+            if (false !== strpos(get_class($file), 'XMLFile')) {
+                $file->open(!$write, $node_name, $start_element);
+            } else {
+                $file->open();
+            }
+        } catch (Exceptions\FilePointerExistsException $e) {
+            // The stream is already open
+        }
     }
 }

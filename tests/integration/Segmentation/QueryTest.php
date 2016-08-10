@@ -1,10 +1,10 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Integration;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\DataFile as DataFile;
+use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
-    const SMALL_TEST = './Tests/integration/Segmentation/test_small.csv';
+    const SMALL_TEST = './tests/integration/Segmentation/test_small.csv';
 
     /**
      * @test
@@ -12,7 +12,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeSmallTestCorrectly($query_data, $expected)
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->setSource(self::SMALL_TEST, ['modifier' => 'r']);
 
         $query = new Query();
@@ -35,7 +35,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     **/
     public function executeSmallTestDateCorrectly($query_data, $expected)
     {
-        $sourceFile = new DataFile();
+        $sourceFile = new CSVFile();
         $sourceFile->setSource(self::SMALL_TEST, ['modifier' => 'r']);
 
         $query = new Query();

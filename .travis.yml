@@ -6,7 +6,13 @@ php:
 before_script:
     - composer install
     - find . -type f -name *.csv -exec chmod 777 {} +
+    - mkdir build
     
-script: phpunit --configuration phpunit.xml --coverage-text
+script: 
+    - phpunit --configuration phpunit.xml.dist
+
+after_script: 
+    - php vendor/bin/coveralls -v
+
 notifications:
     email: mfmbarber@gmail.com
