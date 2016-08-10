@@ -7,7 +7,7 @@
 >
     <testsuites>
         <testsuite name="Data_Cruncher">
-            <directory>./tests/**/*.php</directory>
+            <directory>./tests/*</directory>
         </testsuite>
     </testsuites>
     <logging>
