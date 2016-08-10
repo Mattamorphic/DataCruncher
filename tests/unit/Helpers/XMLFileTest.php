@@ -88,6 +88,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
+        $this->root = null;
         $this->mockSourceXML = null;
         $this->mockOutXML = null;
     }

@@ -28,6 +28,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        $this->root = null;
         $this->mockSourceCSV = null;
     }
     /**
