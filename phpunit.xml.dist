@@ -4,6 +4,7 @@
     convertWarningsToExceptions="true"
     strict="true"
     bootstrap="vendor/autoload.php"
+    verbose = "true"
 >
     <testsuites>
         <testsuite name="Data_Cruncher">
