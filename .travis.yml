@@ -5,8 +5,15 @@ php:
 
 before_script:
     - composer install
+    - satooshi/php-coveralls:dev-master
     - find . -type f -name *.csv -exec chmod 777 {} +
+    - mkdir build
     
-script: phpunit --configuration phpunit.xml --coverage-text
+script: 
+    - phpunit --configuration phpunit.xml --coverage-text --coverage-clover ./build/clover.xml
+
+after_script: 
+    - php vendor/bin/coveralls -v
+
 notifications:
     email: mfmbarber@gmail.com
