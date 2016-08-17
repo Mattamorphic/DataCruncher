@@ -46,7 +46,9 @@ class CSVFile extends DataFile implements DataInterface
         if ($this->_fp !== null) {
             if ($this->_headers === []) {
                 $this->_headers = array_keys($row);
-                fputcsv($this->_fp, $this->_headers, $this->_delimiter, $this->_encloser);
+                if (false === fputcsv($this->_fp, $this->_headers, $this->_delimiter, $this->_encloser)) {
+                    throw new \RuntimeException("Couldn't write to {$this->getSourceName()}");
+                }
             }
             fputcsv($this->_fp, $row, $this->_delimiter, $this->_encloser);
         } else {
