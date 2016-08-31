@@ -16,7 +16,20 @@ class CSVFile extends DataFile implements DataInterface
     private $_headers = [];
     private $_delimiter = ',';
     private $_encloser = "\"";
-
+    
+    /**
+     * Opens a file at the beginning, reads a line and closes the file
+     * Returns the configured fields
+     * 
+     * @return array
+    **/
+    public function getHeaders()
+    {
+        $this->open();
+        $this->getNextDataRow();
+        $this->close();
+        return $this->_headers;
+    }
     /**
      * Calls the _getcsv method to get the next line, if it
      * exists. The process then creates an a set of key value pairs that

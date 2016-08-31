@@ -15,7 +15,7 @@ use mfmbarber\Data_Cruncher\Exceptions;
 abstract class DataFile
 {
     protected $_modifier = 'r';
-    protected $_fp = null;
+    public $_fp = null;
     protected $_filename = '';
     /**
      * Sets the source  file of the Manipulator object, if valid sets attributes

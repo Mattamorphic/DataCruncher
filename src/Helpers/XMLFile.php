@@ -17,6 +17,24 @@ class XMLFile extends DataFile implements DataInterface
     private $start_element;
     private $_read;
     private $_fields = [];
+
+    /**
+     * Opens a file at the beginning, reads a line and closes the file
+     * Returns the configured fields
+     *
+     * @param string $node_name
+     * @param string $start_element 
+     * 
+     * @return array
+    **/
+    public function getHeaders($node_name, $start_element)
+    {
+        $this->open(true, $node_name, $start_element);
+        $this->getNextDataRow();
+        $this->close();
+        return $this->_fields;
+    }
+
     /**
      * Returns the next row of data from a file, if there are no rows locale_accept_from_http
      * this returns false

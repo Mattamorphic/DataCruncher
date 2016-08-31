@@ -162,10 +162,10 @@ class Query
     {
         $result = [];
         $validRowCount = 0;
-        Validation::openDataFile($this->_source, $node_name, $start_element);
         if ($outfile !== null) {
             Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
+        Validation::openDataFile($this->_source, $node_name, $start_element);
         while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
             $rowValue = trim($row[$this->_where]);
@@ -220,8 +220,20 @@ class Query
         if (null === $outfile) {
             return $result;
         }
-        $outfile->close();
-        return $validRowCount;
+        $class = get_class($outfile);
+        switch ($class) {
+            case 'mfmbarber\Data_Cruncher\Helpers\CSVOutput':
+                $outfile->reset();
+                $result = stream_get_contents($outfile->_fp);
+                $outfile->close();
+                return $result;
+            case 'mfmbarber\Data_Cruncher\Helpers\CSVFile':
+            case 'mfmbarber\Data_Cruncher\Helpers\XMLFile':
+                $outfile->close();
+                return $validRowCount;
+            default:
+                return $result;
+        }
     }
     /**
      * Checks to see if a row value is in query values

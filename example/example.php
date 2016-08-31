@@ -5,12 +5,32 @@ include 'vendor/autoload.php';
 
 use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
 use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
 
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
 
 use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
+
+echo date('H:i:s');
+echo "\n";
+$query = new Query();
+$CSVFile = new CSVFile();
+$CSVFile->setSource('./example/example.csv', []);
+$outfile = new CSVOutput();
+$outfile->setSource('', []);
+
+$result = $query->fromSource($CSVFile)
+    ->select(['name', 'age'])
+    ->where('email')
+    ->condition('CONTAINS')
+    ->value('gmail')
+    ->execute($outfile);
+
+print_r($result);
+echo "\n";
+echo date('H:i:s');
 
 // $manip = new Manipulator(new CSVFile(), new Query());
 // $outFile = new XMLFile();
