@@ -77,8 +77,8 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
             </breakfast_menu>"
         );
         vfsStream::url('/home/test_out', 0777);
-        $this->mockSourceXML = new XMLFile();
-        $this->mockOutXML = new XMLFile();
+        $this->mockSourceXML = new XMLFile('food', 'breakfast_menu');
+        $this->mockOutXML = new XMLFile('food', 'breakfast_menu');
         $this->mockSourceXML->setSource('vfs://home/test', ['modifier' => 'r']);
         $this->mockOutXML->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }

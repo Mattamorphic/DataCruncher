@@ -18,6 +18,12 @@ class XMLFile extends DataFile implements DataInterface
     private $_read;
     private $_fields = [];
 
+    public function __construct($node_name, $start_element)
+    {
+        $this->node_name = $node_name;
+        $this->start_elemeent = $start_element;
+    }
+
     /**
      * Opens a file at the beginning, reads a line and closes the file
      * Returns the configured fields
@@ -27,9 +33,9 @@ class XMLFile extends DataFile implements DataInterface
      * 
      * @return array
     **/
-    public function getHeaders($node_name, $start_element)
+    public function getHeaders()
     {
-        $this->open(true, $node_name, $start_element);
+        $this->open(true, $this->node_name, $this->start_element);
         $this->getNextDataRow();
         $this->close();
         return $this->_fields;
@@ -92,7 +98,6 @@ class XMLFile extends DataFile implements DataInterface
     public function open($read = true, $node_name = null, $start_element = null)
     {
         if ($this->_fp === null) {
-            $this->node_name = $node_name;
             if ($read) {
                 $this->_fp = new \XMLReader();
                 $this->_read = $read;
@@ -103,8 +108,7 @@ class XMLFile extends DataFile implements DataInterface
                 $this->_read = false;
                 $this->_fp->openURI($this->_filename);
                 $this->_fp->startDocument('1.0');
-                if (null !== $start_element) {
-                    $this->start_element = $start_element;
+                if (null !== $this->start_element) {
                     $this->_fp->startElement($start_element);
                 }
             }
