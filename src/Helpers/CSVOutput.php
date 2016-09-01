@@ -35,4 +35,12 @@ class CSVOutput extends CSVFile
             );
         }
     }
+    /**
+     * Returns the type of the source 
+     * @return string
+    **/
+    public function getType()
+    {
+        return 'stream';
+    }
 }

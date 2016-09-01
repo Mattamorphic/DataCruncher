@@ -79,6 +79,16 @@ abstract class DataFile
     {
         return (bool) is_readable($filename);
     }
+
+    /**
+     * Returns the type of the source 
+     * @return string
+    **/
+    public function getType()
+    {
+        return 'file';
+    }
+
     /**
      * Returns the current filename tied to this object
      *

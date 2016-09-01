@@ -220,15 +220,13 @@ class Query
         if (null === $outfile) {
             return $result;
         }
-        $class = get_class($outfile);
-        switch ($class) {
-            case 'mfmbarber\Data_Cruncher\Helpers\CSVOutput':
+        switch ($outfile->getType()) {
+            case 'stream':
                 $outfile->reset();
                 $result = stream_get_contents($outfile->_fp);
                 $outfile->close();
                 return $result;
-            case 'mfmbarber\Data_Cruncher\Helpers\CSVFile':
-            case 'mfmbarber\Data_Cruncher\Helpers\XMLFile':
+            case 'file':
                 $outfile->close();
                 return $validRowCount;
             default:
