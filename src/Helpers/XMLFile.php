@@ -95,7 +95,7 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return void
      */
-    public function open($read = true, $node_name = null, $start_element = null)
+    public function open($read = true)
     {
         if ($this->_fp === null) {
             if ($read) {
@@ -109,7 +109,7 @@ class XMLFile extends DataFile implements DataInterface
                 $this->_fp->openURI($this->_filename);
                 $this->_fp->startDocument('1.0');
                 if (null !== $this->start_element) {
-                    $this->_fp->startElement($start_element);
+                    $this->_fp->startElement($this->start_element);
                 }
             }
         } else {

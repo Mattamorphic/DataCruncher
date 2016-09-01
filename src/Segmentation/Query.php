@@ -158,14 +158,14 @@ class Query
      *
      * @return array
     **/
-    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = '')
+    public function execute(DataInterface $outfile = null)
     {
         $result = [];
         $validRowCount = 0;
         if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element, true);
+            Validation::openDataFile($outfile, true);
         }
-        Validation::openDataFile($this->_source, $node_name, $start_element);
+        Validation::openDataFile($this->_source);
         while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
             $rowValue = trim($row[$this->_where]);

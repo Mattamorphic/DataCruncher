@@ -100,11 +100,11 @@ class Validation
      *
      * @return void
      */
-    public static function openDataFile(DataInterface &$file, $node_name = '', $start_element = null, $write = false)
+    public static function openDataFile(DataInterface &$file, $write = false)
     {
         try {
             if (false !== strpos(get_class($file), 'XMLFile')) {
-                $file->open(!$write, $node_name, $start_element);
+                $file->open(!$write);
             } else {
                 $file->open();
             }
