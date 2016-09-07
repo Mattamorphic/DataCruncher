@@ -9,7 +9,7 @@
  */
 namespace mfmbarber\Data_Cruncher\Config;
 
-use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
 
 class Validation

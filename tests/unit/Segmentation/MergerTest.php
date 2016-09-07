@@ -2,7 +2,7 @@
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
 use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;

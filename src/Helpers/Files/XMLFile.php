@@ -7,9 +7,10 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers\Files;
 
 use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 
 class XMLFile extends DataFile implements DataInterface
 {
