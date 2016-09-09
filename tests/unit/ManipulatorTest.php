@@ -54,7 +54,7 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
-        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\Data_Cruncher\analysis\Statistics');
+        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\Data_Cruncher\Analysis\Statistics');
     }
 
     /**
