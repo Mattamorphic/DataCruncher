@@ -3,7 +3,7 @@ namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;

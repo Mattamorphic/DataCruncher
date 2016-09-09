@@ -11,7 +11,7 @@
 namespace mfmbarber\Data_Cruncher\Segmentation;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Query
@@ -154,11 +154,11 @@ class Query
      * Execute the query, returning an array of arrays, where each sub array
      * is a row of headers and values
      *
-     * @param Helpers\DataInterface $outfile a location to populate with results
-     *
+     * @param Helpers\DataInterface $outfile    a location to populate with results
+     * @param assoc_array           $mappings   ['original' => 'outputheader']
      * @return array
     **/
-    public function execute(DataInterface $outfile = null)
+    public function execute(DataInterface $outfile = null, $mappings = null)
     {
         $result = [];
         $validRowCount = 0;
@@ -204,12 +204,21 @@ class Query
             }
             if ($valid) {
                 $validRowCount++;
+                $row = array_intersect_key($row, $this->_fields);
+                if (null !== $mappings) {
+                    // mappings = ['a' => 'a1', 'b' => 'b1']
+                    // replace the keys in row with the keys in mappings and combine with the values
+                    foreach ($row as $header => $value) {
+                        if (in_array($header, array_keys($mappings))) {
+                            $row[$mappings[$header]] = $value;
+                            unset($row[$header]);
+                        }
+                    }
+                }
                 if (null === $outfile) {
-                    $result[] = array_intersect_key($row, $this->_fields);
+                    $result[] = $row;
                 } else {
-                    $outfile->writeDataRow(
-                        array_intersect_key($row, $this->_fields)
-                    );
+                    $outfile->writeDataRow($row);
                 }
                 if ($this->_limit > 0 && $validRowCount === $this->_limit) {
                     break;

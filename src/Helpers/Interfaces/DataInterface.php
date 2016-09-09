@@ -7,7 +7,7 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers\Interfaces;
 
 interface DataInterface
 {
@@ -15,12 +15,5 @@ interface DataInterface
     public function getSourceName();
     public function getNextDataRow();
     public function writeDataRow(array $row);
-    //public function sendRaw($type, $data);
-    // public function connect();
-    // public function disconnect();
-    // public function restart();
-    // public function open();
-    // public function close();
-    // public function reset();
 
 }

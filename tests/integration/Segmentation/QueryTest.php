@@ -1,7 +1,7 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Integration;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 class QueryTest extends \PHPUnit_Framework_TestCase
 {
     const SMALL_TEST = './tests/integration/Segmentation/test_small.csv';

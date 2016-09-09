@@ -11,7 +11,7 @@
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
 
 use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\XMLFile as XMLFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 

@@ -3,9 +3,11 @@
 // namespace mfmbarber\Example;
 include 'vendor/autoload.php';
 
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
-use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
-use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
+// use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+// use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+// use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
+
+use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
 
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
@@ -16,17 +18,17 @@ use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 echo date('H:i:s');
 echo "\n";
 $query = new Query();
-$CSVFile = new CSVFile();
-$CSVFile->setSource('./example/example.csv', []);
-$outfile = new CSVOutput();
+$file = DataSource::generate('file', 'csv');
+$file->setSource('./example/example.csv', []);
+$outfile = DataSource::generate('system', 'csv');
 $outfile->setSource('', []);
 
-$result = $query->fromSource($CSVFile)
-    ->select(['name', 'age'])
+$result = $query->fromSource($file)
+    ->select(['name', 'job'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile);
+    ->execute($outfile, ['job' => 'occupation']);
 
 print_r($result);
 echo "\n";
