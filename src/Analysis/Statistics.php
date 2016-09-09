@@ -7,7 +7,7 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\analysis;
+namespace mfmbarber\Data_Cruncher\Analysis;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
 use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
@@ -93,6 +93,17 @@ class Statistics
         };
         return $this;
     }
+
+    public function groupRegex($regex)
+    {
+        $this->_option = $regex;
+        $this->_function = function ($value, $regex) {
+            $result = [];
+            preg_match($regex, trim($value), $result, PREG_OFFSET_CAPTURE);
+            return $result[0][0];
+        };
+        return $this;
+    }
     /**
      * Sets the _function private property to be a closure, this closure
      * returns the date grouping given the part of the date to be returned
@@ -121,17 +132,17 @@ class Statistics
      * Execute the statistics calculation given the parameters are set
      * returns an associative array of key value results
      *
-     * @param Helpers\DataInterface $outfile a location to populate with results
+     * @param Helpers\DataInterface $output a location to populate with results
      *
      * @return array
     **/
-    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = null)
+    public function execute(DataInterface $output = null)
     {
         // TODO :: Validation of object vars.
         $result = [];
-        Validation::openDataFile($this->_sourceFile, $node_name, $start_element);
-        if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element);
+        Validation::openDataFile($this->_sourceFile);
+        if ($output !== null) {
+            Validation::openDataFile($output);
         }
         $rowTotal = 0; // count the rows
         while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
@@ -144,15 +155,15 @@ class Statistics
             }
         }
         $this->_sourceFile->close();
-        if ($outfile !== null) {
+        if ($output !== null) {
             foreach ($result as $key => $value) {
                 $row = [
                     $this->_field => $key,
                     $this->_type => $value
                 ];
-                $outfile->writeDataRow($row);
+                $output->writeDataRow($row);
             }
-            $outfile->close();
+            $output->close();
             return true;
         }
         return $result;

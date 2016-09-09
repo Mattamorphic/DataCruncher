@@ -20,11 +20,11 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $file = vfsStream::url('home/test', 0777);
         file_put_contents(
             $file,
-            "email, name, colour, dob, age\n"
-            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-            ."j@something.com, john, \"green\", 01/01/2000, 15"
+            "email, name, colour, dob, age, phone\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28, apple iphone 6\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35, samsung galaxy s6\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25, samsung note 7\n"
+            ."j@something.com, john, \"green\", 01/01/2000, 15, htc m8"
         );
         vfsStream::url('home/test_out', 0777);
         $this->mockSourceCSV = new CSVFile;
@@ -152,6 +152,28 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             file_get_contents($this->mockOutCSV->getSourceName()),
             "dob,PERCENT\n1987,25\n1980,25\n1990,25\n2000,25\n",
             file_get_contents($this->mockOutCSV->getSourceName())
+        );
+    }
+
+    /**
+     * @test
+    **/
+    public function executeRegexTest()
+    {
+        $stats = new Statistics();
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->setField('phone')
+            ->groupRegex('/^([\w\-]+)/i')
+            ->execute();
+        $this->assertEquals(
+            [
+                'apple' => 25,
+                'samsung' => 50,
+                'htc' => 25
+            ],
+            $result,
+            "Execute did not return the expected results"
         );
     }
 
