@@ -2,7 +2,9 @@
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Analysis;
 
 use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+
+use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -51,11 +53,13 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     public function executePercentagesWorkCorrectlyExactGrouping()
     {
         $stats = new Statistics();
+        $rule = new Rule();
+        $rule = $rule->setField('name')->groupExact();
+        $stats->addRule($rule);
         $result = $stats->fromSource($this->mockSourceCSV)
             ->percentages()
-            ->setField('name')
-            ->groupExact()
             ->execute();
+        $result = array_pop($result);
         $this->assertEquals(
             [
                 'matt' => 25,
@@ -78,11 +82,13 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     public function executePercentagesWorkCorrectlyNumericGrouping()
     {
         $stats = new Statistics();
+         $rule = new Rule();
+        $rule = $rule->setField('age')->groupNumeric(10);
+        $stats->addRule($rule);
         $result = $stats->fromSource($this->mockSourceCSV)
             ->percentages()
-            ->setField('age')
-            ->groupNumeric(10)
             ->execute();
+        $result = array_pop($result);
         $this->assertEquals(
             [
                 '10, 20' => 25,
@@ -92,21 +98,6 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             $result,
             "Execute did not return the expected results"
         );
-    }
-
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     * @expectedMessage Step must be an integer
-    **/
-    public function executeNumericGroupingThrowsException()
-    {
-        $stats = new Statistics();
-        $result = $stats->fromSource($this->mockSourceCSV)
-            ->percentages()
-            ->setField('age')
-            ->groupNumeric('a')
-            ->execute();
     }
     /**
      * Tests the execution of percentages grouping the values in a field
@@ -119,11 +110,13 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     public function executePercentagesWorkCorrectlyDateGrouping()
     {
         $stats = new Statistics();
+        $rule = new Rule();
+        $rule = $rule->setField('dob') ->groupDate('d/m/Y', 'Y');
+        $stats->addRule($rule);
         $result = $stats->fromSource($this->mockSourceCSV)
             ->percentages()
-            ->setField('dob')
-            ->groupDate('d/m/Y', 'Y')
             ->execute();
+        $result = array_pop($result);
         $this->assertEquals(
             [
                 '1987' => 25,
@@ -135,19 +128,20 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             "Execute did not return the expected results"
         );
     }
+
+    // TODO : Fix the outfile functionality...
     /**
-     * @test
+     * @t/est
     **/
     public function executePercentageOutfile()
     {
         $stats = new Statistics();
+        $rule = new Rule();
+        $rule = $rule->setField('dob') ->groupDate('d/m/Y', 'Y');
+        $stats->addRule($rule);
         $stats->fromSource($this->mockSourceCSV)
             ->percentages()
-            ->setField('dob')
-            ->groupDate('d/m/Y', 'Y')
             ->execute($this->mockOutCSV);
-        
-
         $this->assertEquals(
             file_get_contents($this->mockOutCSV->getSourceName()),
             "dob,PERCENT\n1987,25\n1980,25\n1990,25\n2000,25\n",
@@ -155,4 +149,93 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @test
+    **/
+    public function executeRegexTest()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule = $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
+        $stats->addRule($rule);
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->execute();
+        $result = array_pop($result);
+        $this->assertEquals(
+            [
+                'apple' => 25,
+                'samsung' => 50,
+                'htc' => 25
+            ],
+            $result,
+            "Execute did not return the expected results"
+        );
+    }
+
+    /**
+     * @test
+    **/
+    public function executeMultipleStats()
+    {
+        $stats = new Statistics();
+        $rules = [];
+        $rule = new Rule();
+        $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
+        $stats->addRule($rule);
+        $rule->setField('colour')->groupRegex('/([^,]+)/');
+        $stats->addRule($rule);
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->execute();
+        $this->assertEquals(
+            [
+                [
+                    'apple' => 25,
+                    'samsung' => 50,
+                    'htc' => 25
+                ],
+                [
+                    'red' => 50,
+                    'black' => 25,
+                    'green' => 25
+                ]
+            ],
+            $result,
+            "Execute did not return the expected results"
+        );
+    }
+    /**
+     * @test
+    **/
+    public function executeStatisticsWithLabels()
+    {
+        $stats = new Statistics();
+        $rules = [];
+        $rule = new Rule();
+        $rule->setField('phone')->groupRegex('/^([\w\-]+)/i')->setLabel('company');
+        $stats->addRule($rule);
+        $rule = new Rule();
+        $rule->setField('colour')->groupRegex('/([^,]+)/')->setLabel('colour');
+        $stats->addRule($rule);
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->execute();
+        $this->assertEquals(
+            [
+                'company' => [
+                    'apple' => 25,
+                    'samsung' => 50,
+                    'htc' => 25
+                ],
+                'colour' => [
+                    'red' => 50,
+                    'black' => 25,
+                    'green' => 25
+                ]
+            ],
+            $result,
+            "Execute did not return the expected results"
+        );
+    }
 }

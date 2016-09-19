@@ -7,7 +7,10 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\analysis;
+declare(strict_types=1);
+namespace mfmbarber\Data_Cruncher\Analysis;
+
+use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
 use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
@@ -16,6 +19,8 @@ use mfmbarber\Data_Cruncher\Exceptions;
 class Statistics
 {
     private $_sourceFile;
+    private $_type;
+    private $_rules = [];
 
     public function __construct()
     {
@@ -29,7 +34,7 @@ class Statistics
      *
      * @return Statistics
      **/
-    public function fromSource(DataInterface $sourceFile)
+    public function fromSource(DataInterface $sourceFile) : Statistics
     {
         $this->_sourceFile = $sourceFile;
         return $this;
@@ -39,84 +44,23 @@ class Statistics
      *
      * @return Statistics
     **/
-    public function percentages()
+    public function percentages() : Statistics
     {
         $this->_type = 'PERCENT';
         return $this;
     }
+
     /**
-     * Sets the field to calculate statistics on
-     *
-     * @param string $field The name of the field to run the statistics on
+     * Adds a rule to the rule stack 
      *
      * @return Statistics
     **/
-    public function setField($field)
+    public function addRule(Rule $rule) : Statistics
     {
-        $this->_field = $field;
+        $this->_rules[] = $rule->get();
         return $this;
     }
-    /**
-     * Sets the _function private property to be a closure, this closure
-     * simply returns the value given. Exact implies the key in the results
-     * will be exact and not a grouping.
-     *
-     * @return Statistics
-    **/
-    public function groupExact()
-    {
-        $this->_function = function ($value, $option) {
-            return $value;
-        };
-        return $this;
-    }
-    /**
-     * Sets the _function private property to be a closure, this closure
-     * returns the numeric grouping given the step for the groups.
-     * So for instance a step of 10, would return 0, 10, if the value given
-     * was 7
-     *
-     * @param integer $step The step between each value in the grouping
-     *
-     * @return Statistics
-    **/
-    public function groupNumeric($step)
-    {
-        if (!is_numeric($step) || !is_int($step)) {
-            throw new \InvalidArgumentException('Step must be an integer');
-        }
-        $this->_option = $step;
-        $this->_function = function ($value, $step) {
-            $lower = ((int) ($value / $step)) * $step;
-            $upper = (((int) ($value / $step)) + 1) * $step;
-            return "$lower, $upper";
-        };
-        return $this;
-    }
-    /**
-     * Sets the _function private property to be a closure, this closure
-     * returns the date grouping given the part of the date to be returned
-     * So for instance, given a returnFormat of 'Y', would return 1987 given
-     * 24/11/1987 and a dataFormat of d/m/Y
-     *
-     * @param string $dataFormat   The format that the data is in in the source
-     * @param string $returnFormat The format to return the data in
-     *
-     * @return Statistics
-    **/
-    public function groupDate($dataFormat, $returnFormat)
-    {
-        $this->_option = $returnFormat;
-        $this->_dataFormat = $dataFormat;
-        $this->_function = function ($value, $format) {
-            $date = Validation::getDateTime($value, $this->_dataFormat);
-            if (!$date) {
-                return false;
-            }
-            return $date->format($format);
-        };
-        return $this;
-    }
+
     /**
      * Execute the statistics calculation given the parameters are set
      * returns an associative array of key value results
@@ -125,43 +69,64 @@ class Statistics
      *
      * @return array
     **/
-    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = null)
+    public function execute(DataInterface $output = null) : array
     {
         // TODO :: Validation of object vars.
-        $result = [];
-        Validation::openDataFile($this->_sourceFile, $node_name, $start_element);
-        if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element);
+        $idx = 0;
+        $keys = [];
+        array_walk(
+            $this->_rules,
+            function (&$rule) use (&$idx, &$keys) {
+                if ($rule['label'] === null) {
+                    $rule['label'] = $idx;
+                    $idx++;
+                }
+                $keys[] = $rule['label'];
+            }
+        );
+        $results = array_fill_keys($keys, []);
+        Validation::openDataFile($this->_sourceFile);
+        if ($output !== null) {
+            Validation::openDataFile($output);
         }
         $rowTotal = 0; // count the rows
         while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
             $rowTotal++;
-            $this->_processRow($result, $row);
+            foreach ($this->_rules as $key => $rule) {
+                $this->processRow($results[$rule['label']], $row, $rule);
+            }
+
+            //$this->processRow($result, $row);
         }
         if ($this->_type == 'PERCENT') {
-            foreach ($result as $key => $value) {
-                $result[$key] = (100 / $rowTotal) * $value;
+            foreach ($results as &$result) {
+                foreach ($result as $key => $value) {
+                    $result[$key] = (100 / $rowTotal) * $value;
+                }
             }
         }
         $this->_sourceFile->close();
-        if ($outfile !== null) {
-            foreach ($result as $key => $value) {
-                $row = [
-                    $this->_field => $key,
-                    $this->_type => $value
-                ];
-                $outfile->writeDataRow($row);
-            }
-            $outfile->close();
-            return true;
+        if ($output !== null) {
+            // foreach ($results as $key => &$result) {
+            //     foreach ($result as $key => $value) {
+            //         $row = [
+            //             $this->_rules[$key]['field'] => $key,
+            //             $this->_type => $value
+            //         ];
+            //         $output->writeDataRow($result);
+            //     }
+            // }
+            // $output->close();
+            // return true;
         }
-        return $result;
+        // if we have a single result - return that
+        return $results;
     }
 
-    private function _processRow(array &$result, array $row)
+    public function processRow(array &$result, array $row, array $rule)
     {
         // invoke the closure assigned to the attribute (our statistics func)
-        $key = $this->_function->__invoke($row[$this->_field], $this->_option);
+        $key = $rule['function']->__invoke($row[$rule['field']], $rule['option']);
         if (false !== $key) {
             if (!array_key_exists($key, $result)) {
                 $result[$key] = 0;
