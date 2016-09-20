@@ -22,11 +22,11 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $file = vfsStream::url('home/test', 0777);
         file_put_contents(
             $file,
-            "email, name, colour, dob, age\n"
-            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
-            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
-            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
-            ."j@something.com, john, \"green\", 01/01/2000, 15"
+            "email, name, colour, dob, age, phone\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28, apple iphone 6\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35, samsung galaxy s6\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25, samsung note 7\n"
+            ."j@something.com, john, \"green\", 01/01/2000, 15, htc m8"
         );
         vfsStream::url('home/test_out', 0777);
         $this->mockSourceCSV = new CSVFile;

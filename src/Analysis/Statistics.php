@@ -13,7 +13,7 @@ namespace mfmbarber\Data_Cruncher\Analysis;
 use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Statistics
@@ -65,7 +65,7 @@ class Statistics
      * Execute the statistics calculation given the parameters are set
      * returns an associative array of key value results
      *
-     * @param Helpers\DataInterface $outfile a location to populate with results
+     * @param Helpers\DataInterface $output a location to populate with results
      *
      * @return array
     **/

@@ -2,9 +2,11 @@
 // namespace mfmbarber\Example;
 include 'vendor/autoload.php';
 
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
-use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
-use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
+// use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+// use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+// use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
+
+use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
 
 use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
 

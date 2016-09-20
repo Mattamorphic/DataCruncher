@@ -8,7 +8,7 @@
  *
  */
 
-namespace mfmbarber\Data_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers\Files;
 
 use mfmbarber\Data_Cruncher\Exceptions;
 
@@ -107,6 +107,7 @@ abstract class DataFile
     {
         if ($this->_fp === null) {
             $this->_fp = fopen($this->_filename, $this->_modifier);
+            return true;
 
         } else {
             throw new Exceptions\FilePointerExistsException(

@@ -7,9 +7,10 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Helpers;
+namespace mfmbarber\Data_Cruncher\Helpers\System;
 
 use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 class CSVOutput extends CSVFile
 {

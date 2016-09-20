@@ -17,7 +17,7 @@ class Manipulator
      * @return Manipulator
     **/
     public function __construct(
-        Helpers\DataInterface $dataSource,
+        Helpers\Interfaces\DataInterface $dataSource,
         Segmentation\Query $query = null,
         Analysis\Statistics $statistics = null
     ) {

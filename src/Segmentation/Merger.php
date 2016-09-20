@@ -11,7 +11,7 @@
 namespace mfmbarber\Data_Cruncher\Segmentation;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Merger

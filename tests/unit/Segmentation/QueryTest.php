@@ -1,7 +1,7 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 use org\bovigo\vfs\vfsStream,
@@ -39,9 +39,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
         vfsStream::url('home/test_out', 0777);
-        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
         $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }
 
