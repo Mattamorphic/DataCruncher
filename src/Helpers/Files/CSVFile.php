@@ -27,6 +27,7 @@ class CSVFile extends DataFile implements DataInterface
     private $_buffer = '';
 
     private $_write_buffer = [];
+    private $_write_buffer_counter = 0;
 
     /**
      * Opens a file at the beginning, reads a line and closes the file
@@ -104,7 +105,7 @@ class CSVFile extends DataFile implements DataInterface
     **/
     public function close()
     {
-        if (count($this->_write_buffer) > 0 && $this->_fp !== null) {
+        if (isset($this->_write_buffer) && $this->_fp !== null) {
             $meta = stream_get_meta_data($this->_fp);
             // todo : check if a or w in mode
             if ($meta['mode'] === 'w') {
@@ -149,11 +150,13 @@ class CSVFile extends DataFile implements DataInterface
     **/
     private function _putCSV(array $row) : bool
     {
-        if (count($this->_write_buffer) >= self::WRITE_BUFFER_LIMIT) {
+        if ($this->_write_buffer_counter >= self::WRITE_BUFFER_LIMIT) {
             $result = fwrite($this->_fp, Validation::arrayToCSV($this->_write_buffer, $this->_delimiter, $this->_encloser));
             $this->_write_buffer = [];
+            $this->_write_buffer_counter = 0;
         } else {
             $this->_write_buffer[] = $row;
+            $this->_write_buffer_counter++;
             $result = true;
         }
         return $result === false ? false : true;
