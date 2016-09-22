@@ -58,7 +58,8 @@ class Merger
      */
     public function execute(DataInterface $outfile = null, $node_name = '', $start_element = null)
     {
-        if (count($this->_sources) === 0) {
+        // if there are no soruces then throw an exception
+        if (!count($this->_sources)) {
             throw new \InvalidArgumentException("Set some sources to merge using class::source");
         }
         array_walk(
@@ -72,25 +73,25 @@ class Merger
              */
             function ($source) use ($node_name, $start_element) {
                 Validation::openDataFile($source, $node_name, $start_element);
-                if (!in_array($this->_field, array_keys($source->getNextDataRow()))) {
-                    throw \InvalidArgumentException(
-                        "The merge field $this->_field field doesn't exist in "
-                        . $source->getSourceName()
-                    );
-                } else {
-                    $source->reset();
-                }
             }
         );
         if ($outfile !== null) {
             Validation::openDataFile($outfile, $node_name, $start_element, true);
         }
         $result = [];
-        while (count($this->_sources) > 0) {
+        while (count($this->_sources)) {
             $analyse = array_shift($this->_sources);
-            while ([] !== ($row = $analyse->getNextDataRow())) {
-                $this->_processRow($result, $row);
+            $row = $analyse->getNextDataRow();
+            if (!isset($row[$this->_field])) {
+                throw \InvalidArgumentException(
+                    "The merge field $this->_field field doesn't exist in "
+                    . $analyse->getSourceName()
+                );
             }
+            do {
+                $this->_processRow($result, $row);
+            } while ([] !== ($row = $analyse->getNextDataRow()));
+            $analyse->reset();
         }
         foreach ($this->_sources as $source) {
             $source->close();
@@ -103,7 +104,7 @@ class Merger
         foreach ($this->_sources as $source) {
             while ([] !== ($merge_row = $source->getNextDataRow())) {
                 if ($row[$this->_field] === $merge_row[$this->_field]) {
-                    $result[] =  array_merge($row, $merge_row);
+                    $result[] = array_merge($row, $merge_row);
                 }
             }
             $source->reset();

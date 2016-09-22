@@ -58,7 +58,6 @@ class MergerTest extends \PHPUnit_Framework_TestCase
             ->fromSource($this->mockMergeCSV)
             ->on('email')
             ->execute();
-
         $expected = [
             [
                 'email' => 'mfmbarber@test.com',

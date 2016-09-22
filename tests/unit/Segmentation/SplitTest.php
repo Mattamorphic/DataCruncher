@@ -178,7 +178,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
         $result = $split->fromSource($this->mockSourceCSV)
             ->horizontal(2)
             ->execute($outfiles);
-        
+
         $this->assertEquals(
             file_get_contents($outfiles[0]->getSourceName()),
             "email,name,colour,dob,age\n"
@@ -187,7 +187,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             "Outfile doesn't contain correct data"
         );
     }
-    
+
     /**
      * @test
     **/

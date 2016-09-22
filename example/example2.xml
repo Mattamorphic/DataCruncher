@@ -1,9 +1,0 @@
-<?xml version='1.0'?>
-<breakfast_menu>
-    <food>
-        <id>0</id>
-        <name>Belgian Waffles</name>
-        <topping>Chocolate Sauce</topping>
-        <rating>5</rating>
-    </food>
-</breakfast_menu>

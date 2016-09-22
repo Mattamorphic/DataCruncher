@@ -8,7 +8,6 @@ include 'vendor/autoload.php';
 
 use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
 
-use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
 
 use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
 use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
@@ -21,19 +20,28 @@ use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 echo date('H:i:s');
 echo "\n";
 $file = DataSource::generate('file', 'csv');
-$file->setSource('./example/example2.csv');
-$stats = new Statistics();
+$file->setSource('./example/2008.csv');
 
-$rule = new Rule();
-$rule->setField('phone')->groupRegex('/^([\w\-]+)/i')->setLabel('phone type');
-$stats->addRule($rule);
-$rule = new Rule();
-$rule->setField('colour')->groupRegex('/([^,]+)/');
-$stats->addRule($rule);
+$outfile = DataSource::generate('file', 'csv');
+$outfile->setSource('./example/outfile2.csv', ['modifier' => 'wb']);
 
-$result = $stats->fromSource($file)
-    ->percentages()
-    ->execute();
+$query = new Query();
+
+$result = $query->fromSource($file)->select(['Year', 'Month', 'DayOfMonth', 'WeatherDelay'])->where('WeatherDelay')->condition('GREATER')->value(0)->execute($outfile);
+
+
+//$stats = new Statistics();
+
+//$rule = new Rule();
+//$rule->setField('phone')->groupRegex('/^([\w\-]+)/i')->setLabel('phone type');
+//$stats->addRule($rule);
+//$rule = new Rule();
+//$rule->setField('colour')->groupRegex('/([^,]+)/');
+//$stats->addRule($rule);
+
+//$result = $stats->fromSource($file)
+//    ->percentages()
+//    ->execute();
 
 print_r($result);
 echo "\n";

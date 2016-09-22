@@ -22,7 +22,7 @@ class Query
     private $_condition = '';
     private $_value = '';
     private $_limit = -1;
-    
+
     /**
      * Sets the data source for the query
      *
@@ -206,10 +206,10 @@ class Query
                 $validRowCount++;
                 $row = array_intersect_key($row, $this->_fields);
                 if (null !== $mappings) {
-                    // mappings = ['a' => 'a1', 'b' => 'b1']
-                    // replace the keys in row with the keys in mappings and combine with the values
                     foreach ($row as $header => $value) {
-                        if (in_array($header, array_keys($mappings))) {
+                        // if the mappings are not equal, then pull out the value we want
+                        // and unset the old value
+                        if ($header !== $mappings[$header]) {
                             $row[$mappings[$header]] = $value;
                             unset($row[$header]);
                         }

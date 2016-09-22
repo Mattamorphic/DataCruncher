@@ -40,6 +40,7 @@ class Rule
         $this->_label = $label;
         return $this;
     }
+
     /**
      * Sets the _function private property to be a closure, this closure
      * simply returns the value given. Exact implies the key in the results
@@ -54,6 +55,7 @@ class Rule
         };
         return $this;
     }
+
     /**
      * Sets the _function private property to be a closure, this closure
      * returns the numeric grouping given the step for the groups.
