@@ -151,4 +151,18 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $sourceFile->writeDataRow(['email' => 'test@test.com']);
     }
 
+    /**
+     * Test that get headers returns an array of headers
+     * @test
+    **/
+    public function headerRetrievalTest()
+    {
+        $headers = $this->mockSourceCSV->getHeaders();
+        $this->assertEquals(
+            ['email', 'name', 'colour', 'dob', 'age'],
+            $headers,
+            'The headers read don\'t match those expected'
+        );
+    }
+
 }
