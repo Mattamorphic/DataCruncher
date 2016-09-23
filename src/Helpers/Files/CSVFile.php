@@ -16,16 +16,20 @@ use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
 
 class CSVFile extends DataFile implements DataInterface
 {
+    // The amount of the file to load into memory in one chunk
     const CHUNK_SIZE = 4096;
+    // The amount of lines to store  in memory before writing to the output 
     const WRITE_BUFFER_LIMIT = 50;
 
     private $_headers = [];
     private $_delimiter = ',';
     private $_encloser = "\"";
 
+    // current chunk and the buffer
     private $_chunk = [];
     private $_buffer = '';
 
+    // current write buffer and the length of the write buffer
     private $_write_buffer = [];
     private $_write_buffer_counter = 0;
 
@@ -150,15 +154,15 @@ class CSVFile extends DataFile implements DataInterface
     **/
     private function _putCSV(array $row) : bool
     {
+        $result = true;
         if ($this->_write_buffer_counter >= self::WRITE_BUFFER_LIMIT) {
-            $result = fwrite($this->_fp, Validation::arrayToCSV($this->_write_buffer, $this->_delimiter, $this->_encloser));
+            $result = (bool) fwrite($this->_fp, Validation::arrayToCSV($this->_write_buffer, $this->_delimiter, $this->_encloser));
             $this->_write_buffer = [];
             $this->_write_buffer_counter = 0;
         } else {
             $this->_write_buffer[] = $row;
-            $this->_write_buffer_counter++;
-            $result = true;
+            ++$this->_write_buffer_counter;
         }
-        return $result === false ? false : true;
+        return $result;
     }
 }

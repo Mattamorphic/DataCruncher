@@ -10,9 +10,9 @@
 declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Analysis\Config;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
-use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
+use mfmbarber\Data_Cruncher\Config\Validation;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
+use mfmbarber\Data_Cruncher\Analysis\Config\Rule;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Rule
@@ -120,6 +120,11 @@ class Rule
         return $this;
     }
 
+    /**
+     * Returns the rule as a structured array 
+     *
+     * @return array
+    **/
     public function get() : array
     {
         return [

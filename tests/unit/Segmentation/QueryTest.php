@@ -155,12 +155,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong data type for the select method, throw error
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
-     * @expectedExceptionMessage The parameter type for this method was incorrect, expected a normal array
+     * @expectedException        TypeError
      *
      * @return null
     **/
-    public function selectThrowsParameterException()
+    public function selectThrowsTypeError()
     {
         $query = new Query();
 
@@ -176,12 +175,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong data type for the where method, throw error
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
-     * @expectedExceptionMessage The parameter type for this method was incorrect, expected a string field name
+     * @expectedException        TypeError
      *
      * @return null
     **/
-    public function whereThrowsParameterException()
+    public function whereThrowsTypeError()
     {
         $query = new Query();
 

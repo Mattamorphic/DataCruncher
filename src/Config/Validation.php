@@ -15,7 +15,7 @@ use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
 
 class Validation
 {
-    public static $conditions = [
+    const CONDITIONS = [
             'EQUALS',
             'GREATER',
             'LESS',
@@ -66,7 +66,7 @@ class Validation
     **/
     public static function validCondition(string $cond) : bool
     {
-        return (in_array($cond, self::$conditions));
+        return (in_array($cond, self::CONDITIONS));
     }
     /**
      * Given a value and a dateFormat, return a DateTime obj

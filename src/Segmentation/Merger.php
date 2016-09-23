@@ -7,11 +7,11 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-
+declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Segmentation;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Config\Validation;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Merger
@@ -25,7 +25,7 @@ class Merger
      *
      * @return this
      */
-    public function fromSource(DataInterface $source)
+    public function fromSource(DataInterface $source) : Merger
     {
         $this->_sources[] = $source;
         return $this;
@@ -39,11 +39,8 @@ class Merger
      *
      * @return this
      */
-    public function on($field)
+    public function on(string $field) : Merger
     {
-        if (!is_string($field)) {
-            throw new InvalidArgumentException("Field to merge on must be a string");
-        }
         $this->_field =  $field;
         return $this;
     }
@@ -56,8 +53,7 @@ class Merger
      *
      * @return mixed
      */
-    public function execute(DataInterface $outfile = null, $node_name = '', $start_element = null)
-    {
+    public function execute(DataInterface $outfile = null) : array {
         // if there are no soruces then throw an exception
         if (!count($this->_sources)) {
             throw new \InvalidArgumentException("Set some sources to merge using class::source");
@@ -71,39 +67,50 @@ class Merger
              * @throws InvalidArgumentException
              * @return void
              */
-            function ($source) use ($node_name, $start_element) {
-                Validation::openDataFile($source, $node_name, $start_element);
+            function ($source) {
+                Validation::openDataFile($source);
             }
         );
         if ($outfile !== null) {
-            Validation::openDataFile($outfile, $node_name, $start_element, true);
+            Validation::openDataFile($outfile, true);
         }
         $result = [];
-        while (count($this->_sources)) {
+        // While there are sources to merge
+        do {
+            // get a source
             $analyse = array_shift($this->_sources);
+            // get the first row and check there's a matching field
             $row = $analyse->getNextDataRow();
             if (!isset($row[$this->_field])) {
-                throw \InvalidArgumentException(
-                    "The merge field $this->_field field doesn't exist in "
-                    . $analyse->getSourceName()
-                );
+                throw \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
             }
+            // if the field is valid, process it 
             do {
                 $this->_processRow($result, $row);
+                // while we have rows to process against
             } while ([] !== ($row = $analyse->getNextDataRow()));
+            // reset the analyses object
             $analyse->reset();
-        }
+        } while (count($this->_sources));
+        // Foreach source, close it
         foreach ($this->_sources as $source) {
             $source->close();
         }
         return $result;
     }
 
+    /**
+     * Processes a row against all lines in a source file 
+    **/
     private function _processRow(array &$result, array $row)
     {
+        // Foreach of the remaining sources
         foreach ($this->_sources as $source) {
+            // While we have lines to merge 
             while ([] !== ($merge_row = $source->getNextDataRow())) {
+                // if they are equal
                 if ($row[$this->_field] === $merge_row[$this->_field]) {
+                    // do your thing
                     $result[] = array_merge($row, $merge_row);
                 }
             }

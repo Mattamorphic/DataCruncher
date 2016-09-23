@@ -7,16 +7,18 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-
+declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Helpers\Files;
 
 use mfmbarber\Data_Cruncher\Exceptions;
 
 abstract class DataFile
 {
+
     protected $_modifier = 'r';
     public $_fp = null;
     protected $_filename = '';
+    
     /**
      * Sets the source  file of the Manipulator object, if valid sets attributes
      *
@@ -25,7 +27,7 @@ abstract class DataFile
      *
      * @return null
     **/
-    public function setSource($filename, array $properties = [])
+    public function setSource(string $filename, array $properties = [])
     {
         if (isset($properties['modifier'])) {
             $this->_modifier = strtolower($properties['modifier']);
@@ -51,9 +53,12 @@ abstract class DataFile
         if (isset($properties['encloser'])) {
             $this->_encloser = $properties['encloser'];
         }
-
     }
-    public function fileExists($filename)
+
+    /**
+     * A local copy of fileExists to allow us to mock this function 
+    **/
+    public function fileExists(string $filename) : bool
     {
         return (bool) file_exists($filename);
     }
@@ -64,7 +69,7 @@ abstract class DataFile
      *
      * @return bool
     **/
-    public function writable($filename)
+    public function writable(string $filename) : bool
     {
         return (bool) is_writable($filename);
     }
@@ -75,7 +80,7 @@ abstract class DataFile
      *
      * @return bool
     **/
-    public function readable($filename)
+    public function readable(string $filename) : bool
     {
         return (bool) is_readable($filename);
     }
@@ -84,7 +89,7 @@ abstract class DataFile
      * Returns the type of the source 
      * @return string
     **/
-    public function getType()
+    public function getType() : string
     {
         return 'file';
     }
@@ -94,7 +99,7 @@ abstract class DataFile
      *
      * @return string
     **/
-    public function getSourceName()
+    public function getSourceName() : string
     {
         return $this->_filename;
     }
@@ -108,7 +113,6 @@ abstract class DataFile
         if ($this->_fp === null) {
             $this->_fp = fopen($this->_filename, $this->_modifier);
             return true;
-
         } else {
             throw new Exceptions\FilePointerExistsException(
                 'A filepointer exists on this object, use class::close to'
