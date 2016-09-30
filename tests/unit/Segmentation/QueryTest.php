@@ -98,6 +98,22 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             'Result returned more than 10'
         );
     }
+    /**
+     * @test
+    **/
+    public function remappingResult()
+    {
+        $query = new Query();
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['email'])
+            ->where('email')
+            ->condition('contains')
+            ->value('test.com')
+            ->limit(1)
+            ->execute(null, ['email' => 'EMAIL ADDRESS']);
+
+        $this->assertTrue(in_array('EMAIL ADDRESS', array_keys($result[0])));
+    }
 
     /**
      * Tests that query (with dates) execution returns the appropriate array
@@ -165,6 +181,25 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         $result = $query->fromSource($this->mockSourceCSV)
             ->select('dob')
+            ->condition('equals')
+            ->where('name')
+            ->value('matt')
+            ->execute();
+    }
+
+    /**
+     * Given the wrong type of array, throw error
+     *
+     * @test
+     * @expectedException         mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
+     *
+     * @return null
+    **/
+    public function selectThrowsParameterTypeException()
+    {
+        $query = new Query();
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['a' => 'b'])
             ->condition('equals')
             ->where('name')
             ->value('matt')
