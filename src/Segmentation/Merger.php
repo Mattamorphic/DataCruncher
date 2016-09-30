@@ -84,7 +84,7 @@ class Merger
             if (!isset($row[$this->_field])) {
                 throw \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
             }
-            // if the field is valid, process it 
+            // if the field is valid, process it
             do {
                 $this->_processRow($result, $row);
                 // while we have rows to process against
@@ -100,7 +100,7 @@ class Merger
     }
 
     /**
-     * Processes a row against all lines in a source file 
+     * Processes a row against all lines in a source file
     **/
     private function _processRow(array &$result, array $row)
     {

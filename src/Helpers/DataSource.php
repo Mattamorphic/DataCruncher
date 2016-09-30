@@ -21,14 +21,14 @@ class DataSource
      * @param string $type      Denotes the contextual type, JSON, CSV, XML
      *
      * @return new Object
-     * 
+     *
     **/
     public static function generate(
         string $format,
         string $type,
         string $node = null,
         string $parent = null
-    ) : DataInterface {
+    ) {
         switch ($format) {
             case 'file':
                 return self::generateFile($type, $node, $parent);
@@ -38,7 +38,7 @@ class DataSource
     }
 
     /**
-     * If the Factory requires a file, this method is used to generate and return this 
+     * If the Factory requires a file, this method is used to generate and return this
      *
      * @return DataInterface
     **/
@@ -46,7 +46,7 @@ class DataSource
         string $type,
         string $node = null,
         string $parent = null
-    ) : DataInterface {
+    ) {
         switch ($type) {
             case 'csv':
                 return new Files\CSVFile();
@@ -54,7 +54,7 @@ class DataSource
                 return new Files\XMLFile($node, $parent);
         }
     }
-    
+
     /**
      * If the Factory requires a system output, this method is used to generate and return this
      *
@@ -64,7 +64,7 @@ class DataSource
         string $type,
         string $node = null,
         string $parent = null
-    ) : DataInterface {
+    ) {
         switch ($type) {
             case 'csv':
                 return new System\CSVOutput();
