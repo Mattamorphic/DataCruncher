@@ -82,7 +82,7 @@ class Merger
             // get the first row and check there's a matching field
             $row = $analyse->getNextDataRow();
             if (!isset($row[$this->_field])) {
-                throw \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
+                throw new \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
             }
             // if the field is valid, process it
             do {
