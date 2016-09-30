@@ -123,6 +123,22 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $sourceFile->close();
     }
     /**
+     * Unit test, If a file pointer hasn't been opened and a close is attempted
+     *
+     * @test
+     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerExistsException
+     * @expectedExceptionMessage A filepointer exists on this object, use class::close to close the current pointer
+     *
+     * @return null
+    **/
+    public function openInvalidFilePointerException()
+    {
+        $csv = new CSVFile();
+        $csv->setSource('vfs://home/test', ['modifier' => 'r']);
+        $csv->open();
+        $csv->open();
+    }
+    /**
      * Unit test, If a file pointer hasn't been opened and a reset is attempted
      *
      * @test
@@ -149,6 +165,20 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     {
         $sourceFile = new CSVFile();
         $sourceFile->writeDataRow(['email' => 'test@test.com']);
+    }
+
+    /**
+     * Test that get headers returns an array of headers
+     * @test
+    **/
+    public function headerRetrievalTest()
+    {
+        $headers = $this->mockSourceCSV->getHeaders();
+        $this->assertEquals(
+            ['email', 'name', 'colour', 'dob', 'age'],
+            $headers,
+            'The headers read don\'t match those expected'
+        );
     }
 
 }

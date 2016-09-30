@@ -71,33 +71,31 @@ class Statistics
     **/
     public function execute(DataInterface $output = null) : array
     {
-        // TODO :: Validation of object vars.
         $idx = 0;
         $keys = [];
+        $rowTotal = 0;
+        // We need to figure out a key for each rule
         array_walk(
             $this->_rules,
             function (&$rule) use (&$idx, &$keys) {
-                if ($rule['label'] === null) {
-                    $rule['label'] = $idx;
-                    $idx++;
-                }
+                $rule['label'] = $rule['label'] ?? $idx++;
                 $keys[] = $rule['label'];
             }
         );
+        // then we need to create a results array, where each element is
+        // based on a rule
         $results = array_fill_keys($keys, []);
         Validation::openDataFile($this->_sourceFile);
         if ($output !== null) {
             Validation::openDataFile($output);
         }
-        $rowTotal = 0; // count the rows
         while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
-            $rowTotal++;
+            ++$rowTotal; //used for percentages
             foreach ($this->_rules as $key => $rule) {
                 $this->processRow($results[$rule['label']], $row, $rule);
             }
-
-            //$this->processRow($result, $row);
         }
+        // For percentages calculate the percentage based on the total rows
         if ($this->_type == 'PERCENT') {
             foreach ($results as &$result) {
                 foreach ($result as $key => $value) {
@@ -116,8 +114,8 @@ class Statistics
             //         $output->writeDataRow($result);
             //     }
             // }
-            // $output->close();
-            // return true;
+            $output->close();
+            return true;
         }
         // if we have a single result - return that
         return $results;
@@ -126,12 +124,12 @@ class Statistics
     public function processRow(array &$result, array $row, array $rule)
     {
         // invoke the closure assigned to the attribute (our statistics func)
-        $key = $rule['function']->__invoke($row[$rule['field']], $rule['option']);
+        $key = $rule['function']($row[$rule['field']], $rule['option']);
         if (false !== $key) {
             if (!array_key_exists($key, $result)) {
                 $result[$key] = 0;
             }
-            $result[$key]++;
+            ++$result[$key];
         }
     }
 }

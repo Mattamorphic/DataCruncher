@@ -7,7 +7,7 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-
+declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Helpers;
 
 use mfmbarber\Data_Cruncher\Helpers\Files;
@@ -21,10 +21,14 @@ class DataSource
      * @param string $type      Denotes the contextual type, JSON, CSV, XML
      *
      * @return new Object
-     * 
+     *
     **/
-    public static function generate($format, $type, $node = null, $parent = null)
-    {
+    public static function generate(
+        string $format,
+        string $type,
+        string $node = null,
+        string $parent = null
+    ) {
         switch ($format) {
             case 'file':
                 return self::generateFile($type, $node, $parent);
@@ -33,8 +37,16 @@ class DataSource
         }
     }
 
-    public static function generateFile($type, $node = null, $parent = null)
-    {
+    /**
+     * If the Factory requires a file, this method is used to generate and return this
+     *
+     * @return DataInterface
+    **/
+    public static function generateFile(
+        string $type,
+        string $node = null,
+        string $parent = null
+    ) {
         switch ($type) {
             case 'csv':
                 return new Files\CSVFile();
@@ -43,8 +55,16 @@ class DataSource
         }
     }
 
-    public static function generateSystemOutput($type, $node = null, $parent = null)
-    {
+    /**
+     * If the Factory requires a system output, this method is used to generate and return this
+     *
+     * @return DataInterface
+    **/
+    public static function generateSystemOutput(
+        string $type,
+        string $node = null,
+        string $parent = null
+    ) {
         switch ($type) {
             case 'csv':
                 return new System\CSVOutput();

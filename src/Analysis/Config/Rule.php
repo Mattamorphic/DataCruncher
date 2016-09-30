@@ -10,9 +10,9 @@
 declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Analysis\Config;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
-use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
+use mfmbarber\Data_Cruncher\Config\Validation;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
+use mfmbarber\Data_Cruncher\Analysis\Config\Rule;
 use mfmbarber\Data_Cruncher\Exceptions;
 
 class Rule
@@ -40,6 +40,7 @@ class Rule
         $this->_label = $label;
         return $this;
     }
+
     /**
      * Sets the _function private property to be a closure, this closure
      * simply returns the value given. Exact implies the key in the results
@@ -54,6 +55,7 @@ class Rule
         };
         return $this;
     }
+
     /**
      * Sets the _function private property to be a closure, this closure
      * returns the numeric grouping given the step for the groups.
@@ -118,6 +120,11 @@ class Rule
         return $this;
     }
 
+    /**
+     * Returns the rule as a structured array 
+     *
+     * @return array
+    **/
     public function get() : array
     {
         return [

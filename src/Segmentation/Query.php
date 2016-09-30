@@ -7,7 +7,7 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-
+declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Segmentation;
 
 use mfmbarber\Data_Cruncher\Config\Validation as Validation;
@@ -22,7 +22,7 @@ class Query
     private $_condition = '';
     private $_value = '';
     private $_limit = -1;
-    
+
     /**
      * Sets the data source for the query
      *
@@ -42,7 +42,7 @@ class Query
      *
      * @return Query
     **/
-    public function select($fields)
+    public function select(array $fields) : Query
     {
         if (!Validation::isNormalArray($fields, 1)) {
             throw new Exceptions\ParameterTypeException(
@@ -60,13 +60,13 @@ class Query
      *
      * @return Query
     **/
-    public function condition($condition)
+    public function condition(string $condition) : Query
     {
         $condition = strtoupper($condition);
         if (!Validation::validCondition($condition)) {
             throw new Exceptions\InvalidValueException(
                 "Condition invalid, must be one of : \n"
-                .implode(",\n", Validation::$conditions)
+                .implode(",\n", Validation::CONDITIONS)
             );
         }
         $this->_condition = $condition;
@@ -80,14 +80,8 @@ class Query
      *
      * @return Query
     **/
-    public function where($field, $dateFormat = null)
+    public function where(string $field, $dateFormat = null) : Query
     {
-        if (!is_string($field)) {
-            throw new Exceptions\ParameterTypeException(
-                'The parameter type for this method was incorrect, '
-                .'expected a string field name'
-            );
-        }
         $this->_where = $field;
         if ($dateFormat !== null) {
             $this->_dateFormat = $dateFormat;
@@ -102,7 +96,7 @@ class Query
      *
      * @return Query
     **/
-    public function value($value, $dateFormat = null)
+    public function value($value, $dateFormat = null) : Query
     {
         $valid = false;
         if ($dateFormat !== null) {
@@ -138,14 +132,15 @@ class Query
         }
         return $this;
     }
-    public function limit($size)
+
+    /**
+     * Limits the amount of results from the query 
+     * @param integer $size     The limit
+     *
+     * @return Query
+    **/
+    public function limit(int $size) : Query
     {
-        if (!is_int($size)) {
-            throw new InvalidArgumentException(
-                'The size provided for the limit must be'
-                .' an integer - provided was : '.gettype($size)
-            );
-        }
         $this->_limit = $size;
         return $this;
     }
@@ -206,10 +201,10 @@ class Query
                 $validRowCount++;
                 $row = array_intersect_key($row, $this->_fields);
                 if (null !== $mappings) {
-                    // mappings = ['a' => 'a1', 'b' => 'b1']
-                    // replace the keys in row with the keys in mappings and combine with the values
                     foreach ($row as $header => $value) {
-                        if (in_array($header, array_keys($mappings))) {
+                        // if the mappings are not equal, then pull out the value we want
+                        // and unset the old value
+                        if ($header !== $mappings[$header]) {
                             $row[$mappings[$header]] = $value;
                             unset($row[$header]);
                         }
@@ -282,9 +277,7 @@ class Query
     private function _equality($operator, $rowValue, $queryValue)
     {
         // if match value is numeric try and cast the rowValue
-        if (is_numeric($queryValue)
-            && (false === ($rowValue = (float) $rowValue))
-        ) {
+        if (is_numeric($queryValue) && (false === ($rowValue = (float) $rowValue))) {
             return false;
         }
         $result = false;
@@ -315,11 +308,7 @@ class Query
     private function _empty($condition, $rowValue)
     {
         $result = $rowValue === '';
-        if ($condition === 'EMPTY') {
-            return $result;
-        } else {
-            return !$result;
-        }
+        return ($condition === 'EMPTY') ? $result : !$result;
     }
     /**
      * Completes a comparison between a query date and a row date
@@ -343,12 +332,10 @@ class Query
                 $result = $dateValue < $queryValue;
                 break;
             case 'BETWEEN':
-                $result = (($dateValue > $queryValue[0])
-                            && ($dateValue < $queryValue[1]));
+                $result = (($dateValue > $queryValue[0]) && ($dateValue < $queryValue[1]));
                 break;
             case 'NOT_BETWEEN':
-                $result = (($dateValue < $queryValue[0])
-                            || ($dateValue > $queryValue[1]));
+                $result = (($dateValue < $queryValue[0]) || ($dateValue > $queryValue[1]));
                 break;
             case 'ON':
                 $result = $dateValue == $queryValue;
