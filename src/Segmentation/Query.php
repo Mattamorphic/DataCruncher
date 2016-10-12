@@ -215,7 +215,7 @@ class Query
                 } else {
                     $outfile->writeDataRow($row);
                 }
-                if ($this->_limit > 0 && $validRowCount === $this->_limit) {
+                if ($this->_limit > 0 && ($validRowCount === $this->_limit)) {
                     break;
                 }
             }
