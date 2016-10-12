@@ -90,9 +90,6 @@ The available decoupled components are
 - Statistics
     - Generate statistics based on an input source.
 
-CSVFile and XMLFile are examples of files that implement DataInterface and DataFile is an abstract class.
-
-
 The primary Front Controller component, if you'd like to use that is the Manipulator object, this currently only allows you to inject the Data source, Query and Statistics during instantiation.
 
 ## Contributing
