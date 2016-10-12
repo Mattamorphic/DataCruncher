@@ -111,7 +111,7 @@ class Merger
                 // if they are equal
                 if ($row[$this->_field] === $merge_row[$this->_field]) {
                     // do your thing
-                    $result[] = array_merge($row, $merge_row);
+                    $result[] = $row + $merge_row;
                 }
             }
             $source->reset();
