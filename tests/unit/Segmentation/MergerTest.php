@@ -2,7 +2,7 @@
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
 use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -58,7 +58,6 @@ class MergerTest extends \PHPUnit_Framework_TestCase
             ->fromSource($this->mockMergeCSV)
             ->on('email')
             ->execute();
-
         $expected = [
             [
                 'email' => 'mfmbarber@test.com',
@@ -82,4 +81,37 @@ class MergerTest extends \PHPUnit_Framework_TestCase
             'Merging didn\'t correctly output'
         );
     }
+
+    /**
+     * Given no sources return an invalid argument exception
+     *
+     * @test
+     * @expectedException        InvalidArgumentException
+     *
+     * @return null
+    **/
+    public function executeWithNoSourcesThrowsException()
+    {
+        $merger = new Merger();
+        $merger->on('email')->execute();
+    }
+
+    /**
+     * Given a field that doesn't exist in the sources
+     * throw an invalid argument exception
+     *
+     * @test
+     * @expectedException        InvalidArgumentException
+     *
+     * @return null
+    **/
+    public function executeWithNonExistentField()
+    {
+        $merger = new Merger();
+        $merger->fromSource($this->mockSourceCSV)
+            ->fromSource($this->mockMergeCSV)
+            ->on('foo')
+            ->execute();
+    }
+
 }

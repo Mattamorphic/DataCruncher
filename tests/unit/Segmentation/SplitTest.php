@@ -3,7 +3,7 @@ namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -178,7 +178,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
         $result = $split->fromSource($this->mockSourceCSV)
             ->horizontal(2)
             ->execute($outfiles);
-        
+
         $this->assertEquals(
             file_get_contents($outfiles[0]->getSourceName()),
             "email,name,colour,dob,age\n"
@@ -187,7 +187,7 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             "Outfile doesn't contain correct data"
         );
     }
-    
+
     /**
      * @test
     **/

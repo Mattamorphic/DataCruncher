@@ -11,7 +11,7 @@
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
 
 use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\XMLFile as XMLFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -77,8 +77,8 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
             </breakfast_menu>"
         );
         vfsStream::url('/home/test_out', 0777);
-        $this->mockSourceXML = new XMLFile();
-        $this->mockOutXML = new XMLFile();
+        $this->mockSourceXML = new XMLFile('food', 'breakfast_menu');
+        $this->mockOutXML = new XMLFile('food', 'breakfast_menu');
         $this->mockSourceXML->setSource('vfs://home/test', ['modifier' => 'r']);
         $this->mockOutXML->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }

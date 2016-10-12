@@ -19,13 +19,14 @@ Using a decoupled component, i.e. the Query object
 <?php 
 // include your autoloader
 include 'vendor/autoload.php';
-// a helper class for my source file (implements DataInterface)
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+// a helper class for generating data sources
+use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
+
 // our query class
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 $query = new Query();
-$file = new CSVFile();
+$file = DataSource::generate('file', 'csv');
 
 /*
  input.csv is a file like...
@@ -34,36 +35,43 @@ $file = new CSVFile();
  tonystart@gmail.com, tony, 35
 */
 $file->setSource('example/input.csv', []);
+
 $result = $query->fromSource($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
     ->execute();
+
+
 // will return an array of associative arrays with each element
 // having name and age as keys, and repective values for records where
 // email contains gmail 
 
 // We can also specify an outfile 
-$outfile = new CSVFile();
+$outfile = DataSource::generate('file', 'csv');
 $outfile->setSource('example/output.csv', ['modifier' => 'w']);
+
 $result = $query->fromSource($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
     ->execute($outfile);
+
 // Which will write the lines to a CSV file 
 
 // Or even 
-$outfile = new XMLFile();
+$outfile = DataSource::generate('file', 'xml');
 $outfile->setSource('example/output.xml', ['modifier' => 'w']);
+
 $result = $query->fromSource($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
     ->execute($outfile, 'person', 'people');
+
 // Which will write the output to an XML file with a parent node of 'people' and each
 // record as a child node of 'person'
 ```
@@ -96,7 +104,17 @@ The primary Front Controller component, if you'd like to use that is the Manipul
 6. Submit a pull request :D
 
 ## History
-10/08/2016 Completed README and finished XML support 
+12/10/2016 
+- Factory DataSources
+- Regex Support
+- Rule abstraction for statistics
+- PHP7 only
+- Chunked read write to increase performance
+- General optimisations
+- Improved test coverage 
+
+10/08/2016 
+- Completed README and finished XML support 
 
 ## Credits
 Get your name here!

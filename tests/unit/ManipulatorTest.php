@@ -5,7 +5,7 @@ use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
 
 use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -54,7 +54,7 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
-        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\Data_Cruncher\analysis\Statistics');
+        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\Data_Cruncher\Analysis\Statistics');
     }
 
     /**

@@ -7,9 +7,11 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Helpers;
+declare(strict_types=1);
+namespace mfmbarber\Data_Cruncher\Helpers\Files;
 
 use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
 
 class XMLFile extends DataFile implements DataInterface
 {
@@ -17,22 +19,44 @@ class XMLFile extends DataFile implements DataInterface
     private $start_element;
     private $_read;
     private $_fields = [];
+
+    public function __construct(string $node_name, string $start_element)
+    {
+        $this->node_name = $node_name;
+        $this->start_elemeent = $start_element;
+    }
+
+    /**
+     * Opens a file at the beginning, reads a line and closes the file
+     * Returns the configured fields
+     *
+     * @param string $node_name
+     * @param string $start_element 
+     * 
+     * @return array
+    **/
+    public function getHeaders() : array
+    {
+        $this->open(true, $this->node_name, $this->start_element);
+        $this->getNextDataRow();
+        $this->close();
+        return $this->_fields;
+    }
+
     /**
      * Returns the next row of data from a file, if there are no rows locale_accept_from_http
      * this returns false
      *
      * @return mixed
      */
-    public function getNextDataRow()
+    public function getNextDataRow() :array
     {
         $row = [];
         while ($this->_fp->name === $this->node_name) {
             $row = $this->_toArray(new \SimpleXMLElement($this->_fp->readOuterXML()));
             break;
         }
-        if ($this->_fields === []) {
-            $this->_fields = array_keys($row);
-        }
+        $this->_fields  = ($this->_fields === []) ? array_keys($row) : $this->_fields;
         $this->_fp->next($this->node_name);
         return $row;
     }
@@ -71,10 +95,9 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return void
      */
-    public function open($read = true, $node_name = null, $start_element = null)
+    public function open(bool $read = true)
     {
         if ($this->_fp === null) {
-            $this->node_name = $node_name;
             if ($read) {
                 $this->_fp = new \XMLReader();
                 $this->_read = $read;
@@ -85,9 +108,8 @@ class XMLFile extends DataFile implements DataInterface
                 $this->_read = false;
                 $this->_fp->openURI($this->_filename);
                 $this->_fp->startDocument('1.0');
-                if (null !== $start_element) {
-                    $this->start_element = $start_element;
-                    $this->_fp->startElement($start_element);
+                if (null !== $this->start_element) {
+                    $this->_fp->startElement($this->start_element);
                 }
             }
         } else {
@@ -145,7 +167,7 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return array
      */
-    private function _toArray($xml, $row = [])
+    private function _toArray($xml, array $row = [])
     {
         // if the data is an object, we get this as an array, else we return the xml
         $data = (is_object($xml)) ? get_object_vars($xml) : $xml;

@@ -1,7 +1,7 @@
 <?php
 namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
 
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 
 use org\bovigo\vfs\vfsStream,
@@ -39,9 +39,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
         vfsStream::url('home/test_out', 0777);
-        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\CSVFile');
+        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
         $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }
 
@@ -97,6 +97,22 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             1,
             'Result returned more than 10'
         );
+    }
+    /**
+     * @test
+    **/
+    public function remappingResult()
+    {
+        $query = new Query();
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['email'])
+            ->where('email')
+            ->condition('contains')
+            ->value('test.com')
+            ->limit(1)
+            ->execute(null, ['email' => 'EMAIL ADDRESS']);
+
+        $this->assertTrue(in_array('EMAIL ADDRESS', array_keys($result[0])));
     }
 
     /**
@@ -155,12 +171,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong data type for the select method, throw error
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
-     * @expectedExceptionMessage The parameter type for this method was incorrect, expected a normal array
+     * @expectedException        TypeError
      *
      * @return null
     **/
-    public function selectThrowsParameterException()
+    public function selectThrowsTypeError()
     {
         $query = new Query();
 
@@ -173,15 +188,33 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Given the wrong data type for the where method, throw error
+     * Given the wrong type of array, throw error
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
-     * @expectedExceptionMessage The parameter type for this method was incorrect, expected a string field name
+     * @expectedException         mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
      *
      * @return null
     **/
-    public function whereThrowsParameterException()
+    public function selectThrowsParameterTypeException()
+    {
+        $query = new Query();
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['a' => 'b'])
+            ->condition('equals')
+            ->where('name')
+            ->value('matt')
+            ->execute();
+    }
+
+    /**
+     * Given the wrong data type for the where method, throw error
+     *
+     * @test
+     * @expectedException        TypeError
+     *
+     * @return null
+    **/
+    public function whereThrowsTypeError()
     {
         $query = new Query();
 

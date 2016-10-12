@@ -7,14 +7,15 @@
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
+declare(strict_types=1);
 namespace mfmbarber\Data_Cruncher\Config;
 
-use mfmbarber\Data_Cruncher\Helpers\DataInterface as DataInterface;
+use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
 
 class Validation
 {
-    public static $conditions = [
+    const CONDITIONS = [
             'EQUALS',
             'GREATER',
             'LESS',
@@ -36,7 +37,7 @@ class Validation
      *
      * @return bool
     **/
-    public static function isNormalArray($arr, $minSize = 1)
+    public static function isNormalArray($arr, int $minSize = 1) : bool
     {
         return self::isArray($arr, $minSize) && (bool) !count(array_filter(array_keys($arr), 'is_string'));
     }
@@ -47,7 +48,7 @@ class Validation
      *
      * @return bool
     **/
-    public static function isAssociativeArray($arr, $minSize = 1)
+    public static function isAssociativeArray($arr, int $minSize = 1) : bool
     {
         return self::isArray($arr, $minSize) && (count(array_filter(array_keys($arr), 'is_string')) > 0);
     }
@@ -55,7 +56,7 @@ class Validation
      *
      *
     **/
-    public static function isArray($arr, $minSize = 1)
+    public static function isArray($arr, int $minSize = 1) : bool
     {
         return is_array($arr) && (count($arr) >= $minSize);
     }
@@ -63,9 +64,9 @@ class Validation
      * Is the given condition a valid condition
      *
     **/
-    public static function validCondition($cond)
+    public static function validCondition(string $cond) : bool
     {
-        return (in_array($cond, self::$conditions));
+        return (in_array($cond, self::CONDITIONS));
     }
     /**
      * Given a value and a dateFormat, return a DateTime obj
@@ -75,15 +76,15 @@ class Validation
      *
      * @return mixed
     **/
-    public static function getDateTime($value, $dateFormat)
+    public static function getDateTime($value, string $dateFormat)
     {
         $dateFormat = trim($dateFormat);
         // If they just need the year then assume from 01/01 of year
         if ($dateFormat === 'Y' || $dateFormat === 'YY' || $dateFormat === 'YYYY') {
             $dateObj = new \DateTime();
-            try {
-                $dateObj->setDate($value, 1, 1);
-            } catch (\Exception $e) {
+            if (is_numeric($value)) {
+                $dateObj->setDate((int) $value, 1, 1);
+            } else {
                 $dateObj = false;
             }
         } else {
@@ -100,16 +101,31 @@ class Validation
      *
      * @return void
      */
-    public static function openDataFile(DataInterface &$file, $node_name = '', $start_element = null, $write = false)
+    public static function openDataFile(DataInterface &$file, bool $write = false)
     {
         try {
             if (false !== strpos(get_class($file), 'XMLFile')) {
-                $file->open(!$write, $node_name, $start_element);
+                $file->open(!$write);
             } else {
                 $file->open();
             }
         } catch (Exceptions\FilePointerExistsException $e) {
             // The stream is already open
         }
+    }
+
+    /**
+     * Converts an array of arrays to a CSV string
+    **/
+    public static function arrayToCSV(array $arr, string $delimiter = ',', string $encloser = '"') : string
+    {
+        $f = fopen('php://temp', 'rw');
+        foreach ($arr as $row) {
+            fputcsv($f, $row, $delimiter, $encloser);
+        }
+        rewind($f);
+        $csv = stream_get_contents($f);
+        fclose($f);
+        return $csv;
     }
 }

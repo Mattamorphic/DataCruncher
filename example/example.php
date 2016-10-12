@@ -1,54 +1,48 @@
 <?php
-//
 // namespace mfmbarber\Example;
 include 'vendor/autoload.php';
 
-use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
-use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+// use mfmbarber\Data_Cruncher\Helpers\CSVFile as CSVFile;
+// use mfmbarber\Data_Cruncher\Helpers\XMLFile as XMLFile;
+// use mfmbarber\Data_Cruncher\Helpers\CSVOutput as CSVOutput;
 
+use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
+
+
+use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
+use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
 use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
 use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
 
 use mfmbarber\Data_Cruncher\Segmentation\Merger as Merger;
 use mfmbarber\Data_Cruncher\Segmentation\Split as Split;
 
-// $manip = new Manipulator(new CSVFile(), new Query());
-// $outFile = new XMLFile();
-// $outFile->setSource('example/output.xml', ['modifier' => 'w']);
+echo date('H:i:s');
+echo "\n";
+$file = DataSource::generate('file', 'csv');
+$file->setSource('./example/2008.csv');
 
-// $manip->setDataSource('example/example.csv', []);
+$outfile = DataSource::generate('file', 'csv');
+$outfile->setSource('./example/outfile2.csv', ['modifier' => 'wb']);
 
-// $res = $manip->query()
-// ->select(['name', 'email', 'age'])
-// ->where('email')
-// ->condition('CONTAINS')
-// ->value('@')
-// ->execute($outFile, 'person', 'people');
+$query = new Query();
 
-// print_r($res);
+$result = $query->fromSource($file)->select(['Year', 'Month', 'DayOfMonth', 'WeatherDelay'])->where('WeatherDelay')->condition('GREATER')->value(0)->execute($outfile);
 
 
-// $merger = new Merger();
-// $source_a = new XMLFile();
-// $source_a->setSource('example/example.xml', []);
-// $source_b = new XMLFile();
-// $source_b->setSource('example/example2.xml', []);
-// $result = $merger->fromSource($source_a)
-//             ->fromSource($source_b)
-//             ->on('name')
-//             ->execute(null, 'food', 'breakfast_menu');
-// print_r($result);
+//$stats = new Statistics();
 
+//$rule = new Rule();
+//$rule->setField('phone')->groupRegex('/^([\w\-]+)/i')->setLabel('phone type');
+//$stats->addRule($rule);
+//$rule = new Rule();
+//$rule->setField('colour')->groupRegex('/([^,]+)/');
+//$stats->addRule($rule);
 
-// $split = new Split();
-// $split_source = new CSVFile();
-// $split_source->setSource('example/example.csv', []);
-// $result = $split->fromSource($split_source)->vertical([['email', 'name'], ['email', 'job']])->execute();
-// print_r($result);
+//$result = $stats->fromSource($file)
+//    ->percentages()
+//    ->execute();
 
-
-// $split = new Split();
-// $split_source = new XMLFile();
-// $split_source->setSource('example/example.xml', []);
-// $result = $split->fromSource($split_source)->vertical([['name', 'price'], ['name', 'description']])->execute([], 'food', 'breakfast_menu');
-// print_r($result);
+print_r($result);
+echo "\n";
+echo date('H:i:s');
