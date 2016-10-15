@@ -1,7 +1,7 @@
 <?php 
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Config;
+namespace mfmbarber\DataCruncher\Tests\Unit\Config;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
+use mfmbarber\DataCruncher\Config\Validation as Validation;
 
 class ValidationTest extends \PHPUnit_Framework_TestCase
 {

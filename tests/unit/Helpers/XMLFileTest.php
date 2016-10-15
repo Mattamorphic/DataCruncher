@@ -2,16 +2,16 @@
 /**
  * XML File Tests
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage tests/unit/Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
+namespace mfmbarber\DataCruncher\Tests\Unit\Helpers;
 
-use mfmbarber\Data_Cruncher\Tests\Mocks as Mocks;
-use mfmbarber\Data_Cruncher\Helpers\Files\XMLFile as XMLFile;
+use mfmbarber\DataCruncher\Tests\Mocks as Mocks;
+use mfmbarber\DataCruncher\Helpers\Files\XMLFile as XMLFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -118,7 +118,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a read is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
@@ -169,7 +169,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a write is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
@@ -182,7 +182,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer has been opened and another open is called
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerExistsException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerExistsException
      * @expectedExceptionMessage A filepointer exists on this object, use class::close to close the current pointer
      *
      * @return null
@@ -217,7 +217,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      */
     public function resetFilePointerOnNullFileThrowsException()
@@ -227,7 +227,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      */
     public function closeFilePointerOnNullFileThrowsException()

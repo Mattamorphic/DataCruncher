@@ -2,17 +2,18 @@
 /**
  * Query Processor
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Segmentation
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Segmentation;
+namespace mfmbarber\DataCruncher\Segmentation;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
-use mfmbarber\Data_Cruncher\Exceptions;
+use Symfony\Component\Stopwatch\Stopwatch;
+use mfmbarber\DataCruncher\Config\Validation as Validation;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
+use mfmbarber\DataCruncher\Exceptions;
 
 class Query
 {
@@ -134,7 +135,7 @@ class Query
     }
 
     /**
-     * Limits the amount of results from the query 
+     * Limits the amount of results from the query
      * @param integer $size     The limit
      *
      * @return Query
@@ -153,14 +154,16 @@ class Query
      * @param assoc_array           $mappings   ['original' => 'outputheader']
      * @return array
     **/
-    public function execute(DataInterface $outfile = null, $mappings = null)
+    public function execute(DataInterface $outfile = null, $mappings = null, bool $timer = false)
     {
+        $stopwatch = new Stopwatch();
         $result = [];
         $validRowCount = 0;
         if ($outfile !== null) {
             Validation::openDataFile($outfile, true);
         }
         Validation::openDataFile($this->_source);
+        ($timer) ? $stopwatch->start('execute') : null;
         while ([] !== ($row = $this->_source->getNextDataRow())) {
             $valid = false;
             $rowValue = trim($row[$this->_where]);
@@ -221,21 +224,32 @@ class Query
             }
         }
         $this->_source->close();
-        if (null === $outfile) {
-            return $result;
+        if (null !== $outfile) {
+            switch ($outfile->getType()) {
+                case 'stream':
+                    $outfile->reset();
+                    $result = stream_get_contents($outfile->_fp);
+                    $outfile->close();
+                    break;
+                case 'file':
+                    $outfile->close();
+                    $result = ['rows' => $validRowCount];
+                    break;
+                default:
+                    break;
+            }
         }
-        switch ($outfile->getType()) {
-            case 'stream':
-                $outfile->reset();
-                $result = stream_get_contents($outfile->_fp);
-                $outfile->close();
-                return $result;
-            case 'file':
-                $outfile->close();
-                return $validRowCount;
-            default:
-                return $result;
+        if ($timer) {
+            $time = $stopwatch->stop('execute');
+            $result = [
+                'data' => $result,
+                'timer' => [
+                    'elapsed' => $time->getDuration(), // milliseconds
+                    'memory' => $time->getMemory() // bytes
+                ]
+            ];
         }
+        return $result;
     }
     /**
      * Checks to see if a row value is in query values

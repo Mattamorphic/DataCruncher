@@ -2,17 +2,17 @@
 /**
  * CSVFile Handler
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Helpers\Files;
+namespace mfmbarber\DataCruncher\Helpers\Files;
 
-use mfmbarber\Data_Cruncher\Exceptions;
-use mfmbarber\Data_Cruncher\Config\Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
+use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Config\Validation;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
 
 class CSVFile extends DataFile implements DataInterface
 {

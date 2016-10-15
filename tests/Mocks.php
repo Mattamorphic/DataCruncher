@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests;
+namespace mfmbarber\DataCruncher\Tests;
 
 class Mocks extends \PHPUnit_Framework_TestCase
 {
@@ -11,7 +11,7 @@ class Mocks extends \PHPUnit_Framework_TestCase
     public function createMockQuery()
     {
         $query = $this->getMockBuilder(
-            'mfmbarber\Data_Cruncher\Segmentation\Query'
+            'mfmbarber\DataCruncher\Segmentation\Query'
         )->setMethods(['execute'])->getMock();
         $query->method('execute')->willReturn(
             [

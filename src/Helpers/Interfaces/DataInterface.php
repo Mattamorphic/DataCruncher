@@ -2,13 +2,13 @@
 /**
  * Interface for all data files
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Helpers\Interfaces;
+namespace mfmbarber\DataCruncher\Helpers\Interfaces;
 
 interface DataInterface
 {

@@ -1,11 +1,11 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests\Unit;
+namespace mfmbarber\DataCruncher\Tests\Unit;
 
-use mfmbarber\Data_Cruncher\Manipulator as Manipulator;
+use mfmbarber\DataCruncher\Manipulator as Manipulator;
 
-use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
-use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Analysis\Statistics as Statistics;
+use mfmbarber\DataCruncher\Segmentation\Query as Query;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -54,7 +54,7 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
-        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\Data_Cruncher\Analysis\Statistics');
+        $this->assertEquals(get_class($manipulator->statistics()), 'mfmbarber\DataCruncher\Analysis\Statistics');
     }
 
     /**
@@ -64,12 +64,12 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
-        $this->assertEquals(get_class($manipulator->query()), 'mfmbarber\Data_Cruncher\Segmentation\Query');
+        $this->assertEquals(get_class($manipulator->query()), 'mfmbarber\DataCruncher\Segmentation\Query');
     }
 
     /**
      * @test
-     * @expectedException mfmbarber\Data_Cruncher\Exceptions\AttributeNotSetException
+     * @expectedException mfmbarber\DataCruncher\Exceptions\AttributeNotSetException
      * @expectedMessage Query object not passed during instantiation
     **/
     public function queryMethodThrowsAttributeNotSet()
@@ -81,7 +81,7 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
 
         /**
      * @test
-     * @expectedException mfmbarber\Data_Cruncher\Exceptions\AttributeNotSetException
+     * @expectedException mfmbarber\DataCruncher\Exceptions\AttributeNotSetException
      * @expectedMessage Query Statistics object not passed during instantiation
     **/
     public function statisticsMethodThrowsAttributeNotSet()

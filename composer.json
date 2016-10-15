@@ -1,4 +1,13 @@
 {
+    "name": "mfmbarber/DataCruncher",
+    "description": "Data Analyser for PHP 7",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matt Barber",
+            "email": "mfmbarber@gmail.com"
+        }
+    ],
     "require-dev": {
         "phpunit/phpunit": "*",
         "mikey179/vfsStream": "*",
@@ -8,13 +17,16 @@
     },
     "autoload": {
         "psr-4": {
-            "mfmbarber\\Data_Cruncher\\": "src/",
+            "mfmbarber\\DataCruncher\\": "src/",
             "mfmbarber\\Example\\": "example/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "mfmbarber\\Data_Cruncher\\Tests\\": "tests/"
+            "mfmbarber\\DataCruncher\\Tests\\": "tests/"
         }
+    },
+    "require": {
+        "symfony/stopwatch": "^3.1"
     }
 }

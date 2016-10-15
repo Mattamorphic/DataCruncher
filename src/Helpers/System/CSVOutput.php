@@ -2,15 +2,15 @@
 /**
  * CSVOutput Handler
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Helpers\System;
+namespace mfmbarber\DataCruncher\Helpers\System;
 
-use mfmbarber\Data_Cruncher\Exceptions;
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
 class CSVOutput extends CSVFile
 {

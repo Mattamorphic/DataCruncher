@@ -1,7 +1,7 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Helpers;
+namespace mfmbarber\DataCruncher\Tests\Unit\Helpers;
 
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
@@ -98,7 +98,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * matching exception with message
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidFileException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidFileException
      * @expectedExceptionMessage FakeFile.csv doesn't exist
      *
      * @return null
@@ -112,7 +112,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
@@ -126,7 +126,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerExistsException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerExistsException
      * @expectedExceptionMessage A filepointer exists on this object, use class::close to close the current pointer
      *
      * @return null
@@ -142,7 +142,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a reset is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
@@ -156,7 +156,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, If a file pointer hasn't been opened and a write is attempted
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\FilePointerInvalidException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null

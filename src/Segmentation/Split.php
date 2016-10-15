@@ -2,16 +2,16 @@
 /**
  * Split Processor
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Segmentation
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
-namespace mfmbarber\Data_Cruncher\Segmentation;
+namespace mfmbarber\DataCruncher\Segmentation;
 
-use mfmbarber\Data_Cruncher\Exceptions as Exceptions;
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
+use mfmbarber\DataCruncher\Exceptions as Exceptions;
+use mfmbarber\DataCruncher\Config\Validation as Validation;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
 
 class Split
 {

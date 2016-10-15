@@ -2,19 +2,20 @@
 /**
  * Statistics Processor
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Analysis
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Analysis;
+namespace mfmbarber\DataCruncher\Analysis;
 
-use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
+use Symfony\Component\Stopwatch\Stopwatch;
+use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
 
-use mfmbarber\Data_Cruncher\Config\Validation as Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
-use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\DataCruncher\Config\Validation as Validation;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
+use mfmbarber\DataCruncher\Exceptions;
 
 class Statistics
 {
@@ -51,7 +52,7 @@ class Statistics
     }
 
     /**
-     * Adds a rule to the rule stack 
+     * Adds a rule to the rule stack
      *
      * @return Statistics
     **/
@@ -69,8 +70,10 @@ class Statistics
      *
      * @return array
     **/
-    public function execute(DataInterface $output = null) : array
+    public function execute(DataInterface $output = null, bool $timer = false) : array
     {
+        // TODO :: Validation of object vars.
+        $stopwatch = new Stopwatch();
         $idx = 0;
         $keys = [];
         $rowTotal = 0;
@@ -89,6 +92,8 @@ class Statistics
         if ($output !== null) {
             Validation::openDataFile($output);
         }
+        $rowTotal = 0; // count the rows
+        ($timer) ? $stopwatch->start('execute') : null;
         while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
             ++$rowTotal; //used for percentages
             foreach ($this->_rules as $key => $rule) {
@@ -118,6 +123,14 @@ class Statistics
             return true;
         }
         // if we have a single result - return that
+        if ($timer) {
+            $time = $stopwatch->stop('execute');
+            $results = ['data' => $results];
+            $results['timer'] = [
+                'elapsed' => $time->getDuration(), // milliseconds
+                'memory' => $time->getMemory() // bytes
+            ];
+        }
         return $results;
     }
 

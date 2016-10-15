@@ -2,16 +2,16 @@
 /**
  * DataSource
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Helpers;
+namespace mfmbarber\DataCruncher\Helpers;
 
-use mfmbarber\Data_Cruncher\Helpers\Files;
-use mfmbarber\Data_Cruncher\Helpers\System;
+use mfmbarber\DataCruncher\Helpers\Files;
+use mfmbarber\DataCruncher\Helpers\System;
 
 class DataSource
 {

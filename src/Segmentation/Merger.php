@@ -2,17 +2,17 @@
 /**
  * Merger Processor
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Segmentation
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Segmentation;
+namespace mfmbarber\DataCruncher\Segmentation;
 
-use mfmbarber\Data_Cruncher\Config\Validation;
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface;
-use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\DataCruncher\Config\Validation;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
+use mfmbarber\DataCruncher\Exceptions;
 
 class Merger
 {
