@@ -14,11 +14,13 @@ use mfmbarber\DataCruncher\Exceptions;
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
 
+use mfmbarber\DataCruncher\Exceptions\InvalidFileException;
+
 class CSVFile extends DataFile implements DataInterface
 {
     // The amount of the file to load into memory in one chunk
     const CHUNK_SIZE = 4096;
-    // The amount of lines to store  in memory before writing to the output 
+    // The amount of lines to store  in memory before writing to the output
     const WRITE_BUFFER_LIMIT = 50;
 
     private $_headers = [];
@@ -33,6 +35,18 @@ class CSVFile extends DataFile implements DataInterface
     private $_write_buffer = [];
     private $_write_buffer_counter = 0;
 
+    public function setSource(string $filename, array $properties = [])
+    {
+        parent::setSource($filename, $properties);
+        if (stripos($this->_modifier, 'r') !== false) {
+            $this->open();
+            $row = $this->getNextDataRow();
+            $this->close();
+            if (!$row) {
+                throw new Exceptions\InvalidFileException("The file provided is not in the correct format");
+            }
+        }
+    }
     /**
      * Opens a file at the beginning, reads a line and closes the file
      * Returns the configured fields
@@ -53,7 +67,7 @@ class CSVFile extends DataFile implements DataInterface
      *
      * @return array
     **/
-    public function getNextDataRow() : array
+    public function getNextDataRow()
     {
         if ([] !== ($line = $this->_getCsv())) {
             // trim all the values in the array of values
@@ -64,7 +78,7 @@ class CSVFile extends DataFile implements DataInterface
                 $this->_headers = $line;
                 return $this->getNextDataRow();
             } else {
-                return array_combine($this->_headers, $line);
+                return @array_combine($this->_headers, $line);
             }
         } else {
             return [];
@@ -95,6 +109,11 @@ class CSVFile extends DataFile implements DataInterface
             );
         }
     }
+    public function open()
+    {
+      $this->_headers = [];
+      parent::open();
+    }
 
     public function reset()
     {
@@ -103,18 +122,24 @@ class CSVFile extends DataFile implements DataInterface
     }
 
     /**
-     * Override the parent DataFile close method, because we're using chunked writing - we don't 
-     * necessarily know if the buffer is empty, so let's just write it to the output stream 
+     * Override the parent DataFile close method, because we're using chunked writing - we don't
+     * necessarily know if the buffer is empty, so let's just write it to the output stream
      *
     **/
     public function close()
     {
-        if (isset($this->_write_buffer) && $this->_fp !== null) {
-            $meta = stream_get_meta_data($this->_fp);
-            // todo : check if a or w in mode
-            if ($meta['mode'] === 'w') {
-                fwrite($this->_fp, Validation::arrayToCSV($this->_write_buffer, $this->_delimiter, $this->_encloser));
-                $this->_write_buffer = [];
+        if ($this->_fp !== null) {
+            if (isset($this->_write_buffer)) {
+                $meta = stream_get_meta_data($this->_fp);
+                // todo : check if a or w in mode
+                if ($meta['mode'] === 'w') {
+                    fwrite($this->_fp, Validation::arrayToCSV($this->_write_buffer, $this->_delimiter, $this->_encloser));
+                    $this->_write_buffer = [];
+                }
+            }
+            if (isset($this->_chunk)) {
+                $this->_chunk = [];
+                $this->_buffer = '';
             }
         }
         parent::close();
@@ -123,7 +148,7 @@ class CSVFile extends DataFile implements DataInterface
     /**
      * _getcsv is a private method that uses the file pointer to get the next line
      * It uses a chunked method where it loads CHUNK_SIZE of string data into memory
-     * This reduces the latency of reading from the file every time we want a line 
+     * This reduces the latency of reading from the file every time we want a line
      *
      * @return array / bool
     **/
@@ -148,7 +173,7 @@ class CSVFile extends DataFile implements DataInterface
     }
 
     /**
-     * _putcvsv is a private method that writes a set of files to the output stream a 
+     * _putcvsv is a private method that writes a set of files to the output stream a
      * chunk at a time, again this reduces latency when writing to the file. A validation
      * method returns an array of csv lines as a single csv string.
     **/

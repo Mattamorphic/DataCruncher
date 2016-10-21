@@ -181,4 +181,31 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Unit test, if a CSV file isn't a CSV file
+     *
+     * @test
+     * @expectedException         mfmbarber\DataCruncher\Exceptions\InvalidFileException
+     * @expectedExceptionMessage  The file provided is not in the correct format
+     *
+     * @return null
+    **/
+    public function invalidCSVFile()
+    {
+        $file = vfsStream::url('home/invalidCSV', 0777);
+        file_put_contents(
+            $file,
+            "This is an information set\n"
+            ."email, name, colour, dob, age\n"
+            ."mfmbarber@test.com, matt, \"black, green, blue\", 24/11/1987, 28\n"
+            ."matt.barber@test.com, matthew, \"red, green\", 01/12/1980, 35\n"
+            ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
+            ."\n\n"
+            ."DPA Rules apply"
+        );
+        $this->mockSourceCSV = new CSVFile();
+        $this->mockSourceCSV->setSource('vfs://home/invalidCSV', ['modifier' => 'r']);
+
+    }
+
 }
