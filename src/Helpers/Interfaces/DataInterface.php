@@ -14,7 +14,7 @@ interface DataInterface
 {
     public function setSource(string $location, array $properties);
     public function getSourceName() : string;
-    public function getNextDataRow() : array;
+    public function getNextDataRow();
     public function writeDataRow(array $row);
 
 }
