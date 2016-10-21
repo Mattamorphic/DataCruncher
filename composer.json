@@ -27,6 +27,7 @@
         }
     },
     "require": {
+         "php": ">=7.0",
         "symfony/stopwatch": "^3.1"
     }
 }
