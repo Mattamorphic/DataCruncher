@@ -53,11 +53,13 @@ class CSVFile extends DataFile implements DataInterface
      *
      * @return array
     **/
-    public function getHeaders() : array
+    public function getHeaders($force = true) : array
     {
-        $this->open();
-        $this->getNextDataRow();
-        $this->close();
+        if ($force || $this->_headers === []) {
+            $this->open();
+            $this->getNextDataRow();
+            $this->close();
+        }
         return $this->_headers;
     }
     /**
@@ -144,6 +146,14 @@ class CSVFile extends DataFile implements DataInterface
         }
         parent::close();
     }
+
+    public function sort($key)
+    {
+        $headers = array_flip($this->getHeaders());
+        $key = (int) $headers[trim($key)] + 1;
+        $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
+        shell_exec($cmd);
+     }
 
     /**
      * _getcsv is a private method that uses the file pointer to get the next line
