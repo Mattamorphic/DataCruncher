@@ -207,5 +207,4 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $this->mockSourceCSV->setSource('vfs://home/invalidCSV', ['modifier' => 'r']);
 
     }
-
 }

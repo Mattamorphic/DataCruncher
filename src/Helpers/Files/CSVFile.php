@@ -53,11 +53,13 @@ class CSVFile extends DataFile implements DataInterface
      *
      * @return array
     **/
-    public function getHeaders() : array
+    public function getHeaders($force = true) : array
     {
-        $this->open();
-        $this->getNextDataRow();
-        $this->close();
+        if ($force || $this->_headers === []) {
+            $this->open();
+            $this->getNextDataRow();
+            $this->close();
+        }
         return $this->_headers;
     }
     /**
@@ -144,6 +146,33 @@ class CSVFile extends DataFile implements DataInterface
         }
         parent::close();
     }
+
+    /**
+      * Sorts a data file using the unix sort command
+      * unfortunately this is not compatible with Windows systems
+      * just *nix
+      *
+      * @param $key   The header to sort by
+      *
+      *
+      * Note: Currently this only supports numeric and string sorting
+      * NOT dates, nor does it operate with multiple enclosed values in a field
+      * As the separator is ','
+      *
+    **/
+    public function sort($key)
+    {
+        if (PHP_SHLIB_SUFFIX === 'dll') {
+            throw new \DomainException("Sorting can only be carried out on a *nix system");
+        }
+        $headers = array_flip($this->getHeaders());
+        $key = (int) $headers[trim($key)] + 1;
+        $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
+        $res = shell_exec($cmd);
+        if ($res !== null) {
+            throw new \Exception("Couldn't execute sort, error : $res");
+        }
+     }
 
     /**
      * _getcsv is a private method that uses the file pointer to get the next line
