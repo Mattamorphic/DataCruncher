@@ -169,7 +169,7 @@ class CSVFile extends DataFile implements DataInterface
         $key = (int) $headers[trim($key)] + 1;
         $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
         $res = shell_exec($cmd);
-        if ($res !== '') {
+        if ($res !== null) {
             throw new \Exception("Couldn't execute sort, error : $res");
         }
      }
