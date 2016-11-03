@@ -13,7 +13,8 @@
         "mikey179/vfsStream": "*",
         "mockery/mockery": "^0.9.4",
         "squizlabs/php_codesniffer": "^2.3",
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "dev-master",
+        "johnkary/phpunit-speedtrap": "^1.0"
     },
     "autoload": {
         "psr-4": {

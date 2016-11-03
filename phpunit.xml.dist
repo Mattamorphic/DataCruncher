@@ -11,7 +11,7 @@
 	        <directory suffix='.php'>./tests/unit</directory>
         </testsuite>
 	    <testsuite name="integration">
-    		<directory suffix='.php'>./tests/integration</directory>	
+    		<directory suffix='.php'>./tests/integration</directory>
     	</testsuite>
        	<testsuite name="functional">
     		<directory suffix='.php'>./tests/functional</directory>
@@ -26,4 +26,7 @@
             <directory suffix=".php">./src</directory>
         </whitelist>
     </filter>
+    <listeners>
+        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" />
+    </listeners>
 </phpunit>
