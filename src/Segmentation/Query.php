@@ -18,6 +18,7 @@ use mfmbarber\DataCruncher\Exceptions;
 class Query
 {
     private $_source = null;
+    private $_isdb = false;
     private $_fields = [];
     private $_where = '';
     private $_condition = '';
@@ -34,6 +35,9 @@ class Query
     public function fromSource(DataInterface $source)
     {
         $this->_source = $source;
+        if (get_class($source) === 'mfmbarber\DataCruncher\Helpers\Databases\Database') {
+            $this->_isdb = true;
+        }
         return $this;
     }
     /**
@@ -164,41 +168,50 @@ class Query
         }
         Validation::openDataFile($this->_source);
         ($timer) ? $stopwatch->start('execute') : null;
+        // if this will be executed on a DB, then fire it off
+        if ($this->_isdb) {
+            $this->_source->query($this->_fields, $this->_where, $this->_condition, $this->_value);
+        }
         while ([] !== ($row = $this->_source->getNextDataRow())) {
-            $valid = false;
-            $rowValue = trim($row[$this->_where]);
-            switch ($this->_condition) {
-                case 'EQUALS':
-                case 'GREATER':
-                case 'LESS':
-                case 'NOT':
-                    $valid = $this->_equality(
-                        $this->_condition,
-                        $rowValue,
-                        $this->_value
-                    );
-                    break;
-                case 'AFTER':
-                case 'BEFORE':
-                case 'ON':
-                case 'BETWEEN':
-                case 'NOT_BETWEEN':
-                    $valid = $this->_date(
-                        $this->_condition,
-                        $rowValue,
-                        $this->_value
-                    );
-                    break;
-                case 'EMPTY':
-                case 'NOT_EMPTY':
-                    $valid = $this->_empty($this->_condition, $rowValue);
-                    break;
-                case 'CONTAINS':
-                    $valid = $this->_contains($rowValue, $this->_value);
-                    break;
-                case 'IN':
-                    $valid = $this->_in($rowValue, $this->_value);
-                    break;
+            // If this is executed on a DB it will only contain valid results
+            if ($this->_isdb) {
+                $valid = true;
+            } else {
+                $valid = false;
+                $rowValue = trim($row[$this->_where]);
+                switch ($this->_condition) {
+                    case 'EQUALS':
+                    case 'GREATER':
+                    case 'LESS':
+                    case 'NOT':
+                        $valid = $this->_equality(
+                            $this->_condition,
+                            $rowValue,
+                            $this->_value
+                        );
+                        break;
+                    case 'AFTER':
+                    case 'BEFORE':
+                    case 'ON':
+                    case 'BETWEEN':
+                    case 'NOT_BETWEEN':
+                        $valid = $this->_date(
+                            $this->_condition,
+                            $rowValue,
+                            $this->_value
+                        );
+                        break;
+                    case 'EMPTY':
+                    case 'NOT_EMPTY':
+                        $valid = $this->_empty($this->_condition, $rowValue);
+                        break;
+                    case 'CONTAINS':
+                        $valid = $this->_contains($rowValue, $this->_value);
+                        break;
+                    case 'IN':
+                        $valid = $this->_in($rowValue, $this->_value);
+                        break;
+                }
             }
             if ($valid) {
                 $validRowCount++;

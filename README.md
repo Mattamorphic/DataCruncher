@@ -6,7 +6,7 @@ DataCruncher is a PHP library allowing XML and CSV files (currently) to be queri
 This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will
 require loading the array into memory and blarg.
 
-This has been designed with both a Front Controller pattern giving you access to a Manuiplator object as well as a set of Decoupled self contained components
+This has been designed with both a Front Controller pattern giving you access to a Manipulator object as well as a set of Decoupled self contained components
 
 
 ## Installation
@@ -94,6 +94,9 @@ The available decoupled components are
 
 - Statistics
     - Generate statistics based on an input source.
+
+- DataSources
+    - An interface for CSV and XML files, CSV files support sorting if running on a nix platform through sort method. 
 
 The primary Front Controller component, if you'd like to use that is the Manipulator object, this currently only allows you to inject the Data source, Query and Statistics during instantiation.
 
