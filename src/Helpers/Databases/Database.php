@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract Database Handler (shared methods)
+ * Database Handler
  *
  * @package DataCruncher
  * @subpackage Helpers
@@ -53,19 +53,24 @@ class Database implements DataInterface
         $type = $properties['type'] ?? 'mysql';
         $host = $properties['host'] ?? 'localhost';
         $this->setDSN($type, $db, $host);
-
-        if (!isset($properties['username'])) {
-            throw new \Exception('A username key must be passed in the properties array');
-        }
-        if (!isset($properties['password'])) {
-            throw new \Exception('A password key must be passed in the properties array');
-        }
+        // This will always hold true - we can't assert this
         if (!isset($properties['table'])) {
             throw new \Exception('A table key must be passed in the properties array');
         }
+        // Maybe the user doesn't have any credentials protection - potential on local
+        // So let's assert, and flag this up - and if the assertions are switched off
+        // let's use null coalscale.
+        assert(
+            isset($properties['username']) && is_string($properties['username']),
+            "The key username must be set in the properties array to a string '' is valid"
+        );
+        assert(
+            isset($properties['password']) && is_string($properties['password']),
+            "The key password must be set in the properties array to a string '' is valid"
+        );
 
-        $this->_username = $properties['username'];
-        $this->_password = $properties['password'];
+        $this->_username = $properties['username'] ?? '';
+        $this->_password = $properties['password'] ?? '';
 
         $this->setTable($properties['table']);
     }
@@ -124,6 +129,8 @@ class Database implements DataInterface
                     "Couldn't establish connection using {$this->_dsn} is the server running?"
                 );
             }
+        } else {
+            throw new \PDOException("Connection is already active");
         }
 
     }
@@ -135,7 +142,11 @@ class Database implements DataInterface
     **/
     public function close()
     {
-        $this->_connection = null;
+        if ($this->_connection !== null) {
+            $this->_connection = null;
+        } else {
+            throw new \PDOException("No connection active");
+        }
     }
 
     /**
@@ -157,8 +168,9 @@ class Database implements DataInterface
             $condition = self::CONDITIONS[$condition];
             switch ($condition) {
                 case 'LIKE':
-                    $value = "%$value%";
+                    $value = "%:value%";
                 break;
+                // TODO Fix this
                 case 'IN':
                     $value = '('. implode(',', $value) .')';
                 break;
@@ -193,22 +205,34 @@ class Database implements DataInterface
             return [];
         }
     }
+
+    /**
+     * Insert a data row into the target table
+     *
+     * @param array $row
+    **/
     public function writeDataRow(array $row)
     {
-        // TODO Sanitize your inputs - bobby drop tables
-        $subs = array_map(function($item) {
-            return ":$item";
-        }, array_keys($row));
+        // Create an array of substitutions
+        $subs = array_map(
+            function($item) {
+                return ":$item";
+            },
+            array_keys($row)
+        );
+        // Create the prepared insert phrase
         $sql = "INSERT INTO {$this->_table} (" .
             implode(', ', array_keys($row)) .
         ") VALUES (" .
             implode(', ', $subs) .
         ")";
         $insert = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        // execute combining our values with our substitutions
+        // If this fails it'll through an SQL exception
         $insert->execute(array_combine($subs, array_values($row)));
-        // something more substantial?
         return true;
     }
+    
     /**
      * Sets the DSN for the PDO object held in connection
      * @param string    $type   The DB type, i.e. mysql
