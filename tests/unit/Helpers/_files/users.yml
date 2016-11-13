@@ -1,0 +1,31 @@
+users:
+    -
+        id: 1
+        name: "matt"
+        email: "mfmbarber@gmail.com"
+        colour: "red"
+        age: 29
+    -
+        id: 2
+        name: "laura"
+        email: "flipflopflaura@gmail.com"
+        colour: "green"
+        age: 27
+    -
+        id: 3
+        name: "ryan"
+        email: "darkstar@yahoo.com"
+        colour: "black"
+        age: 25
+    -
+        id: 4
+        name: "ann"
+        email: "annbond@msn.com"
+        colour: "green"
+        age: 60
+    -
+        id: 5
+        name: "mark"
+        email: "mightymark@live.com"
+        colour: "brown"
+        age: 35

@@ -94,9 +94,14 @@ class Database implements DataInterface
     public function getHeaders(bool $force = true) : array
     {
         if ($force || $this->_headers === []) {
-            $desc = $this->_connection->prepare("DESCRIBE {$this->_table}");
+            // TODO : fix and stuff
+            // You wouldn't be using this on an empty table - so 'fuck it'
+            // there isn't a cross compliant way of handling this across SQLLITE
+            // mysql and postgres - I should probably write a wrapper or something
+            $sql = "SELECT * FROM {$this->_table} LIMIT 1";
+            $desc = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
             $desc->execute();
-            $this->_headers = $desc->fetchAll(\PDO::FETCH_COLUMN);
+            $this->_headers = array_keys($desc->fetch(\PDO::FETCH_ASSOC));
         }
         return $this->_headers;
     }
@@ -104,14 +109,21 @@ class Database implements DataInterface
     /**
      * Create a DB connection and store it in the state of the object using PDO
      *
+     * @param bool  $reconnect  Optionally force a reconnection if the connection is already open
+     *                          i.e. changing DSN then reconnecting
+     *
      * @return null
     **/
-    public function open()
+    public function open(bool $reconnect = false)
     {
-        try {
-            $this->_connection = new \PDO($this->_dsn, $this->_username, $this->_password);
-        } catch (\PDOException $e) {
-            // TODO Throw a kinder exception
+        if ($this->_connection === null || $reconnect) {
+            try {
+                $this->_connection = new \PDO($this->_dsn, $this->_username, $this->_password);
+            } catch (\PDOException $e) {
+                throw new \PDOException(
+                    "Couldn't establish connection using {$this->_dsn} is the server running?"
+                );
+            }
         }
 
     }
@@ -137,21 +149,24 @@ class Database implements DataInterface
      *
      * @return null
     **/
-    public function query($fields, $where, $condition, $value)
+    public function query($fields, $where = null, $condition = null, $value = null)
     {
+        $sql = 'SELECT ' . implode(', ', array_keys($fields)) . " FROM {$this->_table}";
         // TODO a fuck tonne of parsing of where  condition and value based on constant CONDITIOND
-        $condition = self::CONDITIONS[$condition];
-        switch ($condition) {
-            case 'LIKE':
-                $value = "%$value%";
-            break;
-            case 'IN':
-                $value = '('. implode(',', $value) .')';
-            break;
+        if (isset($where)) {
+            $condition = self::CONDITIONS[$condition];
+            switch ($condition) {
+                case 'LIKE':
+                    $value = "%$value%";
+                break;
+                case 'IN':
+                    $value = '('. implode(',', $value) .')';
+                break;
+            }
+            $sql .= " WHERE $where $condition :value";
         }
-        $sql = 'SELECT ' . implode(', ', array_keys($fields)) . " FROM {$this->_table} WHERE $where $condition :value";
         $this->_query = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
-        $this->_query->execute([':value' => $value]);
+        $this->_query->execute((isset($where)) ? [':value' => $value] : null);
 
     }
 
@@ -162,10 +177,7 @@ class Database implements DataInterface
     **/
     public function getSourceName() : string
     {
-        if ($this->_connection === null) {
-            return null;
-        }
-        return '';
+        return $this->_dsn;
     }
 
     /**
@@ -183,8 +195,19 @@ class Database implements DataInterface
     }
     public function writeDataRow(array $row)
     {
-        // insert into
-
+        // TODO Sanitize your inputs - bobby drop tables
+        $subs = array_map(function($item) {
+            return ":$item";
+        }, array_keys($row));
+        $sql = "INSERT INTO {$this->_table} (" .
+            implode(', ', array_keys($row)) .
+        ") VALUES (" .
+            implode(', ', $subs) .
+        ")";
+        $insert = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $insert->execute(array_combine($subs, array_values($row)));
+        // something more substantial?
+        return true;
     }
     /**
      * Sets the DSN for the PDO object held in connection
