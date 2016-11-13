@@ -2,16 +2,16 @@
 /**
  * Validation and Reusable Functions
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Config
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Config;
+namespace mfmbarber\DataCruncher\Config;
 
-use mfmbarber\Data_Cruncher\Helpers\Interfaces\DataInterface as DataInterface;
-use mfmbarber\Data_Cruncher\Exceptions as CSV_Exceptions;
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
+use mfmbarber\DataCruncher\Exceptions as CSV_Exceptions;
 
 class Validation
 {

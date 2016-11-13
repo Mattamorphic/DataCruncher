@@ -2,15 +2,15 @@
 /**
  * Abstract Data File Handler (shared methods)
  *
- * @package Data_Cruncher
+ * @package DataCruncher
  * @subpackage Helpers
  * @author matt barber <mfmbarber@gmail.com>
  *
  */
 declare(strict_types=1);
-namespace mfmbarber\Data_Cruncher\Helpers\Files;
+namespace mfmbarber\DataCruncher\Helpers\Files;
 
-use mfmbarber\Data_Cruncher\Exceptions;
+use mfmbarber\DataCruncher\Exceptions;
 
 abstract class DataFile
 {
@@ -18,7 +18,7 @@ abstract class DataFile
     protected $_modifier = 'r';
     public $_fp = null;
     protected $_filename = '';
-    
+
     /**
      * Sets the source  file of the Manipulator object, if valid sets attributes
      *
@@ -56,9 +56,9 @@ abstract class DataFile
     }
 
     /**
-     * A local copy of fileExists to allow us to mock this function 
+     * A local copy of fileExists to allow us to mock this function
     **/
-    public function fileExists(string $filename) : bool
+    public function fileExists(string $filename)
     {
         return (bool) file_exists($filename);
     }
@@ -69,7 +69,7 @@ abstract class DataFile
      *
      * @return bool
     **/
-    public function writable(string $filename) : bool
+    public function writable(string $filename)
     {
         return (bool) is_writable($filename);
     }
@@ -80,13 +80,13 @@ abstract class DataFile
      *
      * @return bool
     **/
-    public function readable(string $filename) : bool
+    public function readable(string $filename)
     {
         return (bool) is_readable($filename);
     }
 
     /**
-     * Returns the type of the source 
+     * Returns the type of the source
      * @return string
     **/
     public function getType() : string

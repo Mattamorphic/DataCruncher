@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\Data_Cruncher;
+namespace mfmbarber\DataCruncher;
 
 class Manipulator
 {

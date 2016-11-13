@@ -2,29 +2,35 @@
 [![Coverage Status](https://coveralls.io/repos/github/Matt-Barber/DataCruncher/badge.svg?branch=master)](https://coveralls.io/github/Matt-Barber/DataCruncher?branch=master)
 
 # DataCruncher :page_facing_up:
-DataCruncher is a PHP library allowing XML and CSV files (currently) to be queried as you might query a database table (with added extras).
+DataCruncher is a PHP library allowing Database Tables, XML and CSV files (currently) to be queried as you might query a standard database table (with added extras).
 This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will
-require loading the array into memory and blarg. 
+require loading the array into memory and blarg.
 
-This has been designed with both a Front Controller pattern giving you access to a Manuiplator object as well as a set of Decoupled self contained components
+This has been designed with both a Front Controller pattern giving you access to a Manipulator object as well as a set of Decoupled self contained components
 
 
 ## Installation
-The easiest way to install this is probably to git clone this into an extensions folder in your project, then update your composer.json with an autoloader reference. 
-It will, once complete, be uploaded to packagist and installed via composer - woo! 
+The easiest way to install this is probably to git clone this into an extensions folder in your project, then update your composer.json with an autoloader reference.
+It will, once complete, be uploaded to packagist and installed via composer - woo!
 
 ## Usage
-Using a decoupled component, i.e. the Query object 
+Using a decoupled component, i.e. the Query object
+
+Our basic includes
 ```php
-<?php 
+<?php
 // include your autoloader
 include 'vendor/autoload.php';
 // a helper class for generating data sources
-use mfmbarber\Data_Cruncher\Helpers\DataSource as DataSource;
+use mfmbarber\DataCruncher\Helpers\DataSource as DataSource;
 
 // our query class
-use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
+use mfmbarber\DataCruncher\Segmentation\Query as Query;
+```
 
+An example using a CSV input
+
+```php
 $query = new Query();
 $file = DataSource::generate('file', 'csv');
 
@@ -34,6 +40,7 @@ $file = DataSource::generate('file', 'csv');
  mfmbarber@gmail.com, matt, 28
  tonystart@gmail.com, tony, 35
 */
+
 $file->setSource('example/input.csv', []);
 
 $result = $query->fromSource($file)
@@ -43,12 +50,25 @@ $result = $query->fromSource($file)
     ->value('gmail')
     ->execute();
 
-
 // will return an array of associative arrays with each element
 // having name and age as keys, and repective values for records where
-// email contains gmail 
+// email contains gmail
 
-// We can also specify an outfile 
+$result === [
+    [
+        'name' => 'matt',
+        'age' => 28
+    ],
+    [
+        'name' => 'tony'
+        'age' => 35
+    ]
+];
+
+```
+
+Example writing to an outfile
+```php
 $outfile = DataSource::generate('file', 'csv');
 $outfile->setSource('example/output.csv', ['modifier' => 'w']);
 
@@ -58,11 +78,12 @@ $result = $query->fromSource($file)
     ->condition('CONTAINS')
     ->value('gmail')
     ->execute($outfile);
+```
 
-// Which will write the lines to a CSV file 
+Example writing from a CSV query to an XML file
 
-// Or even 
-$outfile = DataSource::generate('file', 'xml');
+```php
+$outfile = DataSource::generate('file', 'xml', 'person', 'people');
 $outfile->setSource('example/output.xml', ['modifier' => 'w']);
 
 $result = $query->fromSource($file)
@@ -70,13 +91,58 @@ $result = $query->fromSource($file)
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile, 'person', 'people');
-
-// Which will write the output to an XML file with a parent node of 'people' and each
-// record as a child node of 'person'
+    ->execute($outfile);
 ```
 
-The available decoupled components are 
+Example using a Datbaase table as a source
+Outputting to a CSV
+
+```php
+// Say we wanted to use a database, and write to a CSV we could use
+$db = DataSource::generate('db', 'sql');
+$db->setSource('TEST', [
+    'username' => 'root',
+    'password' => '',
+    'table' => 'users'
+]);
+
+$outfile = DataSource::generate('file', 'csv');
+$outfile->setSource('./example/outfile3.csv', ['modifier' => 'w']);
+
+$query = new Query();
+
+$result = $query
+    ->fromSource($db)
+    ->select(['firstname', 'lastname'])
+    ->where('email')
+    ->condition('CONTAINS')
+    ->value('gmail.com')
+    ->execute($outfile);
+```
+
+Queries support limiting the amount of results
+
+```php
+
+$result = $query
+    ->fromSource($db)
+    ->select(['firstname', 'lastname'])
+    ->where('email')
+    ->condition('CONTAINS')
+    ->value('gmail.com')
+    ->limit(10)
+    ->execute($outfile);
+```
+
+Tracking execution time and memory
+
+```php
+-> execute($outfile, null , true);
+// which returns a ['data' => ..., 'timer' => ['elapsed' => 0, 'memory' => 0]] structure
+
+```
+
+The available decoupled components are
 
 - Query
     - select fields from the source where a field in that source meets a condition, and a value for that condition. Execute takes an optional outfile (that implements DataInterface), and an optional node name and parent node name for XML writing - the preferred way to use this is to write to a file as it allows you to chunk through massive files.
@@ -90,6 +156,9 @@ The available decoupled components are
 - Statistics
     - Generate statistics based on an input source.
 
+- DataSources
+    - An interface for Datbases, CSV and XML files, CSV files support sorting if running on a nix platform through sort method.
+
 The primary Front Controller component, if you'd like to use that is the Manipulator object, this currently only allows you to inject the Data source, Query and Statistics during instantiation.
 
 ## Contributing
@@ -101,17 +170,28 @@ The primary Front Controller component, if you'd like to use that is the Manipul
 6. Submit a pull request :D
 
 ## History
-12/10/2016 
+13/11/2016
+- Added Database Table support
+- Added Database to Factory
+- CSV Sorting (On \*nix systems)
+- CSV Validation
+- Updated CSV Get Headers
+- Added PHPUnit speedtrap support
+- Updated namespacing (to camel case)
+
+
+12/10/2016
 - Factory DataSources
 - Regex Support
 - Rule abstraction for statistics
 - PHP7 only
 - Chunked read write to increase performance
 - General optimisations
-- Improved test coverage 
+- Improved test coverage
+- Execution timer support
 
-10/08/2016 
-- Completed README and finished XML support 
+10/08/2016
+- Completed README and finished XML support
 
 ## Credits
 Get your name here!

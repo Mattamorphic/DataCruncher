@@ -1,8 +1,8 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Analysis\Config;
+namespace mfmbarber\DataCruncher\Tests\Unit\Analysis\Config;
 
-use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;

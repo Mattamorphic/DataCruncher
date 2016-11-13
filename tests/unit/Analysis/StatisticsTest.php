@@ -1,10 +1,10 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Analysis;
+namespace mfmbarber\DataCruncher\Tests\Unit\Analysis;
 
-use mfmbarber\Data_Cruncher\Analysis\Statistics as Statistics;
+use mfmbarber\DataCruncher\Analysis\Statistics as Statistics;
 
-use mfmbarber\Data_Cruncher\Analysis\Config\Rule as Rule;
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -237,5 +237,25 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
             $result,
             "Execute did not return the expected results"
         );
+    }
+
+    /**
+    * @test
+    **/
+    public function trackTimeOfExecution()
+    {
+        $stats = new Statistics();
+        $rules = [];
+        $rule = new Rule();
+        $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
+        $stats->addRule($rule);
+        $rule->setField('colour')->groupRegex('/([^,]+)/');
+        $stats->addRule($rule);
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages()
+            ->execute(null, true);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('timer', $result);
+        $this->assertTrue(is_integer($result['timer']['elapsed']));
     }
 }

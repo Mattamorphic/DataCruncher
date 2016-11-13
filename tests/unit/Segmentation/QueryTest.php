@@ -1,8 +1,8 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Tests\Unit\Segmentation;
+namespace mfmbarber\DataCruncher\Tests\Unit\Segmentation;
 
-use mfmbarber\Data_Cruncher\Helpers\Files\CSVFile as CSVFile;
-use mfmbarber\Data_Cruncher\Segmentation\Query as Query;
+use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
+use mfmbarber\DataCruncher\Segmentation\Query as Query;
 
 use org\bovigo\vfs\vfsStream,
     org\bovigo\vfs\vfsStreamDirectory;
@@ -39,9 +39,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
         vfsStream::url('home/test_out', 0777);
-        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
+        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\Data_Cruncher\Helpers\Files\CSVFile');
+        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
         $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }
 
@@ -152,7 +152,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Unit test, date format or value in value clause of query is incorrect
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidDateValueException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidDateValueException
      * @expectedExceptionMessage Couldn't create datetime object from value/dateFormat - please check
      *
      * @return null
@@ -191,7 +191,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given the wrong type of array, throw error
      *
      * @test
-     * @expectedException         mfmbarber\Data_Cruncher\Exceptions\ParameterTypeException
+     * @expectedException         mfmbarber\DataCruncher\Exceptions\ParameterTypeException
      *
      * @return null
     **/
@@ -229,7 +229,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Given an incorrect condition throw an InvalidValueException
      *
      * @test
-     * @expectedException        mfmbarber\Data_Cruncher\Exceptions\InvalidValueException
+     * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidValueException
      *
      * @return null
     **/
@@ -264,10 +264,29 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->execute($this->mockOutCSV);
 
         $this->assertEquals(
-            2,
+            ['rows' => 2],
             $result,
             "Execute did not return the expected results"
         );
+    }
+
+    /**
+    * Tests that the time of execution can be tracked with an optional Parameter
+    * @test
+    **/
+    public function trackTimeOfExecution()
+    {
+        $query = new Query();
+
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select(['email'])
+            ->where('name')
+            ->condition('contains')
+            ->value('matt')
+            ->execute(null, null, true);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertArrayHasKey('timer', $result);
+        $this->assertTrue(is_integer($result['timer']['elapsed']));
     }
     /**
      * Data provider for executeContains

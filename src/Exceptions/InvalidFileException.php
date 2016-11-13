@@ -1,5 +1,5 @@
 <?php
-namespace mfmbarber\Data_Cruncher\Exceptions;
+namespace mfmbarber\DataCruncher\Exceptions;
 
 class InvalidFileException extends \Exception
 {
