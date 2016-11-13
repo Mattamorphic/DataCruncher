@@ -112,12 +112,26 @@ $outfile->setSource('./example/outfile3.csv', ['modifier' => 'w']);
 $query = new Query();
 
 $result = $query
-->fromSource($db)
-->select(['firstname', 'lastname'])
-->where('email')
-->condition('CONTAINS')
-->value('gmail.com')
-->execute($outfile);
+    ->fromSource($db)
+    ->select(['firstname', 'lastname'])
+    ->where('email')
+    ->condition('CONTAINS')
+    ->value('gmail.com')
+    ->execute($outfile);
+```
+
+Queries support limiting the amount of results
+
+```php
+
+$result = $query
+    ->fromSource($db)
+    ->select(['firstname', 'lastname'])
+    ->where('email')
+    ->condition('CONTAINS')
+    ->value('gmail.com')
+    ->limit(10)
+    ->execute($outfile);
 ```
 
 Tracking execution time and memory
@@ -156,6 +170,16 @@ The primary Front Controller component, if you'd like to use that is the Manipul
 6. Submit a pull request :D
 
 ## History
+13/11/2016
+- Added Database Table support
+- Added Database to Factory
+- CSV Sorting (On \*nix systems)
+- CSV Validation
+- Updated CSV Get Headers
+- Added PHPUnit speedtrap support
+- Updated namespacing (to camel case)
+
+
 12/10/2016
 - Factory DataSources
 - Regex Support
