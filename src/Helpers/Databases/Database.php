@@ -168,7 +168,7 @@ class Database implements DataInterface
             $condition = self::CONDITIONS[$condition];
             switch ($condition) {
                 case 'LIKE':
-                    $value = "%:value%";
+                    $value = "%$value%";
                 break;
                 // TODO Fix this
                 case 'IN':
@@ -232,7 +232,7 @@ class Database implements DataInterface
         $insert->execute(array_combine($subs, array_values($row)));
         return true;
     }
-    
+
     /**
      * Sets the DSN for the PDO object held in connection
      * @param string    $type   The DB type, i.e. mysql
