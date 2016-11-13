@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace mfmbarber\DataCruncher\Helpers;
 
 use mfmbarber\DataCruncher\Helpers\Files;
+use mfmbarber\DataCruncher\Helpers\Databases;
 use mfmbarber\DataCruncher\Helpers\System;
 
 class DataSource
@@ -32,6 +33,8 @@ class DataSource
         switch ($format) {
             case 'file':
                 return self::generateFile($type, $node, $parent);
+            case 'db':
+                return self::generateDB($type, $node, $parent);
             case 'system':
                 return self::generateSystemOutput($type, $node, $parent);
         }
@@ -52,6 +55,24 @@ class DataSource
                 return new Files\CSVFile();
             case 'xml':
                 return new Files\XMLFile($node, $parent);
+        }
+    }
+
+    /**
+     * If the Factory requires a db, this method is used to generate and return this
+     *
+     * @return DataInterface
+    **/
+    public static function generateDB(
+        string $type,
+        string $node = null,
+        string $parent = null
+    ) {
+        // for now
+        $type = 'sql';
+        switch ($type) {
+            case 'sql':
+                return new Databases\Database();
         }
     }
 
