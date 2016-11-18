@@ -38,9 +38,11 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     *  Test setting the manipulator with a CSVFile
+     *
+     * @return null
     **/
-    public function manipulatorSetDataSource()
+    public function testItShouldSetADataSourceOnADependancy()
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
@@ -48,9 +50,11 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * Test retrieving tools
+     *
+     * @return null
     **/
-    public function statisticsMethodReturnsStatisticsObject()
+    public function testItShouldReturnAStatisticsObject()
     {
         $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
@@ -58,37 +62,14 @@ class ManipulatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
-    **/
-    public function queryMethodReturnsStatisticsObject()
-    {
-        $manipulator = new Manipulator(new CSVFile(), new Query(), new Statistics());
-        $manipulator->setDataSource('vfs://home/test', []);
-        $this->assertEquals(get_class($manipulator->query()), 'mfmbarber\DataCruncher\Segmentation\Query');
-    }
-
-    /**
-     * @test
      * @expectedException mfmbarber\DataCruncher\Exceptions\AttributeNotSetException
      * @expectedMessage Query object not passed during instantiation
     **/
-    public function queryMethodThrowsAttributeNotSet()
+    public function testItShouldThrowAnExceptionIfToolNotSetCorrectly()
     {
         $manipulator = new Manipulator(new CSVFile(), null, new Statistics());
         $manipulator->setDataSource('vfs://home/test', []);
         $manipulator->query();
     }
 
-        /**
-     * @test
-     * @expectedException mfmbarber\DataCruncher\Exceptions\AttributeNotSetException
-     * @expectedMessage Query Statistics object not passed during instantiation
-    **/
-    public function statisticsMethodThrowsAttributeNotSet()
-    {
-        $manipulator = new Manipulator(new CSVFile(), new Query);
-        $manipulator->setDataSource('vfs://home/test', []);
-        $manipulator->statistics();
-    }
-    
 }
