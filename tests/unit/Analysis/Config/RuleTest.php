@@ -9,7 +9,12 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 class RuleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetField()
+    /**
+     * Test setting the field for the rule
+     *
+     * @return null
+    **/
+    public function testItShouldSetTheFieldToTest()
     {
         $rule = new Rule();
         $rule->setField('test');
@@ -20,7 +25,12 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSetLabel()
+    /**
+     * Test settinwg the label for the rule
+     *
+     * @return null
+    **/
+    public function testItShouldSetTheLabelForTheTest()
     {
         $rule = new Rule();
         $rule->setLabel('test');
@@ -31,7 +41,12 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGroupExact()
+    /**
+     * Test grouping a rule by exact values
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByExact()
     {
         $rule = new Rule();
         $rule->groupExact();
@@ -42,7 +57,12 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGroupNumeric()
+    /**
+     * Test grouping a rule by numeric boundaries
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByNumeric()
     {
         $rule = new Rule();
         $rule->groupNumeric(10);
@@ -53,7 +73,12 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGroupRegex()
+    /**
+     * Test grouping rule by regular expressions
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByRegex()
     {
         $rule = new Rule();
         $rule->groupRegex('/^([\w\-]+)/i');

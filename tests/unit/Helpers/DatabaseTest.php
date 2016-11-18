@@ -61,9 +61,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Return the configuration for this source helper
-     * @test
     **/
-    public function getSourceName()
+    public function testItShouldReturnValidSourceName()
     {
         $this->assertEquals(
             $this->mockDB->getSourceName(),
@@ -73,9 +72,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
     }
     /**
      * Test that the Database helper returns the next row from the result
-     * @test
     **/
-    public function getNextRowsCorrectly()
+    public function testItShouldReturnTheFirstResult()
     {
         $this->mockDB->query(['name' => 0, 'email' => 1]);
         $this->assertEquals(
@@ -89,9 +87,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Return the current headers
-     * @test
     **/
-    public function getSourceHeaders()
+    public function testItShouldReturnHeaders()
     {
         $this->assertEquals(
             $this->mockDB->getHeaders(),
@@ -107,9 +104,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Test writing a data row
-     * @test
     **/
-    public function writeDataRow()
+    public function testItShouldWriteLineToTheDB()
     {
         $this->mockDB->writeDataRow(
             [

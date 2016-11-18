@@ -34,11 +34,9 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests that once assigned the source name can be retrieved
      *
-     * @test
-     *
      * @return null
      **/
-    public function getSourceName()
+    public function testItShouldReturnValidSourceName()
     {
         $this->assertEquals(
             $this->mockSourceCSV->getSourceName(),
@@ -50,11 +48,10 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, retrieving associative array of headers & values from a
      * data stream
      *
-     * @test
      *
      * @return null
      **/
-    public function getNextRowsCorrectly()
+    public function testItShouldReturnTheLinesInSequence()
     {
         $result = [];
         try {
@@ -97,13 +94,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
      * Unit test, Either a file doesn't exist, or isn't readable - throws
      * matching exception with message
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidFileException
      * @expectedExceptionMessage FakeFile.csv doesn't exist
      *
      * @return null
     **/
-    public function invalidFileException()
+    public function testItShouldThrowInvalidFileException()
     {
         $sourceFile = new CSVFile();
         $sourceFile->setSource('FakeFile.csv', ['modifier' => 'r']);
@@ -111,13 +107,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/
-    public function closeInvalidFilePointerException()
+    public function testItShouldThrowAnExceptionIfNotOpen()
     {
         $sourceFile = new CSVFile();
         $sourceFile->close();
@@ -125,13 +120,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerExistsException
      * @expectedExceptionMessage A filepointer exists on this object, use class::close to close the current pointer
      *
      * @return null
     **/
-    public function openInvalidFilePointerException()
+    public function testItShouldThrowAnErrorIfAlreadyOpen()
     {
         $csv = new CSVFile();
         $csv->setSource('vfs://home/test', ['modifier' => 'r']);
@@ -141,13 +135,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a reset is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/
-    public function resetInvalidFilePointerException()
+    public function testItShouldThrowAnErrorIfResetBeforeSet()
     {
         $sourceFile = new CSVFile();
         $sourceFile->reset();
@@ -155,13 +148,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a write is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
     **/
-    public function writeInvalidFilePointerException()
+    public function testItShouldThrowAnErrorOnWriteBeforeOpen()
     {
         $sourceFile = new CSVFile();
         $sourceFile->writeDataRow(['email' => 'test@test.com']);
@@ -169,9 +161,10 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Test that get headers returns an array of headers
-     * @test
+     *
+     * @return null
     **/
-    public function headerRetrievalTest()
+    public function testItShouldReturnHeaders()
     {
         $headers = $this->mockSourceCSV->getHeaders();
         $this->assertEquals(
@@ -184,13 +177,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, if a CSV file isn't a CSV file
      *
-     * @test
      * @expectedException         mfmbarber\DataCruncher\Exceptions\InvalidFileException
      * @expectedExceptionMessage  The file provided is not in the correct format
      *
      * @return null
     **/
-    public function invalidCSVFile()
+    public function testItShouldThrowAnExceptionIfMalformed()
     {
         $file = vfsStream::url('home/invalidCSV', 0777);
         file_put_contents(

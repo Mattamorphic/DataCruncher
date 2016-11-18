@@ -15,6 +15,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     private $mockSourceCSV;
     private $mockOutCSV;
 
+    /**
+     * Generate mock file for us to use, stubbing out the readable, writable and fileExists methods.
+     * Our file won't technically exist.
+     * @param string    $class_name     The class to mock
+     *
+     * @return mock
+    **/
     private function _generateMockFile($class_name)
     {
         $file = $this->getMockBuilder($class_name)
@@ -28,6 +35,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->root = vfsStream::setup('home', 0777);
         $file = vfsStream::url('home/test', 0777);
         file_put_contents(
@@ -47,6 +55,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         $this->root = null;
         $this->mockSourceCSV = null;
         $this->mockOutCSV = null;
@@ -55,14 +64,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Tests that query execution returns the appropriate array (structure /
      * values)
      *
-     * @test
      * @dataProvider queryDataProvider
      * @param        array $query_data The data for the test
      * @param        array $expected   The expected result, given the query_data
      *
      * @return null
     **/
-    public function executeQuery($query_data, $expected)
+    public function testItShouldExecuteValidQuery($query_data, $expected)
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -79,9 +87,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
     /**
-     * @test
+     * Tests the limiting of results, sometimes we might just want back a sample
+     * set of data.
+     *
+     * @return null
      **/
-    public function limitQuery()
+    public function testItShouldLimitTheAmountOfResults()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -99,9 +110,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
     /**
-     * @test
+     * Allows us to remap the field names from the original headers to whatever we choose.
+     *
+     * @return null
     **/
-    public function remappingResult()
+    public function testItShouldLetUsRemapTheResultFields()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -119,14 +132,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Tests that query (with dates) execution returns the appropriate array
      * (struture / values)
      *
-     * @test
      * @dataProvider queryDateDataProvider
      * @param        array $query_data The data for the test
      * @param        array $expected   The expected result, given the query_data
      *
      * @return null
     **/
-    public function executeQueryDatesWorkCorrectly($query_data, $expected)
+    public function testItShouldHandleDateQueries($query_data, $expected)
     {
         $query = new Query();
 
@@ -151,13 +163,12 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, date format or value in value clause of query is incorrect
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidDateValueException
      * @expectedExceptionMessage Couldn't create datetime object from value/dateFormat - please check
      *
      * @return null
     **/
-    public function executeQueryDateThrowsException()
+    public function testItShouldThrowAnErrorGivenAMalformedDate()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -170,12 +181,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Given the wrong data type for the select method, throw error
      *
-     * @test
      * @expectedException        TypeError
      *
      * @return null
     **/
-    public function selectThrowsTypeError()
+    public function testItShouldThrowAnExceptionIfSelectIsNotAnArray()
     {
         $query = new Query();
 
@@ -190,12 +200,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Given the wrong type of array, throw error
      *
-     * @test
      * @expectedException         mfmbarber\DataCruncher\Exceptions\ParameterTypeException
      *
      * @return null
     **/
-    public function selectThrowsParameterTypeException()
+    public function itShouldThrowAnExceptionIfSelectIsAnAssocArray()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -209,15 +218,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Given the wrong data type for the where method, throw error
      *
-     * @test
      * @expectedException        TypeError
      *
      * @return null
     **/
-    public function whereThrowsTypeError()
+    public function testItShouldThrowAnExceptionIfWhereIsNotAPrimitive()
     {
         $query = new Query();
-
         $result = $query->fromSource($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('equals')
@@ -228,12 +235,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     /**
      * Given an incorrect condition throw an InvalidValueException
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\InvalidValueException
      *
      * @return null
     **/
-    public function invalidConditionThrowsValueException()
+    public function testItShouldThrowAnExceptionIfConditionDoesntExist()
     {
         $query = new Query();
 
@@ -248,11 +254,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      * Tests that execution can write to a file, and return a count of the rows
      * affected
      *
-     * @test
-     *
      * @return null
     **/
-    public function executeWriteToFile()
+    public function testItShouldWriteToAFileAndReturnResultCount()
     {
         $query = new Query();
 
@@ -272,9 +276,10 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
     * Tests that the time of execution can be tracked with an optional Parameter
-    * @test
+    *
+    * @return null
     **/
-    public function trackTimeOfExecution()
+    public function testItShouldBeAbleToTrackExecutionTime()
     {
         $query = new Query();
 
