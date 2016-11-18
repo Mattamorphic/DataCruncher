@@ -125,9 +125,10 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Test sorting a database table during execution
-     * @test
+     *
+     * @return null
     **/
-    public function sortData()
+    public function testItShouldSortTheResultData()
     {
         $this->mockDB->sort('age');
         $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
