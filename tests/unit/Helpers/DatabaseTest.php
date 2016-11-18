@@ -122,4 +122,18 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
             $this->mockDB->getNextDataRow()
         );
     }
+
+    /**
+     * Test sorting a database table during execution
+     * @test
+    **/
+    public function sortData()
+    {
+        $this->mockDB->sort('age');
+        $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
+        $this->assertEquals(
+            ['name' => 'ryan'],
+            $this->mockDB->getNextDataRow()
+        );
+    }
 }
