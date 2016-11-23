@@ -104,6 +104,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Test writing a data row
+     *
+     * @return null
     **/
     public function testItShouldWriteLineToTheDB()
     {
