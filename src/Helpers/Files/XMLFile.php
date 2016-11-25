@@ -23,7 +23,7 @@ class XMLFile extends DataFile implements DataInterface
     public function __construct(string $node_name, string $start_element)
     {
         $this->node_name = $node_name;
-        $this->start_elemeent = $start_element;
+        $this->start_element = $start_element;
     }
 
     /**
@@ -31,8 +31,8 @@ class XMLFile extends DataFile implements DataInterface
      * Returns the configured fields
      *
      * @param string $node_name
-     * @param string $start_element 
-     * 
+     * @param string $start_element
+     *
      * @return array
     **/
     public function getHeaders() : array

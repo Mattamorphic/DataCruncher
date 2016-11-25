@@ -220,7 +220,7 @@ class Query
                     foreach ($row as $header => $value) {
                         // if the mappings are not equal, then pull out the value we want
                         // and unset the old value
-                        if ($header !== $mappings[$header]) {
+                        if (isset($mappings[$header]) && $header !== $mappings[$header]) {
                             $row[$mappings[$header]] = $value;
                             unset($row[$header]);
                         }
