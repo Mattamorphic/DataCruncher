@@ -38,6 +38,16 @@ class Query
         if (get_class($source) === 'mfmbarber\DataCruncher\Helpers\Databases\Database') {
             $this->_isdb = true;
         }
+        if ($this->_fields !== []) {
+            $headers = $this->_source->getHeaders();
+            $fields = array_keys($this->_fields);
+            if (Validation::areArraysDifferent($fields, $headers)) {
+                throw new \Exception(
+                    'One or more of '.implode(', ', $fields) . ' is not in ' .
+                    implode(', ', $headers)
+                );
+            }
+        }
         return $this;
     }
     /**
@@ -54,6 +64,15 @@ class Query
                 'The parameter type for this method was incorrect, '
                 .'expected a normal array'
             );
+        }
+        if ($this->_source !== null) {
+            $headers = $this->_source->getHeaders();
+            if (Validation::areArraysDifferent($fields, $headers)) {
+                throw new \Exception(
+                    'One or more of '.implode(', ', $fields) . ' is not in ' .
+                    implode(', ', $headers)
+                );
+            }
         }
         $this->_fields = array_flip($fields);
         return $this;

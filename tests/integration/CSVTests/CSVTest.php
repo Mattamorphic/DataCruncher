@@ -12,7 +12,7 @@ use mfmbarber\DataCruncher\Segmentation\Merger;
  *
  * @author Matt Barber <mfmbarber@gmail.com>
  * @package DataCruncher : Integration Tests
- * 
+ *
 **/
 class CSVTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,7 +29,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     {
         $this->sourceCSV = DataSource::generate('file', 'csv');
         $this->sourceCSV->setSource($this->file, ['modifier' => 'r']);
-        $this->sourceCSV->sort('id');
+        $this->sourceCSV->sort('id', true, false);
     }
 
     public function tearDown()
@@ -47,6 +47,45 @@ class CSVTest extends \PHPUnit_Framework_TestCase
                 $files
             );
         }
+    }
+
+    public function testItShouldSortTheResultsByString()
+    {
+        $this->sourceCSV->sort('first_name', false, false);
+        $this->sourceCSV->open();
+        $row = $this->sourceCSV->getNextDataRow();
+        $this->sourceCSV->close();
+        $this->assertEquals(
+            $row,
+            [
+                'id' => 701,
+                'first_name' => 'Aaron',
+                'last_name' => 'Collins',
+                'email' => 'acollinsjg@qq.com',
+                'gender' => 'Male',
+                'ip_address' => '41.138.204.207'
+            ]
+        );
+    }
+
+    public function testItShouldSortTheResultByInt()
+    {
+        $this->sourceCSV->sort('id', true, false);
+        $this->sourceCSV->open();
+        $row = $this->sourceCSV->getNextDataRow();
+        $this->sourceCSV->close();
+        $this->assertEquals(
+                $row,
+                [
+                    'id' => 1,
+                    'first_name' => 'Paul',
+                    'last_name' => 'Simmons',
+                    'email' => 'psimmons0@state.gov',
+                    'gender' => 'Male',
+                    'ip_address' => '139.134.139.43'
+                ]
+        );
+
     }
 
     /**

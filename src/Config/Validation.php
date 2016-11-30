@@ -128,4 +128,8 @@ class Validation
         fclose($f);
         return $csv;
     }
+
+    public static function areArraysDifferent(array $arr1, array $arr2) {
+        return count(array_diff($arr1, $arr2)) ? true : false;
+    }
 }

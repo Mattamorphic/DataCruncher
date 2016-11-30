@@ -34,16 +34,16 @@ abstract class DataFile
         }
         if (false !== strpos('r', $this->_modifier) && !$this->readable($filename)) {
             if (!$this->fileExists($filename)) {
-                throw new Exceptions\InvalidFileException("$filename doesn't exist");
+                throw new Exceptions\InvalidFileException("File doesn't exist");
             }
-            throw new Exceptions\InvalidFileException("$filename is not readable");
+            throw new Exceptions\InvalidFileException("File is not readable");
         }
         if ((false !== strpos('w', $this->_modifier) || false !== strpos('a', $this->_modifier))) {
             if (!file_exists($filename)) {
                 touch($filename);
             }
             if (!$this->writable($filename)) {
-                throw new Exceptions\InvalidFileException("$filename is not writable");
+                throw new Exceptions\InvalidFileException("File is not writable");
             }
         }
         $this->_filename = $filename;

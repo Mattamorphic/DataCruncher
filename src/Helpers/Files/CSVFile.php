@@ -71,6 +71,9 @@ class CSVFile extends DataFile implements DataInterface
     **/
     public function getNextDataRow()
     {
+        if (false === stripos($this->_modifier, 'r')) {
+            throw new Exceptions\InvalidFileException("File is not set to read mode");
+        }
         if ([] !== ($line = $this->_getCsv())) {
             // trim all the values in the array of values
             $line = array_map('trim', $line);
@@ -160,15 +163,18 @@ class CSVFile extends DataFile implements DataInterface
       * As the separator is ','
       *
     **/
-    public function sort($key)
+    public function sort($key, $isInt = false, $backup = true)
     {
         if (PHP_SHLIB_SUFFIX === 'dll') {
             throw new \DomainException("Sorting can only be carried out on a *nix system");
         }
         $headers = array_flip($this->getHeaders());
         $key = (int) $headers[trim($key)] + 1;
-        $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
+        $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort ".($isInt ? "-n" : "")." --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
         $res = shell_exec($cmd);
+        if (!$backup) {
+            unlink("{$this->_filename}.bak");
+        }
         if ($res !== null) {
             throw new \Exception("Couldn't execute sort, error : $res");
         }
