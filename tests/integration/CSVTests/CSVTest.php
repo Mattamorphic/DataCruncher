@@ -40,7 +40,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             array_map(
                 function ($file) use ($dir) {
                     // avoid . and ..
-                    if (strlen($file) > 2) {
+                    $path = pathinfo("$dir/$file");
+                    if (strlen($file) > 2 && $path['extension'] !== '.md') {
                         unlink("$dir/$file");
                     }
                 },
