@@ -164,8 +164,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             isset($result['timer']['memory'])
         );
         $this->assertTrue(
-            $result['timer']['elapsed'] < 10,
-            "Timer took longer than 10 miliseconds - somethings up!"
+            $result['timer']['elapsed'] < 500,
+            "Timer took longer than 500 miliseconds - somethings up!"
         );
     }
 
