@@ -5,7 +5,7 @@ php:
 before_script:
     - composer install
     - find . -type f -name *.csv -exec chmod 777 {} +
-    - chmod 444 tests/integration/InputFiles/EmptyWriteProtected.csv
+    - chmod 444 tests/integration/CSVTests/InputFiles/EmptyWriteProtected.csv
     - mkdir build
 
 script:
