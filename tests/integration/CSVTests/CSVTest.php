@@ -1,6 +1,7 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Integration\CSVTests;
 
+use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Analysis\Statistics;
 use mfmbarber\DataCruncher\Analysis\Config\Rule;
@@ -35,19 +36,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         // let's remove any outputfiles.
-        $dir = "{$this->dir}/OutputFiles";
-        if (false !== ($files = scandir($dir))) {
-            array_map(
-                function ($file) use ($dir) {
-                    // avoid . and ..
-                    $path = pathinfo("$dir/$file");
-                    if (strlen($file) > 2 && $path['extension'] !== '.md') {
-                        unlink("$dir/$file");
-                    }
-                },
-                $files
-            );
-        }
+        Validation::deleteFiles("{$this->dir}/OutputFiles", ['md']);
     }
 
     public function testItShouldSortTheResultsByString()
