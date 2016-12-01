@@ -161,7 +161,11 @@ class Validation
                         return;
                     }
                     if (!in_array(pathinfo($file, PATHINFO_EXTENSION), $dontDeleteExtensions)) {
-                        unlink($file);
+                        try {
+                            unlink($file);
+                        } catch (\Exception $e) {
+                            error_log("Trying to delete $file - doesn't seem to exist");
+                        }
                     }
                 },
                 $files
