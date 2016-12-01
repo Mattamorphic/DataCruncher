@@ -153,6 +153,9 @@ class Validation
         if (false !== ($files = scandir($dir))) {
             array_map(
                 function ($file) use ($dir, $dontDeleteExtensions) {
+                    if (strlen($file) <= 2) {
+                        return;
+                    }
                     $file = strtolower("$dir/$file");
                     if (is_dir($file)) {
                         return;
