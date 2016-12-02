@@ -65,9 +65,32 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ]
 
         );
-
     }
+
+
+    public function testItShouldOutputCSVString()
+    {
+        $query = new Query();
+        $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
+        $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
+        $xml->setSource($file, ['modifier' => 'r']);
+        $system = DataSource::generate('system', 'csv');
+        $result = $query->fromSource($xml)
+            ->select(['id', 'email'])
+            ->where('ip_address')
+            ->condition('CONTAINS')
+            ->value('106.209.')
+            ->execute($system);
+        $this->assertEquals(
+            $result,
+            "id,email\n".
+            "4,asimpson3@techcrunch.com\n"
+
+        );
+    }
+
     public function testItShouldQueryADatabaseTable(){}
+
     public function testItShouldOutputToCSV()
     {
         $query = new Query();
@@ -133,13 +156,5 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ]
         );
     }
-    public function testItShouldQueryComparison(){}
-    public function testItShouldQueryContains(){}
-    public function testItShouldQueryEmpty(){}
     public function testItShouldQueryDates(){}
-    public function testItShouldQueryStrings(){}
-    public function testItShouldQueryInts(){}
-
-
-
 }

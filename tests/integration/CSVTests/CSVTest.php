@@ -43,7 +43,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     {
         $this->sourceCSV->sort('first_name', false, false);
         $this->sourceCSV->open();
-        $row = $this->sourceCSV->getNextDataRow();
+        $row = $this->sourceCSV->getNextDataRow()->current();
         $this->sourceCSV->close();
         $this->assertEquals(
             $row,
@@ -62,7 +62,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     {
         $this->sourceCSV->sort('id', true, false);
         $this->sourceCSV->open();
-        $row = $this->sourceCSV->getNextDataRow();
+        $row = $this->sourceCSV->getNextDataRow()->current();
         $this->sourceCSV->close();
         $this->assertEquals(
                 $row,

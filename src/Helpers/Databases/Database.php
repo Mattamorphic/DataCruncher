@@ -220,7 +220,7 @@ class Database implements DataInterface
     public function getNextDataRow()
     {
         if ($this->_query !== null && ($line = $this->_query->fetch(\PDO::FETCH_ASSOC))) {
-            return $line;
+            yield $line;
         } else {
             return [];
         }

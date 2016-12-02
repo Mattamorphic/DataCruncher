@@ -59,7 +59,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         } catch (Exceptions\FilePointerExistsException $e) {
             // The stream is already open
         }
-        while ([] !== ($row = $this->mockSourceCSV->getNextDataRow())) {
+        foreach ($this->mockSourceCSV->getNextDataRow() as $validRowCount => $row) {
             $result[] = $row;
         }
         $this->mockSourceCSV->close();

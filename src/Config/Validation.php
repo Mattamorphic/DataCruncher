@@ -168,4 +168,24 @@ class Validation
             );
         }
     }
+
+    /**
+     * Completes a multineed stripos across a haystack string
+     *
+     * @param string    $haystack   The string to scan
+     * @param array     $needles    The characters to check for
+     *
+     * @return array
+    **/
+    public static function multiStripos(string $haystack, array $needles, bool $filter = false)
+    {
+        $found = array_flip($needles);
+        array_walk(
+            $found,
+            function (&$needle, $key) use ($haystack) {
+                $needle = stripos($haystack, $key);
+            }
+        );
+        return ($filter) ? count(array_filter(array_values($found), function ($item) { return $item !== false; })) > 0 : $found;
+    }
 }

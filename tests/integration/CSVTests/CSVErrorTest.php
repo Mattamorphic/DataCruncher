@@ -84,7 +84,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/InputFiles/NonEmpty.csv",
             ['modifier' => 'w']
         );
-        $csv->getNextDataRow();
+        $csv->getNextDataRow()->current();
 
     }
 
@@ -115,7 +115,6 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
             ->condition('CONTAINS')
             ->value('stumbleupon')
             ->execute();
-        error_log(json_encode($result));
     }
 
     /**

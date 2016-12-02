@@ -41,7 +41,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         );
     }
 
-    public function  setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->mockDB = new Database();
@@ -77,7 +77,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
     {
         $this->mockDB->query(['name' => 0, 'email' => 1]);
         $this->assertEquals(
-            $this->mockDB->getNextDataRow(),
+            $this->mockDB->getNextDataRow()->current(),
             [
                 'name' => 'matt',
                 'email' => 'mfmbarber@gmail.com'
@@ -121,7 +121,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->mockDB->query(['email' => 1], 'name', 'CONTAINS', 'Tony');
         $this->assertEquals(
             ['email' => 'tony@starkindustries.com'],
-            $this->mockDB->getNextDataRow()
+            $this->mockDB->getNextDataRow()->current()
         );
     }
 
@@ -136,7 +136,29 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
         $this->assertEquals(
             ['name' => 'ryan'],
-            $this->mockDB->getNextDataRow()
+            $this->mockDB->getNextDataRow()->current()
         );
+    }
+    /**
+     * Test returning all the data
+     *
+     * @return null
+    **/
+    public function testItShouldReturnAllTheData()
+    {
+        $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
+        $results = [
+            'matt',
+            'laura',
+            'ryan',
+            'ann',
+            'mark'
+        ];
+        foreach ($results as $result) {
+            $this->assertEquals(
+                ['name' => $result],
+                $this->mockDB->getNextDataRow()->current()
+            );
+        }
     }
 }

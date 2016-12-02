@@ -103,7 +103,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     {
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
         $this->assertEquals(
-            $this->mockSourceXML->getNextDataRow(),
+            $this->mockSourceXML->getNextDataRow()->current(),
             [
                'name' => 'Belgian Waffles',
                'price' => '$5.95',
@@ -143,7 +143,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
         $this->mockOutXML->close();
         $this->mockOutXML->open(true, 'test', 'data');
         $this->assertEquals(
-            $this->mockOutXML->getNextDataRow(),
+            $this->mockOutXML->getNextDataRow()->current(),
             [
                 'name' => 'tony',
                 'hero' => 'iron man'
@@ -196,11 +196,11 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     public function testItShouldResetTheFilePointerToTheStartOfTheFile()
     {
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
-        $this->mockSourceXML->getNextDataRow();
-        $this->mockSourceXML->getNextDataRow();
+        $this->mockSourceXML->getNextDataRow()->current();
+        $this->mockSourceXML->getNextDataRow()->next();
         $this->mockSourceXML->reset();
         $this->assertEquals(
-            $this->mockSourceXML->getNextDataRow(),
+            $this->mockSourceXML->getNextDataRow()->current(),
             [
                'name' => 'Belgian Waffles',
                'price' => '$5.95',

@@ -88,7 +88,7 @@ class DataSource
     ) {
         switch ($type) {
             case 'csv':
-                return new System\CSVOutput();
+                return new System\CSV();
         }
     }
 }

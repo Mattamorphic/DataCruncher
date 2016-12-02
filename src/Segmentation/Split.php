@@ -83,15 +83,15 @@ class Split
         if ($this->_direction === 'VERTICAL') {
             $result = array_fill(0, count($this->_groups)-1, []);
         }
-        while ([] !== ($row = $this->_source->getNextDataRow())) {
+        foreach ($this->_source->getNextDataRow() as $validRowCount => $row) {
             switch ($this->_direction) {
                 // TODO move processing of out files into functions that handle this
                 case 'HORIZONTAL':
                     // push the row on to our array of lines
                     $set[] = $row;
-                    // if we're at the chunk size then... 
+                    // if we're at the chunk size then...
                     if (count($set) === $this->_size) {
-                        // Decide on output mode 
+                        // Decide on output mode
                         if ($writeOutFiles) {
                             foreach ($set as $row) {
                                 $outfiles[(int) $ticker]->writeDataRow($row);
@@ -121,10 +121,10 @@ class Split
         return $result;
     }
     /**
-     * Opens an array of data sources 
+     * Opens an array of data sources
      * @param array     $outfiles       to open (by reference)
      * @param string    $node_name      are the names of the nodes if the file being opened is xml
-     * @param string    $start_elemnent is the parent element of the data nodes if the file is xml 
+     * @param string    $start_elemnent is the parent element of the data nodes if the file is xml
      *
      * @throws InvalidArgumentException
      * @return Boolean
@@ -157,12 +157,12 @@ class Split
         return true;
     }
     /**
-     * Set groupings creates an array of arrays, where each array represents a vertical group 
-     * 
-     * @param array     $groupings  Can be an array of comma seperated field names, 
+     * Set groupings creates an array of arrays, where each array represents a vertical group
+     *
+     * @param array     $groupings  Can be an array of comma seperated field names,
      *                              or of arrays where each field within represents a field name
      *
-     * @return array  
+     * @return array
     **/
     private function _setGroupings($groupings)
     {

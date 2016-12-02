@@ -191,44 +191,36 @@ class Query
         if ($this->_isdb) {
             $this->_source->query($this->_fields, $this->_where, $this->_condition, $this->_value);
         }
-        while ([] !== ($row = $this->_source->getNextDataRow())) {
+        foreach ($this->_source->getNextDataRow() as $ln => $row) {
             // If this is executed on a DB it will only contain valid results
             if ($this->_isdb) {
                 $valid = true;
             } else {
                 $valid = false;
-                $rowValue = trim($row[$this->_where]);
+                $rValue = trim($row[$this->_where]);
                 switch ($this->_condition) {
                     case 'EQUALS':
                     case 'GREATER':
                     case 'LESS':
                     case 'NOT':
-                        $valid = $this->_equality(
-                            $this->_condition,
-                            $rowValue,
-                            $this->_value
-                        );
+                        $valid = $this->_equality($this->_condition, $rValue, $this->_value);
                         break;
                     case 'AFTER':
                     case 'BEFORE':
                     case 'ON':
                     case 'BETWEEN':
                     case 'NOT_BETWEEN':
-                        $valid = $this->_date(
-                            $this->_condition,
-                            $rowValue,
-                            $this->_value
-                        );
+                        $valid = $this->_date($this->_condition, $rValue, $this->_value);
                         break;
                     case 'EMPTY':
                     case 'NOT_EMPTY':
-                        $valid = $this->_empty($this->_condition, $rowValue);
+                        $valid = $this->_empty($this->_condition, $rValue);
                         break;
                     case 'CONTAINS':
-                        $valid = $this->_contains($rowValue, $this->_value);
+                        $valid = $this->_contains($rValue, $this->_value);
                         break;
                     case 'IN':
-                        $valid = $this->_in($rowValue, $this->_value);
+                        $valid = $this->_in($rValue, $this->_value);
                         break;
                 }
             }
@@ -245,20 +237,17 @@ class Query
                         }
                     }
                 }
-                if (null === $outfile) {
-                    $result[] = $row;
-                } else {
-                    $outfile->writeDataRow($row);
-                }
+                ($outfile) ? $outfile->writeDataRow($row) : $result[] = $row;
                 if ($this->_limit > 0 && ($validRowCount === $this->_limit)) {
                     break;
                 }
             }
         }
         $this->_source->close();
-        if (null !== $outfile) {
+        if ($outfile) {
             switch ($outfile->getType()) {
                 case 'stream':
+                    $outfile->flushBuffer();
                     $outfile->reset();
                     $result = stream_get_contents($outfile->_fp);
                     $outfile->close();
@@ -266,8 +255,6 @@ class Query
                 case 'file':
                     $outfile->close();
                     $result = ['rows' => $validRowCount];
-                    break;
-                default:
                     break;
             }
         }
@@ -286,59 +273,59 @@ class Query
     /**
      * Checks to see if a row value is in query values
      *
-     * @param string $rowValue   The value in the row we want to check
-     * @param array  $queryValue The accepted values for rowValue
+     * @param string $rValue   The value in the row we want to check
+     * @param array  $queryValue The accepted values for rValue
      *
      * @return bool
     **/
-    private function _in($rowValue, $queryValue)
+    private function _in($rValue, $queryValue)
     {
         if (gettype($queryValue) !== 'array') {
             $queryValue = str_getcsv($queryValue);
         }
         $queryValue = array_map('trim', $queryValue);
-        return in_array($rowValue, $queryValue);
+        return in_array($rValue, $queryValue);
     }
     /**
-     * Checks to see if the rowValue is in the query value (equiv to %like%)
+     * Checks to see if the rValue is in the query value (equiv to %like%)
      *
-     * @param string $rowValue   The value in the row we want to check
+     * @param string $rValue   The value in the row we want to check
      * @param string $queryValue The global string we want to see if row value is in
      *
      * @return bool
     **/
-    private function _contains($rowValue, $queryValue)
+    private function _contains($rValue, $queryValue)
     {
-        return false !== strpos($rowValue, $queryValue);
+        return false !== strpos($rValue, $queryValue);
     }
     /**
-     * Equality checks between the rowValue and queryValue
+     * Equality checks between the rValue and queryValue
      *
      * @param string $operator   The comparison to perform
-     * @param string $rowValue   The value in the row we want to check
+     * @param string $rValue   The value in the row we want to check
      * @param string $queryValue The match value for the comparison
      *
      * @return bool
     **/
-    private function _equality($operator, $rowValue, $queryValue)
+    private function _equality($operator, $rValue, $queryValue)
     {
-        // if match value is numeric try and cast the rowValue
-        if (is_numeric($queryValue) && (false === ($rowValue = (float) $rowValue))) {
+        // if match value is numeric try and cast the rValue
+        if (is_numeric($queryValue) && (false === ($rValue = (float) $rValue))) {
             return false;
         }
         $result = false;
         switch ($operator) {
             case 'LESS':
-                $result = $rowValue < $queryValue;
+                $result = $rValue < $queryValue;
                 break;
             case 'GREATER':
-                $result = $rowValue > $queryValue;
+                $result = $rValue > $queryValue;
                 break;
             case 'EQUALS':
-                $result = $rowValue === $queryValue;
+                $result = $rValue === $queryValue;
                 break;
             case 'NOT':
-                $result = $rowValue !== $queryValue;
+                $result = $rValue !== $queryValue;
                 break;
         }
         return $result;
@@ -347,27 +334,27 @@ class Query
      * Check to see if the string is empty or not empty
      *
      * @param string $condition Either EMPTY or NOT EMPTY
-     * @param string $rowValue  The value in the row we want to check
+     * @param string $rValue  The value in the row we want to check
      *
      * @return bool
     **/
-    private function _empty($condition, $rowValue)
+    private function _empty($condition, $rValue)
     {
-        $result = $rowValue === '';
+        $result = $rValue === '';
         return ($condition === 'EMPTY') ? $result : !$result;
     }
     /**
      * Completes a comparison between a query date and a row date
      *
      * @param string $condition  The date comparison to carry out
-     * @param string $rowValue   The value being compared in the current row
+     * @param string $rValue   The value being compared in the current row
      * @param mixed  $queryValue array of DateTime or binary array of DateTime
      *
      * @return bool
     **/
-    private function _date($condition, $rowValue, $queryValue)
+    private function _date($condition, $rValue, $queryValue)
     {
-        $dateValue = \DateTime::createFromFormat($this->_dateFormat, $rowValue);
+        $dateValue = \DateTime::createFromFormat($this->_dateFormat, $rValue);
         $result = false;
 
         switch ($condition) {
