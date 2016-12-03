@@ -2,9 +2,11 @@
 [![Coverage Status](https://coveralls.io/repos/github/Matt-Barber/DataCruncher/badge.svg?branch=master)](https://coveralls.io/github/Matt-Barber/DataCruncher?branch=master)
 
 # DataCruncher :page_facing_up:
+
+##Version : 0.0.4
+
 DataCruncher is a PHP library allowing Database Tables, XML and CSV files (currently) to be queried as you might query a standard database table (with added extras).
-This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will
-require loading the array into memory and blarg.
+This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will require loading the array into memory and blarg.
 
 This has been designed with both a Front Controller pattern giving you access to a Manipulator object as well as a set of Decoupled self contained components
 
@@ -157,19 +159,36 @@ The available decoupled components are
     - Generate statistics based on an input source.
 
 - DataSources
-    - An interface for Datbases, CSV and XML files, CSV files support sorting if running on a nix platform through sort method.
+    - An interface for Databases, CSV and XML files, CSV files support sorting if running on a nix platform through sort method. These can be sorted by string or integer (numerically)
 
 The primary Front Controller component, if you'd like to use that is the Manipulator object, this currently only allows you to inject the Data source, Query and Statistics during instantiation.
+
+## Tests
+
+Tests can be run on most base systems using the PHPUnit xml file, simply call phpunit from the top level directory. For setup of folders see the same commands run for travis in .travis.yml
+
+## Issues?
+
+Please raise issues through the github :octocat: issues system, I'm always looking to improve this library so any feedback is always welcome! :smile:
 
 ## Contributing
 1. Fork it!
 2. Create your feature branch: `git checkout -b my-new-feature`
-3. Write some unit tests: 'code!'
+3. Write some unit/integration tests: 'code!'
 4. Commit your changes: `git commit -am 'Add some feature'`
 5. Push to the branch: `git push origin my-new-feature`
 6. Submit a pull request :D
 
 ## History
+03/12/2016
+- Refactored to use PHP Generators
+- Re-written integration testing
+- Renamed all Unit Tests to standardise
+- Changed rule array result to object
+- Added CSV File integer sorting
+- Increased test coverage
+- Initial CSV system handler (for strings)
+
 13/11/2016
 - Added Database Table support
 - Added Database to Factory
