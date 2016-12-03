@@ -23,7 +23,7 @@ class XMLFile extends DataFile implements DataInterface
     public function __construct(string $node_name, string $start_element)
     {
         $this->node_name = $node_name;
-        $this->start_elemeent = $start_element;
+        $this->start_element = $start_element;
     }
 
     /**
@@ -31,15 +31,17 @@ class XMLFile extends DataFile implements DataInterface
      * Returns the configured fields
      *
      * @param string $node_name
-     * @param string $start_element 
-     * 
+     * @param string $start_element
+     *
      * @return array
     **/
-    public function getHeaders() : array
+    public function getHeaders($force = true) : array
     {
-        $this->open(true, $this->node_name, $this->start_element);
-        $this->getNextDataRow();
-        $this->close();
+        if ($force || $this->_headers === []) {
+            $this->open(true, $this->node_name, $this->start_element);
+            $this->getNextDataRow()->current();
+            $this->close();
+        }
         return $this->_fields;
     }
 
@@ -49,16 +51,16 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return mixed
      */
-    public function getNextDataRow() :array
+    public function getNextDataRow()
     {
         $row = [];
         while ($this->_fp->name === $this->node_name) {
             $row = $this->_toArray(new \SimpleXMLElement($this->_fp->readOuterXML()));
-            break;
+            $this->_fields  = ($this->_fields === []) ? array_keys($row) : $this->_fields;
+            $this->_fp->next($this->node_name);
+            yield $row;
         }
-        $this->_fields  = ($this->_fields === []) ? array_keys($row) : $this->_fields;
-        $this->_fp->next($this->node_name);
-        return $row;
+
     }
     /**
      * Writes a row of data to an output file.

@@ -9,57 +9,85 @@ use org\bovigo\vfs\vfsStreamDirectory;
 
 class RuleTest extends \PHPUnit_Framework_TestCase
 {
-    public function testSetField()
+    /**
+     * Test setting the field for the rule
+     *
+     * @return null
+    **/
+    public function testItShouldSetTheFieldToTest()
     {
         $rule = new Rule();
         $rule->setField('test');
         $result = $rule->get();
         $this->assertEquals(
-            $result['field'],
+            $result->field,
             'test'
         );
     }
 
-    public function testSetLabel()
+    /**
+     * Test settinwg the label for the rule
+     *
+     * @return null
+    **/
+    public function testItShouldSetTheLabelForTheTest()
     {
         $rule = new Rule();
         $rule->setLabel('test');
         $result = $rule->get();
         $this->assertEquals(
-            $result['label'],
+            $result->label,
             'test'
         );
     }
 
-    public function testGroupExact()
+    /**
+     * Test grouping a rule by exact values
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByExact()
     {
         $rule = new Rule();
         $rule->groupExact();
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function']('a', null),
+            $func('a', null),
             'a'
         );
     }
 
-    public function testGroupNumeric()
+    /**
+     * Test grouping a rule by numeric boundaries
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByNumeric()
     {
         $rule = new Rule();
         $rule->groupNumeric(10);
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function'](8, 10),
+            $func(8, 10),
             '0, 10'
         );
     }
 
-    public function testGroupRegex()
+    /**
+     * Test grouping rule by regular expressions
+     *
+     * @return null
+    **/
+    public function testItShouldGroupByRegex()
     {
         $rule = new Rule();
         $rule->groupRegex('/^([\w\-]+)/i');
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function']('apple iphone', '/^([\w\-]+)/i'),
+            $func('apple iphone', '/^([\w\-]+)/i'),
             'apple'
         );
     }

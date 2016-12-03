@@ -69,7 +69,7 @@ class Rule
     public function groupNumeric(int $step) : Rule
     {
         $this->_option = $step;
-        $this->_function = function ($value, $step) {
+        $this->_function = function($value, $step) {
             $lower = ((int) ($value / $step)) * $step;
             $upper = (((int) ($value / $step)) + 1) * $step;
             return "$lower, $upper";
@@ -121,15 +121,15 @@ class Rule
     }
 
     /**
-     * Returns the rule as a structured array 
+     * Returns the rule as a structured array
      *
-     * @return array
+     * @return object
     **/
-    public function get() : array
+    public function get()
     {
-        return [
+        return (object)[
             'field' => $this->_field,
-            'function' => $this->_function,
+            'func' => $this->_function,
             'option' => $this->_option,
             'label' => $this->_label
         ];

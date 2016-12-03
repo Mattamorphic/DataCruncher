@@ -48,9 +48,9 @@ class MergerTest extends \PHPUnit_Framework_TestCase
         $this->mockMergeCSV = null;
     }
     /**
-     * @test
+     * It should merge two CSVs on the Email Field Correctly.
     **/
-    public function executeMergeOnEmailAddressCorrectlyMerges()
+    public function testItMergesTwoSourcesOnEmailCorrectly()
     {
         $merger = new Merger();
 
@@ -85,12 +85,11 @@ class MergerTest extends \PHPUnit_Framework_TestCase
     /**
      * Given no sources return an invalid argument exception
      *
-     * @test
      * @expectedException        InvalidArgumentException
      *
      * @return null
     **/
-    public function executeWithNoSourcesThrowsException()
+    public function testItShouldThrowAnExceptionWithNoSources()
     {
         $merger = new Merger();
         $merger->on('email')->execute();
@@ -100,12 +99,11 @@ class MergerTest extends \PHPUnit_Framework_TestCase
      * Given a field that doesn't exist in the sources
      * throw an invalid argument exception
      *
-     * @test
      * @expectedException        InvalidArgumentException
      *
      * @return null
     **/
-    public function executeWithNonExistentField()
+    public function testItShouldThrowAnExceptionIfTheFieldDoesntExist()
     {
         $merger = new Merger();
         $merger->fromSource($this->mockSourceCSV)

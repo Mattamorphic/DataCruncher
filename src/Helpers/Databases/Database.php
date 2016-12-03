@@ -38,6 +38,7 @@ class Database implements DataInterface
 
     private $_query = null;
     private $_headers = [];
+    private $_sortKey = null;
 
     /**
      * Sets the source for the DATABASE manipulator object.
@@ -150,6 +151,19 @@ class Database implements DataInterface
     }
 
     /**
+     * Sort the data by a given key for each query
+     * @param string    $key    A valid key in the table
+    **/
+    public function sort($key)
+    {
+        if (in_array($key, $this->getHeaders())) {
+            $this->_sortKey = $key;
+        } else {
+            throw new \PDOException("$key is not a header in the table");
+        }
+    }
+
+    /**
      * Execute a PDO prepared statement and store the result in the state attribute
      * _query -> think of this as our _fp
      *
@@ -175,10 +189,16 @@ class Database implements DataInterface
                     $value = '('. implode(',', $value) .')';
                 break;
             }
-            $sql .= " WHERE $where $condition :value";
+            $sql .= " WHERE $where $condition";
+            if (isset($value)) {
+                $sql .= " :value";
+            }
+        }
+        if ($this->_sortKey !== null) {
+            $sql .= " ORDER BY $this->_sortKey";
         }
         $this->_query = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
-        $this->_query->execute((isset($where)) ? [':value' => $value] : null);
+        $this->_query->execute((isset($value)) ? [':value' => $value] : null);
 
     }
 
@@ -200,7 +220,7 @@ class Database implements DataInterface
     public function getNextDataRow()
     {
         if ($this->_query !== null && ($line = $this->_query->fetch(\PDO::FETCH_ASSOC))) {
-            return $line;
+            yield $line;
         } else {
             return [];
         }

@@ -24,7 +24,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     private $mockOutXML;
 
     /**
-     * Setup creates a virtual file system before each test with a dummy file 
+     * Setup creates a virtual file system before each test with a dummy file
      */
     public function setUp()
     {
@@ -94,17 +94,16 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * It should return an array of headers and values 
+     * It should return an array of headers and values
      *
-     * @test
      *
      * @return void
     **/
-    public function getNextDataRow()
+    public function testItShouldReturnFirstBreakfastMenuElement()
     {
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
         $this->assertEquals(
-            $this->mockSourceXML->getNextDataRow(),
+            $this->mockSourceXML->getNextDataRow()->current(),
             [
                'name' => 'Belgian Waffles',
                'price' => '$5.95',
@@ -117,24 +116,22 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a read is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
      */
-    public function readBeforeOpenThrowsException()
+    public function testItShouldThrowAnExceptionIfNotOpen()
     {
         $this->mockOutXML->writeDataRow([]);
     }
     /**
      * It should write the correct data back to the file
      *
-     * @test
      *
      * @return void
      */
-    public function writeDataRow()
+    public function testItShouldWriteALineToAnXMLFile()
     {
         $this->mockOutXML->open(false, 'test', 'data');
         $this->mockOutXML->writeDataRow(
@@ -146,7 +143,7 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
         $this->mockOutXML->close();
         $this->mockOutXML->open(true, 'test', 'data');
         $this->assertEquals(
-            $this->mockOutXML->getNextDataRow(),
+            $this->mockOutXML->getNextDataRow()->current(),
             [
                 'name' => 'tony',
                 'hero' => 'iron man'
@@ -156,9 +153,9 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * Testing Writing to an XMLFile Source
      */
-    public function writeEmptyDataRowReturnsFalse()
+    public function testItShouldReturnFalseIfWritingEmptyRow()
     {
         $this->mockOutXML->open(false, 'test', 'data');
         $this->assertFalse(
@@ -168,26 +165,24 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     /**
      * Unit test, If a file pointer hasn't been opened and a write is attempted
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      *
      * @return null
      */
-    public function writeBeforeOpenThrowsException()
+    public function testItShouldThrowAnErrorOnWriteBeforeOpen()
     {
         $this->mockOutXML->writeDataRow([]);
     }
     /**
      * Unit test, If a file pointer has been opened and another open is called
      *
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerExistsException
      * @expectedExceptionMessage A filepointer exists on this object, use class::close to close the current pointer
      *
      * @return null
      */
-    public function openWhileFilePointerIsOpenThrowsException()
+    public function testItShouldThrowAnErrorIfAlreadyOpen()
     {
         // initial open
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
@@ -196,16 +191,16 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * Testing Resetting the filepointer to the start of the file
      */
-    public function resetTheFilePointerToStartOfFile()
+    public function testItShouldResetTheFilePointerToTheStartOfTheFile()
     {
         $this->mockSourceXML->open(true, 'food', 'breakfast_menu');
-        $this->mockSourceXML->getNextDataRow();
-        $this->mockSourceXML->getNextDataRow();
+        $this->mockSourceXML->getNextDataRow()->current();
+        $this->mockSourceXML->getNextDataRow()->next();
         $this->mockSourceXML->reset();
         $this->assertEquals(
-            $this->mockSourceXML->getNextDataRow(),
+            $this->mockSourceXML->getNextDataRow()->current(),
             [
                'name' => 'Belgian Waffles',
                'price' => '$5.95',
@@ -216,21 +211,19 @@ class XMLFileTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      */
-    public function resetFilePointerOnNullFileThrowsException()
+    public function testItShouldThrowAnErrorIfResetBeforeSet()
     {
         $this->mockSourceXML->reset();
     }
 
     /**
-     * @test
      * @expectedException        mfmbarber\DataCruncher\Exceptions\FilePointerInvalidException
      * @expectedExceptionMessage The filepointer is null on this object, use class::open to open a new filepointer
      */
-    public function closeFilePointerOnNullFileThrowsException()
+    public function testItShouldThrowAnErrorIfCloseBeforeOpen()
     {
         $this->mockSourceXML->close();
     }

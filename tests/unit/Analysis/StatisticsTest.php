@@ -46,11 +46,9 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
      * Tests the execution of percentages grouping exactly by the values in a
      * field
      *
-     * @test
-     *
      * @return null
     **/
-    public function executePercentagesWorkCorrectlyExactGrouping()
+    public function testItShouldCalculatePercentagesBasedOnExactNames()
     {
         $stats = new Statistics();
         $rule = new Rule();
@@ -75,14 +73,12 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
      * Tests the execution of percentages grouping the values in a field
      * by numerical range i.e. 10 would be (1 -> 10, 10 -> 20)
      *
-     * @test
-     *
      * @return null
     **/
-    public function executePercentagesWorkCorrectlyNumericGrouping()
+    public function testItShouldCalculatePercentagesBasedOnNumericGroupings()
     {
         $stats = new Statistics();
-         $rule = new Rule();
+        $rule = new Rule();
         $rule = $rule->setField('age')->groupNumeric(10);
         $stats->addRule($rule);
         $result = $stats->fromSource($this->mockSourceCSV)
@@ -103,11 +99,9 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
      * Tests the execution of percentages grouping the values in a field
      * by date
      *
-     * @test
-     *
      * @return null
     **/
-    public function executePercentagesWorkCorrectlyDateGrouping()
+    public function testItShouldCalculatePercentagesBasedDateGroupings()
     {
         $stats = new Statistics();
         $rule = new Rule();
@@ -133,7 +127,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     /**
      * @t/est
     **/
-    public function executePercentageOutfile()
+    public function ____testItShouldWritePercentagesToOutfile()
     {
         $stats = new Statistics();
         $rule = new Rule();
@@ -150,9 +144,11 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * Tests the execution calculates by percentages and groups the results by regex
+     *
+     * @return null
     **/
-    public function executeRegexTest()
+    public function testItShouldCalculatePercentagesOfPhonesGroupedByRegex()
     {
         $stats = new Statistics();
         $rule = new Rule();
@@ -174,9 +170,11 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @test
+     * Tests the using of multiple rules to get multiway information sets
+     *
+     * @return null
     **/
-    public function executeMultipleStats()
+    public function testItShouldReturnMultipleSetsOfResultsGivenMultipleRules()
     {
         $stats = new Statistics();
         $rules = [];
@@ -206,9 +204,12 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         );
     }
     /**
-     * @test
+     * Tests the using of multiple rules to get multiway information sets
+     * with labelled results
+     *
+     * @return null
     **/
-    public function executeStatisticsWithLabels()
+    public function testItShouldReturnMultipleSetsOfResultsGivenMultipleRulesWithLabels()
     {
         $stats = new Statistics();
         $rules = [];
@@ -240,9 +241,11 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-    * @test
+    * Test the tracking of execution time
+    *
+    * @return null
     **/
-    public function trackTimeOfExecution()
+    public function testItShouldTrackTheTimeOfExecution()
     {
         $stats = new Statistics();
         $rules = [];

@@ -19,7 +19,7 @@ use mfmbarber\DataCruncher\Exceptions;
 
 class Statistics
 {
-    private $_sourceFile;
+    private $_source;
     private $_type;
     private $_rules = [];
 
@@ -37,7 +37,7 @@ class Statistics
      **/
     public function fromSource(DataInterface $sourceFile) : Statistics
     {
-        $this->_sourceFile = $sourceFile;
+        $this->_source = $sourceFile;
         return $this;
     }
     /**
@@ -81,25 +81,24 @@ class Statistics
         array_walk(
             $this->_rules,
             function (&$rule) use (&$idx, &$keys) {
-                $rule['label'] = $rule['label'] ?? $idx++;
-                $keys[] = $rule['label'];
+                $rule->label = $rule->label ?? $idx++;
+                $keys[] = $rule->label;
             }
         );
         // then we need to create a results array, where each element is
         // based on a rule
         $results = array_fill_keys($keys, []);
-        Validation::openDataFile($this->_sourceFile);
-        if ($output !== null) {
-            Validation::openDataFile($output);
-        }
-        $rowTotal = 0; // count the rows
+        Validation::openDataFile($this->_source);
+        // if ($output !== null) {
+        //     Validation::openDataFile($output);
+        // }
         ($timer) ? $stopwatch->start('execute') : null;
-        while ([] !== ($row = $this->_sourceFile->getNextDataRow())) {
-            ++$rowTotal; //used for percentages
+        foreach ($this->_source->getNextDataRow() as $rowTotal => $row) {
             foreach ($this->_rules as $key => $rule) {
-                $this->processRow($results[$rule['label']], $row, $rule);
+                $this->processRow($results[$rule->label], $row, $rule);
             }
         }
+        ++$rowTotal;
         // For percentages calculate the percentage based on the total rows
         if ($this->_type == 'PERCENT') {
             foreach ($results as &$result) {
@@ -108,8 +107,8 @@ class Statistics
                 }
             }
         }
-        $this->_sourceFile->close();
-        if ($output !== null) {
+        $this->_source->close();
+        //if ($output !== null) {
             // foreach ($results as $key => &$result) {
             //     foreach ($result as $key => $value) {
             //         $row = [
@@ -119,13 +118,13 @@ class Statistics
             //         $output->writeDataRow($result);
             //     }
             // }
-            $output->close();
-            return true;
-        }
+            //$output->close();
+            //return true;
+        //}
         // if we have a single result - return that
         if ($timer) {
             $time = $stopwatch->stop('execute');
-            $results = ['data' => $results];
+            $results['data'] = $results;
             $results['timer'] = [
                 'elapsed' => $time->getDuration(), // milliseconds
                 'memory' => $time->getMemory() // bytes
@@ -134,10 +133,19 @@ class Statistics
         return $results;
     }
 
-    public function processRow(array &$result, array $row, array $rule)
+    /**
+     * Process the rule against the row
+     * @param array     &$result    The result of applying the rule
+     * @param array     $row        The row to test
+     * @param object     $rule       The rule
+     *
+     * @return null
+    **/
+    public function processRow(array &$result, array $row, \stdClass $rule)
     {
         // invoke the closure assigned to the attribute (our statistics func)
-        $key = $rule['function']($row[$rule['field']], $rule['option']);
+        $func = $rule->func;
+        $key = $func($row[$rule->field], $rule->option);
         if (false !== $key) {
             if (!array_key_exists($key, $result)) {
                 $result[$key] = 0;

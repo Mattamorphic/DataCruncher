@@ -128,4 +128,64 @@ class Validation
         fclose($f);
         return $csv;
     }
+
+    /**
+     * Compares the values in two different arrays, to see if arr1 is in arr2
+     * @param array     $arr1
+     * @param array     $arr2
+     *
+     * @return bool
+    **/
+    public static function areArraysDifferent(array $arr1, array $arr2) : bool
+    {
+        return count(array_diff($arr1, $arr2)) ? true : false;
+    }
+
+    /**
+     * Delete files from a directory - unless there extension exists in array
+     * @param string    $dir                    The directory to delete the files from
+     * @param array     $dontDeleteExtensions   Don't delete files with these extensions
+     *
+     * @return null
+    **/
+    public static function deleteFiles(string $dir, array $dontDeleteExtensions = [])
+    {
+        if (false !== ($files = scandir($dir))) {
+            array_map(
+                function ($file) use ($dir, $dontDeleteExtensions) {
+                    if (strlen($file) <= 2) {
+                        return;
+                    }
+                    $file = strtolower("$dir/$file");
+                    if (is_dir($file)) {
+                        return;
+                    }
+                    if (!in_array(pathinfo($file, PATHINFO_EXTENSION), $dontDeleteExtensions)) {
+                        @unlink($file);
+                    }
+                },
+                $files
+            );
+        }
+    }
+
+    /**
+     * Completes a multineed stripos across a haystack string
+     *
+     * @param string    $haystack   The string to scan
+     * @param array     $needles    The characters to check for
+     *
+     * @return array
+    **/
+    public static function multiStripos(string $haystack, array $needles, bool $filter = false)
+    {
+        $found = array_flip($needles);
+        array_walk(
+            $found,
+            function (&$needle, $key) use ($haystack) {
+                $needle = stripos($haystack, $key);
+            }
+        );
+        return ($filter) ? count(array_filter(array_values($found), function ($item) { return $item !== false; })) > 0 : $found;
+    }
 }

@@ -41,7 +41,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         );
     }
 
-    public function  setUp()
+    public function setUp()
     {
         parent::setUp();
         $this->mockDB = new Database();
@@ -61,9 +61,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Return the configuration for this source helper
-     * @test
     **/
-    public function getSourceName()
+    public function testItShouldReturnValidSourceName()
     {
         $this->assertEquals(
             $this->mockDB->getSourceName(),
@@ -73,13 +72,12 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
     }
     /**
      * Test that the Database helper returns the next row from the result
-     * @test
     **/
-    public function getNextRowsCorrectly()
+    public function testItShouldReturnTheFirstResult()
     {
         $this->mockDB->query(['name' => 0, 'email' => 1]);
         $this->assertEquals(
-            $this->mockDB->getNextDataRow(),
+            $this->mockDB->getNextDataRow()->current(),
             [
                 'name' => 'matt',
                 'email' => 'mfmbarber@gmail.com'
@@ -89,9 +87,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Return the current headers
-     * @test
     **/
-    public function getSourceHeaders()
+    public function testItShouldReturnHeaders()
     {
         $this->assertEquals(
             $this->mockDB->getHeaders(),
@@ -107,9 +104,10 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     /**
      * Test writing a data row
-     * @test
+     *
+     * @return null
     **/
-    public function writeDataRow()
+    public function testItShouldWriteLineToTheDB()
     {
         $this->mockDB->writeDataRow(
             [
@@ -123,7 +121,44 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->mockDB->query(['email' => 1], 'name', 'CONTAINS', 'Tony');
         $this->assertEquals(
             ['email' => 'tony@starkindustries.com'],
-            $this->mockDB->getNextDataRow()
+            $this->mockDB->getNextDataRow()->current()
         );
+    }
+
+    /**
+     * Test sorting a database table during execution
+     *
+     * @return null
+    **/
+    public function testItShouldSortTheResultData()
+    {
+        $this->mockDB->sort('age');
+        $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
+        $this->assertEquals(
+            ['name' => 'ryan'],
+            $this->mockDB->getNextDataRow()->current()
+        );
+    }
+    /**
+     * Test returning all the data
+     *
+     * @return null
+    **/
+    public function testItShouldReturnAllTheData()
+    {
+        $this->mockDB->query(['name' => 1], 'id', 'NOT_EMPTY');
+        $results = [
+            'matt',
+            'laura',
+            'ryan',
+            'ann',
+            'mark'
+        ];
+        foreach ($results as $result) {
+            $this->assertEquals(
+                ['name' => $result],
+                $this->mockDB->getNextDataRow()->current()
+            );
+        }
     }
 }

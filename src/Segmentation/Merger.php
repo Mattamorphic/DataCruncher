@@ -79,16 +79,15 @@ class Merger
         do {
             // get a source
             $analyse = array_shift($this->_sources);
-            // get the first row and check there's a matching field
-            $row = $analyse->getNextDataRow();
-            if (!isset($row[$this->_field])) {
-                throw new \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
-            }
+            
             // if the field is valid, process it
-            do {
+            foreach ($analyse->getNextDataRow() as $rowNumber => $row) {
+                if ($rowNumber === 0 && !isset($row[$this->_field])) {
+                    throw new \InvalidArgumentException("$this->_field not found in {$analyse->getSourceName()}");
+                }
                 $this->_processRow($result, $row);
                 // while we have rows to process against
-            } while ([] !== ($row = $analyse->getNextDataRow()));
+            }
             // reset the analyses object
             $analyse->reset();
         } while (count($this->_sources));
@@ -106,8 +105,8 @@ class Merger
     {
         // Foreach of the remaining sources
         foreach ($this->_sources as $source) {
-            // While we have lines to merge 
-            while ([] !== ($merge_row = $source->getNextDataRow())) {
+            // While we have lines to merge
+            foreach ($source->getNextDataRow() as $validRowCount => $merge_row) {
                 // if they are equal
                 if ($row[$this->_field] === $merge_row[$this->_field]) {
                     // do your thing
