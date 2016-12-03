@@ -12,13 +12,13 @@ namespace mfmbarber\DataCruncher\Helpers\System;
 use mfmbarber\DataCruncher\Exceptions;
 use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
-class CSVOutput extends CSVFile
+class CSV extends CSVFile
 {
     /**
     * Override the setSource method so we're using a temp file
     * by default these have read/write states
     **/
-    public function setSource($location, array $properties)
+    public function setSource(string $location, array $properties)
     {
         $this->_filename = 'temp_file';
     }
@@ -37,11 +37,12 @@ class CSVOutput extends CSVFile
         }
     }
     /**
-     * Returns the type of the source 
+     * Returns the type of the source
      * @return string
     **/
-    public function getType()
+    public function getType() : string
     {
         return 'stream';
     }
+
 }

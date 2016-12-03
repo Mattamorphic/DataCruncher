@@ -20,7 +20,7 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule->setField('test');
         $result = $rule->get();
         $this->assertEquals(
-            $result['field'],
+            $result->field,
             'test'
         );
     }
@@ -36,7 +36,7 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule->setLabel('test');
         $result = $rule->get();
         $this->assertEquals(
-            $result['label'],
+            $result->label,
             'test'
         );
     }
@@ -51,8 +51,9 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule->groupExact();
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function']('a', null),
+            $func('a', null),
             'a'
         );
     }
@@ -67,8 +68,9 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule->groupNumeric(10);
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function'](8, 10),
+            $func(8, 10),
             '0, 10'
         );
     }
@@ -83,8 +85,9 @@ class RuleTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule->groupRegex('/^([\w\-]+)/i');
         $result = $rule->get();
+        $func = $result->func;
         $this->assertEquals(
-            $result['function']('apple iphone', '/^([\w\-]+)/i'),
+            $func('apple iphone', '/^([\w\-]+)/i'),
             'apple'
         );
     }

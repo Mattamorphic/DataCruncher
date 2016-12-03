@@ -204,7 +204,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @return null
     **/
-    public function itShouldThrowAnExceptionIfSelectIsAnAssocArray()
+    public function testItShouldThrowAnExceptionIfSelectIsAnAssocArray()
     {
         $query = new Query();
         $result = $query->fromSource($this->mockSourceCSV)
@@ -213,6 +213,26 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->where('name')
             ->value('matt')
             ->execute();
+    }
+
+    /**
+     * @expectedException           \Exception
+     * @expectedExceptionMessage    One or more of toaster is not in email, name, colour, dob, age
+    **/
+    public function testItShouldThrowAnExceptionIfFieldIsNotInSourceBeforeSource()
+    {
+        $query = new Query();
+        $query->select(['toaster'])->fromSource($this->mockSourceCSV);
+    }
+
+    /**
+     * @expectedException            \Exception
+     * @expectedExceptionMessage     One or more of toaster is not in email, name, colour, dob, age
+    **/
+    public function testItShouldThrowAnExceptionIfFieldIsNotInSourceAfterSource()
+    {
+        $query = new Query();
+        $query->fromSource($this->mockSourceCSV)->select(['toaster']);
     }
 
     /**
