@@ -48,12 +48,13 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             $row,
             [
-                'id' => 701,
+                'id' => '701',
                 'first_name' => 'Aaron',
                 'last_name' => 'Collins',
                 'email' => 'acollinsjg@qq.com',
                 'gender' => 'Male',
-                'ip_address' => '41.138.204.207'
+                'ip_address' => '41.138.204.207',
+                'age' => '38'
             ]
         );
     }
@@ -72,7 +73,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
                     'last_name' => 'Simmons',
                     'email' => 'psimmons0@state.gov',
                     'gender' => 'Male',
-                    'ip_address' => '139.134.139.43'
+                    'ip_address' => '139.134.139.43',
+                    'age' => '37'
                 ]
         );
 
@@ -361,13 +363,14 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             $result,
             [
                 [
-                    "id" => 1,
+                    "id" => '1',
                     "first_name" => "Paul",
                     "last_name" => "Simmons",
                     "email" => "psimmons0@state.gov",
                     "gender" => "Male",
                     "ip_address" => "139.134.139.43",
-                    "age" => 36
+                    "age" => '37',
+                    'colour' => 'red'
                 ]
             ]
         );

@@ -61,4 +61,39 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
             ]
         );
     }
+
+    public function testItShouldProcessMultipleRules()
+    {
+        $statistics = new Statistics();
+        $rule = new Rule();
+        $rule = $rule->setField('gender')->groupExact()->setLabel('gender');
+        $statistics->addRule($rule);
+        $rule = $rule->setField('age')->groupNumeric(10)->setLabel('age_in_10s');
+        $statistics->addRule($rule);
+        $csv = DataSource::generate('file', 'csv');
+        $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
+        $csv->setSource($file, ['modifier' => 'r']);
+        $result = $statistics->fromSource($csv)
+            ->percentages()
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                'gender' => [
+                    'Male' => 53.400000000000006,
+                    'Female' => 46.600000000000001
+                ],
+                'age_in_10s' => [
+                   '30, 40' => 14.100000000000001,
+                   '20, 30' => 15.600000000000001,
+                   '60, 70' => 14.600000000000001,
+                   '40, 50' => 15.5,
+                   '10, 20' => 10.100000000000001,
+                   '50, 60' => 15.600000000000001,
+                   '70, 80' => 13.4,
+                   '80, 90' => 1.1000000000000001,
+               ]
+            ]
+        );
+    }
 }
