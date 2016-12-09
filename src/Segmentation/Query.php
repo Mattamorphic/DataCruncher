@@ -191,7 +191,7 @@ class Query
         if ($this->_isdb) {
             $this->_source->query($this->_fields, $this->_where, $this->_condition, $this->_value);
         }
-        foreach ($this->_source->getNextDataRow() as $ln => $row) {
+        foreach ($this->_source->getNextDataRow() as $row) {
             // If this is executed on a DB it will only contain valid results
             if ($this->_isdb) {
                 $valid = true;

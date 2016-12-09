@@ -83,7 +83,7 @@ class Split
         if ($this->_direction === 'VERTICAL') {
             $result = array_fill(0, count($this->_groups)-1, []);
         }
-        foreach ($this->_source->getNextDataRow() as $validRowCount => $row) {
+        foreach ($this->_source->getNextDataRow() as $row) {
             switch ($this->_direction) {
                 // TODO move processing of out files into functions that handle this
                 case 'HORIZONTAL':
