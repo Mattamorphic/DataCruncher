@@ -223,6 +223,10 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 ## Upcoming Release 0.0.5
 - Factory Processor
 - Removed Manipulator
+- Rounding percentages when calculating stats
+- Codeclimate integration
+- Removed unused variables
+- Wildcard Selects on queries
 
 ## History
 03/12/2016
