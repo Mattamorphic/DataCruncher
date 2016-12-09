@@ -3,7 +3,7 @@ namespace mfmbarber\DataCruncher\Tests\Integration\QueryTests;
 
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
-use mfmbarber\DataCruncher\Segmentation\Query;
+use mfmbarber\DataCruncher\Processor;
 
 
 class QueryTest extends \PHPUnit_Framework_TestCase
@@ -21,7 +21,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldQueryACSVFile()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
         $csv->setSource($file, ['modifier' => 'r']);
@@ -45,7 +45,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldQueryAXMLFile()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
         $xml->setSource($file, ['modifier' => 'r']);
@@ -70,7 +70,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldOutputCSVString()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
         $xml->setSource($file, ['modifier' => 'r']);
@@ -93,7 +93,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldOutputToCSV()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
@@ -114,7 +114,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
     public function testItShouldOutputToXML(){
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
@@ -138,7 +138,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldOutputToDBTable(){}
     public function testItShouldQueryEquals()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $xml->setSource($this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml');
         $result = $query->fromSource($xml)

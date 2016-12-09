@@ -3,10 +3,7 @@ namespace mfmbarber\DataCruncher\Tests\Integration\CSVTests;
 
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
-use mfmbarber\DataCruncher\Analysis\Statistics;
-use mfmbarber\DataCruncher\Analysis\Config\Rule;
-use mfmbarber\DataCruncher\Segmentation\Query;
-use mfmbarber\DataCruncher\Segmentation\Merger;
+use mfmbarber\DataCruncher\Processor;
 
 /**
  * Test the CSV File object end to end using components
@@ -87,7 +84,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnAnArrayOnceQueried()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $result = $query->fromSource($this->sourceCSV)
             ->select(['id', 'first_name'])
             ->where('email')
@@ -105,7 +102,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldCreateAnOutFileOnceQueried()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $out = DataSource::generate('file', 'csv');
         $out->setSource(
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
@@ -137,7 +134,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnAnExecutionTimeAndMemoryUsage()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $out = Datasource::generate('file', 'csv');
         $out->setSource(
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
@@ -167,7 +164,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnAnXMLFile()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $out = DataSource::generate('file', 'xml', 'person', 'people');
         $out->setSource(
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.xml",
@@ -212,8 +209,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnStatistics()
     {
-        $stats = new Statistics();
-        $rule = new Rule();
+        $stats = Processor::generate('analysis', 'statistics');
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $stats->addRule($rule);
         $result = $stats->fromSource($this->sourceCSV)
@@ -236,13 +233,13 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnMultipleStatistics()
     {
-        $stats = new Statistics();
+        $stats = Processor::generate('analysis', 'statistics');
 
-        $rule = new Rule();
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $stats->addRule($rule);
 
-        $rule = new Rule();
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('email')->groupRegex('/(((?<=\.)\w{2,4}\.\w{2,4}|(?<=\.)\w{2,4}))$/i');
         $stats->addRule($rule);
 
@@ -267,7 +264,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldRemapTheOutput()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $out = Datasource::generate('file', 'csv');
         $out->setSource(
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
@@ -327,7 +324,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldLimitTheAmountOfResults()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $result = $query->fromSource($this->sourceCSV)
             ->select(['id'])
             ->where('email')
@@ -349,7 +346,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldMergeTwoFiles()
     {
-        $merger = new Merger();
+        $merger = Processor::generate('segmentation', 'merge');
         $csv = Datasource::generate('file', 'csv');
         $csv->setSource(
             "{$this->dir}/InputFiles/MergeRows.csv",

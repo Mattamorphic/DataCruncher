@@ -3,10 +3,7 @@ namespace mfmbarber\DataCruncher\Tests\Integration\CSVTests;
 
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
-use mfmbarber\DataCruncher\Analysis\Statistics;
-use mfmbarber\DataCruncher\Analysis\Config\Rule;
-use mfmbarber\DataCruncher\Segmentation\Query;
-use mfmbarber\DataCruncher\Segmentation\Merger;
+use mfmbarber\DataCruncher\Processor;
 
 use mfmbarber\DataCruncher\Exceptions\InvalidFileException;
 
@@ -108,7 +105,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldFailQueryingAHeaderThatDoesntExist()
     {
-        $query = new Query();
+        $query = Processor::generate('segmentation', 'query');
         $result = $query->fromSource($this->sourceCSV)
             ->select(['fandangle'])
             ->where('email')

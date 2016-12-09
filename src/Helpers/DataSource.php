@@ -10,10 +10,7 @@
 declare(strict_types=1);
 namespace mfmbarber\DataCruncher\Helpers;
 
-use mfmbarber\DataCruncher\Helpers\Files;
-use mfmbarber\DataCruncher\Helpers\Databases;
-use mfmbarber\DataCruncher\Helpers\System;
-
+use mfmbarber\DataCruncher\Helpers\{Files, Databases, System};
 class DataSource
 {
     /**
