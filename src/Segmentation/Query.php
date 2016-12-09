@@ -57,8 +57,11 @@ class Query
      *
      * @return Query
     **/
-    public function select(array $fields) : Query
+    public function select(array $fields = []) : Query
     {
+        if ($fields === []) {
+            return $this;
+        }
         if (!Validation::isNormalArray($fields, 1)) {
             throw new Exceptions\ParameterTypeException(
                 'The parameter type for this method was incorrect, '
@@ -226,7 +229,9 @@ class Query
             }
             if ($valid) {
                 $validRowCount++;
-                $row = array_intersect_key($row, $this->_fields);
+                if ($this->_fields !== []) {
+                    $row = array_intersect_key($row, $this->_fields);
+                }
                 if (null !== $mappings) {
                     foreach ($row as $header => $value) {
                         // if the mappings are not equal, then pull out the value we want
