@@ -313,6 +313,35 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('timer', $result);
         $this->assertTrue(is_integer($result['timer']['elapsed']));
     }
+
+    /**
+     * Tests that a wildcard can be used to get all the fields
+     * @return null
+    **/
+    public function testItShouldAllowWildCardSelect()
+    {
+        $query = new Query();
+
+        $result = $query->fromSource($this->mockSourceCSV)
+            ->select()
+            ->where('name')
+            ->condition('contains')
+            ->value('tony')
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'email' => 'tony.stark@avengers.com',
+                    'name' => 'tony',
+                    'colour' => 'red, gold',
+                    'dob' => '02/05/1990',
+                    'age' => '25'
+                ]
+            ]
+        );
+    }
+
     /**
      * Data provider for executeContains
      *
