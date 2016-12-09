@@ -31,9 +31,9 @@ class DataSource
             case 'file':
                 return self::generateFile($type, $node, $parent);
             case 'db':
-                return self::generateDB($type, $node, $parent);
+                return self::generateDB($type);
             case 'system':
-                return self::generateSystemOutput($type, $node, $parent);
+                return self::generateSystemOutput($type);
         }
     }
 
@@ -60,11 +60,8 @@ class DataSource
      *
      * @return DataInterface
     **/
-    public static function generateDB(
-        string $type,
-        string $node = null,
-        string $parent = null
-    ) {
+    public static function generateDB(string $type)
+    {
         // for now
         $type = 'sql';
         switch ($type) {
@@ -78,11 +75,8 @@ class DataSource
      *
      * @return DataInterface
     **/
-    public static function generateSystemOutput(
-        string $type,
-        string $node = null,
-        string $parent = null
-    ) {
+    public static function generateSystemOutput(string $type)
+    {
         switch ($type) {
             case 'csv':
                 return new System\CSV();

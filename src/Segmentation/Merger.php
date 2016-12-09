@@ -79,7 +79,7 @@ class Merger
         do {
             // get a source
             $analyse = array_shift($this->_sources);
-            
+
             // if the field is valid, process it
             foreach ($analyse->getNextDataRow() as $rowNumber => $row) {
                 if ($rowNumber === 0 && !isset($row[$this->_field])) {
@@ -106,7 +106,7 @@ class Merger
         // Foreach of the remaining sources
         foreach ($this->_sources as $source) {
             // While we have lines to merge
-            foreach ($source->getNextDataRow() as $validRowCount => $merge_row) {
+            foreach ($source->getNextDataRow() as $merge_row) {
                 // if they are equal
                 if ($row[$this->_field] === $merge_row[$this->_field]) {
                     // do your thing
