@@ -261,4 +261,31 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('timer', $result);
         $this->assertTrue(is_integer($result['timer']['elapsed']));
     }
+
+    /**
+     * Test the rounding of percentages to floating point
+     *
+     * @return null
+    **/
+    public function testItShouldRoundPercentagesToOneDecimalPoint()
+    {
+        $stats = new Statistics();
+        $rules = [];
+        $rule = new Rule();
+        $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
+        $stats->addRule($rule);
+        $result = $stats->fromSource($this->mockSourceCSV)
+            ->percentages(1)
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'apple' => 25.0,
+                    'samsung' => 50.0,
+                    'htc' => 25.0
+                ]
+            ]
+        );
+    }
 }

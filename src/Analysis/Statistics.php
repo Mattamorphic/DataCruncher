@@ -21,6 +21,7 @@ class Statistics
 {
     private $_source;
     private $_type;
+    private $_round;
     private $_rules = [];
 
     public function __construct()
@@ -45,9 +46,10 @@ class Statistics
      *
      * @return Statistics
     **/
-    public function percentages() : Statistics
+    public function percentages(int $round = null) : Statistics
     {
         $this->_type = 'PERCENT';
+        $this->_round = $round;
         return $this;
     }
 
@@ -104,6 +106,9 @@ class Statistics
             foreach ($results as &$result) {
                 foreach ($result as $key => $value) {
                     $result[$key] = (100 / $rowTotal) * $value;
+                    if ($this->_round !== null) {
+                        $result[$key] = round($result[$key], $this->_round);
+                    }
                 }
             }
         }
