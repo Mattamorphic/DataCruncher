@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/Matt-Barber/DataCruncher.svg?branch=master)](https://travis-ci.org/Matt-Barber/DataCruncher)
 [![Coverage Status](https://coveralls.io/repos/github/Matt-Barber/DataCruncher/badge.svg?branch=master)](https://coveralls.io/github/Matt-Barber/DataCruncher?branch=master)
+[![Code Climate](https://codeclimate.com/github/Matt-Barber/DataCruncher/badges/gpa.svg)](https://codeclimate.com/github/Matt-Barber/DataCruncher)
 
 # DataCruncher :page_facing_up:
 
