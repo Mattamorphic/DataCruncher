@@ -39,7 +39,7 @@ class Merger
      *
      * @return this
      */
-    public function on(string $field) : Merger
+    public function using(string $field) : Merger
     {
         $this->_field =  $field;
         return $this;

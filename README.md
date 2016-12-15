@@ -227,6 +227,7 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 - Codeclimate integration
 - Removed unused variables
 - Wildcard Selects on queries
+- Changed method on to using in Merger (short method infringement)
 
 ## History
 03/12/2016
