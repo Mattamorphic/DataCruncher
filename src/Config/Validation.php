@@ -119,13 +119,13 @@ class Validation
     **/
     public static function arrayToCSV(array $arr, string $delimiter = ',', string $encloser = '"') : string
     {
-        $f = fopen('php://temp', 'rw');
+        $temp = fopen('php://temp', 'rw');
         foreach ($arr as $row) {
-            fputcsv($f, $row, $delimiter, $encloser);
+            fputcsv($temp, $row, $delimiter, $encloser);
         }
-        rewind($f);
-        $csv = stream_get_contents($f);
-        fclose($f);
+        rewind($temp);
+        $csv = stream_get_contents($temp);
+        fclose($temp);
         return $csv;
     }
 

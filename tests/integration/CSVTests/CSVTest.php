@@ -354,7 +354,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         );
         $result = $merger->fromSource($this->sourceCSV)
             ->fromSource($csv)
-            ->on('email')
+            ->using('email')
             ->execute();
         $this->assertEquals(
             $result,
