@@ -24,6 +24,9 @@ class Query
     private $_condition = '';
     private $_value = '';
     private $_limit = -1;
+    private $_timer = null;
+    private $_out = null;
+    private $_mappings = null;
 
     /**
      * Sets the data source for the query
@@ -32,7 +35,7 @@ class Query
      *
      * @return Query
     **/
-    public function fromSource(DataInterface $source)
+    public function from(DataInterface $source)
     {
         $this->_source = $source;
         if (get_class($source) === 'mfmbarber\DataCruncher\Helpers\Databases\Database') {
@@ -173,6 +176,31 @@ class Query
     }
 
     /**
+     * Switches on a timer for the execution process
+     *
+     * @return Query
+    **/
+    public function timer() : Query
+    {
+        $this->_timer = new Stopwatch();
+        return $this;
+    }
+
+    public function out(DataInterface $out) : Query
+    {
+        // TODO change the openDataFile signature
+        Validation::openDataFile($out, true);
+        $this->_out = $out;
+        return $this;
+    }
+
+    public function mappings(array $mappings) : Query
+    {
+        $this->_mappings = $mappings;
+        return $this;
+    }
+
+    /**
      * Execute the query, returning an array of arrays, where each sub array
      * is a row of headers and values
      *
@@ -180,99 +208,38 @@ class Query
      * @param assoc_array           $mappings   ['original' => 'outputheader']
      * @return array
     **/
-    public function execute(DataInterface $outfile = null, $mappings = null, bool $timer = false)
+    public function execute()
     {
-        $stopwatch = new Stopwatch();
         $result = [];
         $validRowCount = 0;
-        if ($outfile !== null) {
-            Validation::openDataFile($outfile, true);
-        }
         Validation::openDataFile($this->_source);
-        ($timer) ? $stopwatch->start('execute') : null;
+        ($this->_timer) ? $this->_timer->start('execute') : null;
         // if this will be executed on a DB, then fire it off
         if ($this->_isdb) {
-            $this->_source->query($this->_fields, $this->_where, $this->_condition, $this->_value);
+            $this->_source->query(
+                $this->_fields,
+                $this->_where,
+                $this->_condition,
+                $this->_value
+            );
         }
         foreach ($this->_source->getNextDataRow() as $row) {
             // If this is executed on a DB it will only contain valid results
-            if ($this->_isdb) {
-                $valid = true;
-            } else {
-                $valid = false;
-                $rValue = trim($row[$this->_where]);
-                switch ($this->_condition) {
-                    case 'EQUALS':
-                    case 'GREATER':
-                    case 'LESS':
-                    case 'NOT':
-                        $valid = $this->_equality($this->_condition, $rValue, $this->_value);
-                        break;
-                    case 'AFTER':
-                    case 'BEFORE':
-                    case 'ON':
-                    case 'BETWEEN':
-                    case 'NOT_BETWEEN':
-                        $valid = $this->_date($this->_condition, $rValue, $this->_value);
-                        break;
-                    case 'EMPTY':
-                    case 'NOT_EMPTY':
-                        $valid = $this->_empty($this->_condition, $rValue);
-                        break;
-                    case 'CONTAINS':
-                        $valid = $this->_contains($rValue, $this->_value);
-                        break;
-                    case 'IN':
-                        $valid = $this->_in($rValue, $this->_value);
-                        break;
-                }
-            }
+            ($this->_isdb) ? $valid = true : $valid = $this->test(trim($row[$this->_where]));
             if ($valid) {
-                $validRowCount++;
+                ++$validRowCount;
                 if ($this->_fields !== []) {
                     $row = array_intersect_key($row, $this->_fields);
                 }
-                if (null !== $mappings) {
-                    foreach ($row as $header => $value) {
-                        // if the mappings are not equal, then pull out the value we want
-                        // and unset the old value
-                        if (isset($mappings[$header]) && $header !== $mappings[$header]) {
-                            $row[$mappings[$header]] = $value;
-                            unset($row[$header]);
-                        }
-                    }
-                }
-                ($outfile) ? $outfile->writeDataRow($row) : $result[] = $row;
+                $this->remap($row);
+                ($this->_out) ? $this->_out->writeDataRow($row) : $result[] = $row;
                 if ($this->_limit > 0 && ($validRowCount === $this->_limit)) {
                     break;
                 }
             }
         }
         $this->_source->close();
-        if ($outfile) {
-            switch ($outfile->getType()) {
-                case 'stream':
-                    $outfile->flushBuffer();
-                    $outfile->reset();
-                    $result = stream_get_contents($outfile->_fp);
-                    $outfile->close();
-                    break;
-                case 'file':
-                    $outfile->close();
-                    $result = ['rows' => $validRowCount];
-                    break;
-            }
-        }
-        if ($timer) {
-            $time = $stopwatch->stop('execute');
-            $result = [
-                'data' => $result,
-                'timer' => [
-                    'elapsed' => $time->getDuration(), // milliseconds
-                    'memory' => $time->getMemory() // bytes
-                ]
-            ];
-        }
+        $this->closeOut($result, $validRowCount);
         return $result;
     }
     /**
@@ -380,5 +347,71 @@ class Query
                 break;
         }
         return $result;
+    }
+
+    private function test($value) : bool
+    {
+        switch ($this->_condition) {
+            case 'EQUALS':
+            case 'GREATER':
+            case 'LESS':
+            case 'NOT':
+                return $this->_equality($this->_condition, $value, $this->_value);
+            case 'AFTER':
+            case 'BEFORE':
+            case 'ON':
+            case 'BETWEEN':
+            case 'NOT_BETWEEN':
+                return $this->_date($this->_condition, $value, $this->_value);
+            case 'EMPTY':
+            case 'NOT_EMPTY':
+                return $this->_empty($this->_condition, $value);
+            case 'CONTAINS':
+                return $this->_contains($value, $this->_value);
+            case 'IN':
+                return $this->_in($value, $this->_value);
+        }
+    }
+
+    private function remap(array &$row)
+    {
+        if ($this->_mappings) {
+            foreach ($row as $header => $value) {
+                // if the mappings are not equal, then pull out the value we want
+                // and unset the old value
+                if (isset($this->_mappings[$header]) && $header !== $this->_mappings[$header]) {
+                    $row[$this->_mappings[$header]] = $value;
+                    unset($row[$header]);
+                }
+            }
+        }
+    }
+
+    private function closeOut(array &$result, int $rows)
+    {
+        if ($this->_out) {
+            switch ($this->_out->getType()) {
+                case 'stream':
+                    $this->_out->flushBuffer();
+                    $this->_out->reset();
+                    $result = stream_get_contents($this->_out->_fp);
+                    $this->_out->close();
+                    break;
+                case 'file':
+                    $this->_out->close();
+                    $result = ['rows' => $rows];
+                    break;
+            }
+        }
+        if ($this->_timer) {
+            $time = $this->_timer->stop('execute');
+            $result = [
+                'data' => $result,
+                'timer' => [
+                    'elapsed' => $time->getDuration(), // milliseconds
+                    'memory' => $time->getMemory() // bytes
+                ]
+            ];
+        }
     }
 }

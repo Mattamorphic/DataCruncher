@@ -57,7 +57,7 @@ $file = DataSource::generate('file', 'csv');
 
 $file->setSource('example/input.csv', []);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
@@ -86,12 +86,13 @@ Example writing to an outfile
 $outfile = DataSource::generate('file', 'csv');
 $outfile->setSource('example/output.csv', ['modifier' => 'w']);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Example writing from a CSV query to an XML file
@@ -100,12 +101,13 @@ Example writing from a CSV query to an XML file
 $outfile = DataSource::generate('file', 'xml', 'person', 'people');
 $outfile->setSource('example/output.xml', ['modifier' => 'w']);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Example using a Database table as a source
@@ -125,33 +127,42 @@ $outfile->setSource('./example/outfile3.csv', ['modifier' => 'w']);
 
 $query = Processor::generate('segmentation', 'query');
 
-$result = $query->fromSource($db)
+$result = $query->from($db)
     ->select(['firstname', 'lastname'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail.com')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Queries support limiting the amount of results
 
 ```php
 
-$result = $query->fromSource($db)
+$result = $query->from($db)
     ->select(['firstname', 'lastname'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail.com')
     ->limit(10)
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Tracking execution time and memory
 
 ```php
--> execute($outfile, null , true);
+->timer()
+->execute();
 // which returns a ['data' => ..., 'timer' => ['elapsed' => 0, 'memory' => 0]] structure
 
+```
+
+Remapping the output fields
+```php
+->mappings(['original' => 'NEW'])
+->execute();
 ```
 
 The available decoupled components under the processor are:
@@ -229,6 +240,7 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 - Removed unused variables
 - Wildcard Selects on queries
 - Changed method on to using in Merger (short method infringement)
+- Massive refactor of Processors to account for complexity and simplify usage
 
 ## History
 03/12/2016
