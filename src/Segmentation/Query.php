@@ -349,6 +349,13 @@ class Query
         return $result;
     }
 
+    /**
+     * Run our query tests using the value we're analysing and return a bool
+     *
+     * @param mixed     $value  The value to test
+     *
+     * @return bool
+    **/
     private function test($value) : bool
     {
         switch ($this->_condition) {
@@ -373,6 +380,13 @@ class Query
         }
     }
 
+    /**
+     * Remaps the field names for the given row
+     *
+     * @param array     &$row   The current row
+     *
+     * @return void
+    **/
     private function remap(array &$row)
     {
         if ($this->_mappings) {
@@ -387,6 +401,15 @@ class Query
         }
     }
 
+    /**
+     * Handles wrapping up the execution process by closing down any open outputs
+     * Also handles updating the results to carry the execution data
+     *
+     * @param array     &$result    The result array
+     * @param int       $rows       A valid row count
+     *
+     * @return null
+    **/
     private function closeOut(array &$result, int $rows)
     {
         if ($this->_out) {
