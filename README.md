@@ -241,6 +241,7 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 - Wildcard Selects on queries
 - Changed method on to using in Merger (short method infringement)
 - Massive refactor of Processors to account for complexity and simplify usage
+- Processors now have a parent class called Runner - that holds the common methods
 
 ## History
 03/12/2016

@@ -61,4 +61,17 @@ abstract class Runner
         return $this;
     }
 
+    // TODO :: Add the following
+    // public function toArray()
+    // {
+    //
+    // }
+    // public function toJson()
+    // {
+    //
+    // }
+    // public function toString()
+    // {
+    //
+    // }
 }
