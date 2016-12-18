@@ -186,6 +186,13 @@ class Query
         return $this;
     }
 
+    /**
+     * Set the output resource for this method
+     *
+     * @param DataInterface     $out    The data interface to write to
+     *
+     * @return Query
+    **/
     public function out(DataInterface $out) : Query
     {
         // TODO change the openDataFile signature
@@ -194,6 +201,14 @@ class Query
         return $this;
     }
 
+
+    /**
+     * Set the output mappings
+     *
+     * @param array     $mappings   The mappings to use, keyed with the original
+     *
+     * @return Query
+    **/
     public function mappings(array $mappings) : Query
     {
         $this->_mappings = $mappings;

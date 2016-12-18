@@ -54,7 +54,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule = $rule->setField('name')->groupExact();
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $result = array_pop($result);
@@ -81,7 +81,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule = $rule->setField('age')->groupNumeric(10);
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $result = array_pop($result);
@@ -107,7 +107,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule = $rule->setField('dob') ->groupDate('d/m/Y', 'Y');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $result = array_pop($result);
@@ -133,9 +133,10 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule = $rule->setField('dob') ->groupDate('d/m/Y', 'Y');
         $stats->addRule($rule);
-        $stats->fromSource($this->mockSourceCSV)
+        $stats->from($this->mockSourceCSV)
             ->percentages()
-            ->execute($this->mockOutCSV);
+            ->out($this->mockOutCSV)
+            ->execute();
         $this->assertEquals(
             file_get_contents($this->mockOutCSV->getSourceName()),
             "dob,PERCENT\n1987,25\n1980,25\n1990,25\n2000,25\n",
@@ -154,7 +155,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule = $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $result = array_pop($result);
@@ -183,7 +184,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $stats->addRule($rule);
         $rule->setField('colour')->groupRegex('/([^,]+)/');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -219,7 +220,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule->setField('colour')->groupRegex('/([^,]+)/')->setLabel('colour');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -254,9 +255,10 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $stats->addRule($rule);
         $rule->setField('colour')->groupRegex('/([^,]+)/');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages()
-            ->execute(null, true);
+            ->timer()
+            ->execute();
         $this->assertArrayHasKey('data', $result);
         $this->assertArrayHasKey('timer', $result);
         $this->assertTrue(is_integer($result['timer']['elapsed']));
@@ -274,7 +276,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $rule = new Rule();
         $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->mockSourceCSV)
+        $result = $stats->from($this->mockSourceCSV)
             ->percentages(1)
             ->execute();
         $this->assertEquals(

@@ -217,7 +217,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->sourceCSV)
+        $result = $stats->from($this->sourceCSV)
             ->execute();
         $result = array_pop($result);
         $this->assertEquals(
@@ -247,7 +247,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         $rule = $rule->setField('email')->groupRegex('/(((?<=\.)\w{2,4}\.\w{2,4}|(?<=\.)\w{2,4}))$/i');
         $stats->addRule($rule);
 
-        $result = $stats->fromSource($this->sourceCSV)
+        $result = $stats->from($this->sourceCSV)
             ->execute();
         $this->assertEquals(
             $result[0]['Male'],
@@ -358,8 +358,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/InputFiles/MergeRows.csv",
             ['modifier' => 'r']
         );
-        $result = $merger->fromSource($this->sourceCSV)
-            ->fromSource($csv)
+        $result = $merger->from($this->sourceCSV)
+            ->from($csv)
             ->using('email')
             ->execute();
         $this->assertEquals(

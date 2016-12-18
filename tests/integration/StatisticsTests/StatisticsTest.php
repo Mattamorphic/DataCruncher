@@ -28,7 +28,7 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
         $csv->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($csv)
+        $result = $statistics->from($csv)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -49,7 +49,7 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
         $xml->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($xml)
+        $result = $statistics->from($xml)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -72,7 +72,7 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
         $csv->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($csv)
+        $result = $statistics->from($csv)
             ->percentages()
             ->execute();
         $this->assertEquals(
