@@ -1,15 +1,28 @@
 [![Build Status](https://travis-ci.org/Matt-Barber/DataCruncher.svg?branch=master)](https://travis-ci.org/Matt-Barber/DataCruncher)
 [![Coverage Status](https://coveralls.io/repos/github/Matt-Barber/DataCruncher/badge.svg?branch=master)](https://coveralls.io/github/Matt-Barber/DataCruncher?branch=master)
+[![Code Climate](https://codeclimate.com/github/Matt-Barber/DataCruncher/badges/gpa.svg)](https://codeclimate.com/github/Matt-Barber/DataCruncher)
 
 # DataCruncher :page_facing_up:
 
-##Version : 0.0.4
+##Version : 0.0.6
 
 DataCruncher is a PHP library allowing Database Tables, XML and CSV files (currently) to be queried as you might query a standard database table (with added extras).
 This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will require loading the array into memory and blarg.
 
-This has been designed with both a Front Controller pattern giving you access to a Manipulator object as well as a set of Decoupled self contained components
+This has been designed around the concept of factories with two main access points to the decoupled components:
 
+```php
+<?php
+    use mfmbarber\DataCruncher\Helpers\DataSource;
+    use mfmbarber\DataCruncher\Processor;
+
+    // This gives us access to the data sources
+    $obj = DataSource::generate('file', 'csv');
+
+    // This gives us access to the processors
+    $obj = Processor::generate('segmentation', 'query');
+
+```
 
 ## Installation
 The easiest way to install this is probably to git clone this into an extensions folder in your project, then update your composer.json with an autoloader reference.
@@ -24,16 +37,15 @@ Our basic includes
 // include your autoloader
 include 'vendor/autoload.php';
 // a helper class for generating data sources
-use mfmbarber\DataCruncher\Helpers\DataSource as DataSource;
+use mfmbarber\DataCruncher\Helpers\DataSource;
 
-// our query class
-use mfmbarber\DataCruncher\Segmentation\Query as Query;
-```
+// our processor
+use mfmbarber\DataCruncher\Processor;
 
 An example using a CSV input
 
 ```php
-$query = new Query();
+$query = Processor::generate('segmentation', 'query');
 $file = DataSource::generate('file', 'csv');
 
 /*
@@ -45,7 +57,7 @@ $file = DataSource::generate('file', 'csv');
 
 $file->setSource('example/input.csv', []);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
@@ -74,12 +86,13 @@ Example writing to an outfile
 $outfile = DataSource::generate('file', 'csv');
 $outfile->setSource('example/output.csv', ['modifier' => 'w']);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Example writing from a CSV query to an XML file
@@ -88,15 +101,16 @@ Example writing from a CSV query to an XML file
 $outfile = DataSource::generate('file', 'xml', 'person', 'people');
 $outfile->setSource('example/output.xml', ['modifier' => 'w']);
 
-$result = $query->fromSource($file)
+$result = $query->from($file)
     ->select(['name', 'age'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
-Example using a Datbaase table as a source
+Example using a Database table as a source
 Outputting to a CSV
 
 ```php
@@ -111,55 +125,94 @@ $db->setSource('TEST', [
 $outfile = DataSource::generate('file', 'csv');
 $outfile->setSource('./example/outfile3.csv', ['modifier' => 'w']);
 
-$query = new Query();
+$query = Processor::generate('segmentation', 'query');
 
-$result = $query
-    ->fromSource($db)
+$result = $query->from($db)
     ->select(['firstname', 'lastname'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail.com')
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Queries support limiting the amount of results
 
 ```php
 
-$result = $query
-    ->fromSource($db)
+$result = $query->from($db)
     ->select(['firstname', 'lastname'])
     ->where('email')
     ->condition('CONTAINS')
     ->value('gmail.com')
     ->limit(10)
-    ->execute($outfile);
+    ->out($outfile)
+    ->execute();
 ```
 
 Tracking execution time and memory
 
 ```php
--> execute($outfile, null , true);
+->timer()
+->execute();
 // which returns a ['data' => ..., 'timer' => ['elapsed' => 0, 'memory' => 0]] structure
 
 ```
 
-The available decoupled components are
+Remapping the output fields
+```php
+->mappings(['original' => 'NEW'])
+->execute();
+```
+
+The available decoupled components under the processor are:
 
 - Query
     - select fields from the source where a field in that source meets a condition, and a value for that condition. Execute takes an optional outfile (that implements DataInterface), and an optional node name and parent node name for XML writing - the preferred way to use this is to write to a file as it allows you to chunk through massive files.
+    ```php
+        $obj = Processor::generate('segmentation', 'query');
+    ```
 
 - Merger
     - Specify multiple source files and merge these together based on an index, for instance email, again like query the execute provides the same options for writing to an outfile
+    ```php
+        $obj = Processor::generate('segmentation', 'merge');
+    ```
 
 - Split
     - Split a source into multiple outfiles or a multi-plex array - this can be done horizontally specifying the amount of elements per file, or vertically specifying the fields for each file. These can be duplicate fields across the multiple out files when using vertical manipulation.
+    ```php
+        $obj = Processor::generate('segmentation', 'split');
+    ```
 
 - Statistics
     - Generate statistics based on an input source.
+    ```php
+        $obj = Processor::generate('analysis', 'statistics');
+    ```
 
-- DataSources
-    - An interface for Databases, CSV and XML files, CSV files support sorting if running on a nix platform through sort method. These can be sorted by string or integer (numerically)
+    - With Rules
+    ```php
+        $obj = Processor::generate('analysis', 'rule');
+    ```
+
+The available decoupled components under the data sources  are:
+    - CSV
+    ```php
+        $obj = DataSource::generate('file', 'csv');
+    ```
+    - XML
+    ```php
+        $obj = DataSource::generate('file', 'xml', 'person', people);
+    ```
+    - Database
+    ```php
+        $obj = DataSource::generate('db', 'sql');
+    ```
+    - System
+    ```php
+        $obj = DataSource::generate('system', 'csv');
+    ```
 
 The primary Front Controller component, if you'd like to use that is the Manipulator object, this currently only allows you to inject the Data source, Query and Statistics during instantiation.
 
@@ -180,6 +233,19 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 6. Submit a pull request :D
 
 ## History
+
+18/12/2016
+- Factory Processor
+- Removed Manipulator
+- Rounding percentages when calculating stats
+- Codeclimate integration
+- Removed unused variables
+- Wildcard Selects on queries
+- Changed method on to using in Merger (short method infringement)
+- Massive refactor of Processors to account for complexity and simplify usage
+- Processors now have a parent class called Runner - that holds the common methods
+
+
 03/12/2016
 - Refactored to use PHP Generators
 - Re-written integration testing

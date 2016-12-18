@@ -3,8 +3,7 @@ namespace mfmbarber\DataCruncher\Tests\Integration\StatisticsTests;
 
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
-use mfmbarber\DataCruncher\Analysis\Statistics;
-use mfmbarber\DataCruncher\Analysis\Config\Rule;
+use mfmbarber\DataCruncher\Processor;
 
 
 class StatisticTest extends \PHPUnit_Framework_TestCase
@@ -22,14 +21,14 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldAnalyseACSVFile()
     {
-        $statistics = new Statistics();
-        $rule = new Rule();
+        $statistics = Processor::generate('analysis', 'statistics');
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $statistics->addRule($rule);
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
         $csv->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($csv)
+        $result = $statistics->from($csv)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -43,14 +42,14 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldAnalyseAXMLFile()
     {
-        $statistics = new Statistics();
-        $rule = new Rule();
+        $statistics = Processor::generate('analysis', 'statistics');
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $statistics->addRule($rule);
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
         $xml->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($xml)
+        $result = $statistics->from($xml)
             ->percentages()
             ->execute();
         $this->assertEquals(
@@ -64,8 +63,8 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
 
     public function testItShouldProcessMultipleRules()
     {
-        $statistics = new Statistics();
-        $rule = new Rule();
+        $statistics = Processor::generate('analysis', 'statistics');
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact()->setLabel('gender');
         $statistics->addRule($rule);
         $rule = $rule->setField('age')->groupNumeric(10)->setLabel('age_in_10s');
@@ -73,7 +72,7 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
         $csv->setSource($file, ['modifier' => 'r']);
-        $result = $statistics->fromSource($csv)
+        $result = $statistics->from($csv)
             ->percentages()
             ->execute();
         $this->assertEquals(

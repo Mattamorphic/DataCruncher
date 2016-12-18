@@ -10,17 +10,17 @@
 declare(strict_types=1);
 namespace mfmbarber\DataCruncher\Analysis;
 
-use Symfony\Component\Stopwatch\Stopwatch;
 use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
-
 use mfmbarber\DataCruncher\Config\Validation as Validation;
 use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Runner as Runner;
 
-class Statistics
+
+class Statistics extends Runner
 {
-    private $_source;
     private $_type;
+    private $_round;
     private $_rules = [];
 
     public function __construct()
@@ -29,25 +29,14 @@ class Statistics
         $this->_option = null;
     }
     /**
-     * Sets the data source for the query
-     *
-     * @param DataInterface $sourceFile The data source for the query
-     *
-     * @return Statistics
-     **/
-    public function fromSource(DataInterface $sourceFile) : Statistics
-    {
-        $this->_source = $sourceFile;
-        return $this;
-    }
-    /**
      * Sets the type of response to percentage rather than totals
      *
      * @return Statistics
     **/
-    public function percentages() : Statistics
+    public function percentages(int $round = null) : Statistics
     {
         $this->_type = 'PERCENT';
+        $this->_round = $round;
         return $this;
     }
 
@@ -66,17 +55,13 @@ class Statistics
      * Execute the statistics calculation given the parameters are set
      * returns an associative array of key value results
      *
-     * @param Helpers\DataInterface $output a location to populate with results
-     *
      * @return array
     **/
-    public function execute(DataInterface $output = null, bool $timer = false) : array
+    public function execute() : array
     {
         // TODO :: Validation of object vars.
-        $stopwatch = new Stopwatch();
         $idx = 0;
         $keys = [];
-        $rowTotal = 0;
         // We need to figure out a key for each rule
         array_walk(
             $this->_rules,
@@ -89,10 +74,7 @@ class Statistics
         // based on a rule
         $results = array_fill_keys($keys, []);
         Validation::openDataFile($this->_source);
-        // if ($output !== null) {
-        //     Validation::openDataFile($output);
-        // }
-        ($timer) ? $stopwatch->start('execute') : null;
+        if ($this->_timer) $this->_timer->start('execute');
         foreach ($this->_source->getNextDataRow() as $rowTotal => $row) {
             foreach ($this->_rules as $key => $rule) {
                 $this->processRow($results[$rule->label], $row, $rule);
@@ -100,36 +82,8 @@ class Statistics
         }
         ++$rowTotal;
         // For percentages calculate the percentage based on the total rows
-        if ($this->_type == 'PERCENT') {
-            foreach ($results as &$result) {
-                foreach ($result as $key => $value) {
-                    $result[$key] = (100 / $rowTotal) * $value;
-                }
-            }
-        }
-        $this->_source->close();
-        //if ($output !== null) {
-            // foreach ($results as $key => &$result) {
-            //     foreach ($result as $key => $value) {
-            //         $row = [
-            //             $this->_rules[$key]['field'] => $key,
-            //             $this->_type => $value
-            //         ];
-            //         $output->writeDataRow($result);
-            //     }
-            // }
-            //$output->close();
-            //return true;
-        //}
-        // if we have a single result - return that
-        if ($timer) {
-            $time = $stopwatch->stop('execute');
-            $results['data'] = $results;
-            $results['timer'] = [
-                'elapsed' => $time->getDuration(), // milliseconds
-                'memory' => $time->getMemory() // bytes
-            ];
-        }
+        if ($this->_type === 'PERCENT') $this->convertToPercent($results, $rowTotal);
+        $this->closeOut($results);
         return $results;
     }
 
@@ -151,6 +105,58 @@ class Statistics
                 $result[$key] = 0;
             }
             ++$result[$key];
+        }
+    }
+
+    /**
+     * Converts the results from a standard numerical representation
+     * To a percentage - with optional rounding based on the methods
+     * called
+     *
+     * @param array     &$results   The results to convert
+     * @param int       $total      The total amount of records
+    **/
+    private function convertToPercent(array &$results, int $total)
+    {
+        foreach ($results as &$result) {
+            foreach ($result as $key => $value) {
+                $result[$key] = (100 / $total) * $value;
+                if ($this->_round) {
+                    $result[$key] = round($result[$key], $this->_round);
+                }
+            }
+        }
+    }
+
+    /**
+     * Close the source, and apply any timing metrics
+     *
+     * @param array     &$results   The results
+    **/
+    private function closeOut(array &$results)
+    {
+        //if ($output !== null) {
+            // foreach ($results as $key => &$result) {
+            //     foreach ($result as $key => $value) {
+            //         $row = [
+            //             $this->_rules[$key]['field'] => $key,
+            //             $this->_type => $value
+            //         ];
+            //         $output->writeDataRow($result);
+            //     }
+            // }
+            //$output->close();
+            //return true;
+        //}
+        // if we have a single result - return that
+        $this->_source->close();
+        if ($this->_timer) {
+            $time = $this->_timer->stop('execute');
+            $results['data'] = $results;
+            $results['timer'] = [
+                'elapsed' => $time->getDuration(), // milliseconds
+                'memory' => $time->getMemory() // bytes
+            ];
         }
     }
 }

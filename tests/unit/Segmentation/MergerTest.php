@@ -54,9 +54,9 @@ class MergerTest extends \PHPUnit_Framework_TestCase
     {
         $merger = new Merger();
 
-        $result = $merger->fromSource($this->mockSourceCSV)
-            ->fromSource($this->mockMergeCSV)
-            ->on('email')
+        $result = $merger->from($this->mockSourceCSV)
+            ->from($this->mockMergeCSV)
+            ->using('email')
             ->execute();
         $expected = [
             [
@@ -92,7 +92,7 @@ class MergerTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionWithNoSources()
     {
         $merger = new Merger();
-        $merger->on('email')->execute();
+        $merger->using('email')->execute();
     }
 
     /**
@@ -106,9 +106,9 @@ class MergerTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionIfTheFieldDoesntExist()
     {
         $merger = new Merger();
-        $merger->fromSource($this->mockSourceCSV)
-            ->fromSource($this->mockMergeCSV)
-            ->on('foo')
+        $merger->from($this->mockSourceCSV)
+            ->from($this->mockMergeCSV)
+            ->using('foo')
             ->execute();
     }
 

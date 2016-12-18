@@ -73,7 +73,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldExecuteValidQuery($query_data, $expected)
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select($query_data['select'])
             ->where($query_data['where'])
             ->condition($query_data['condition'])
@@ -95,7 +95,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldLimitTheAmountOfResults()
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['email'])
             ->where('email')
             ->condition('contains')
@@ -117,13 +117,14 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldLetUsRemapTheResultFields()
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['email'])
             ->where('email')
             ->condition('contains')
             ->value('test.com')
+            ->mappings(['email' => 'EMAIL ADDRESS'])
             ->limit(1)
-            ->execute(null, ['email' => 'EMAIL ADDRESS']);
+            ->execute();
 
         $this->assertTrue(in_array('EMAIL ADDRESS', array_keys($result[0])));
     }
@@ -148,7 +149,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $matchVal = $query_data['value'][0];
         $matchFormat = $query_data['value'][1];
 
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select($query_data['select'])
             ->condition($query_data['condition'])
             ->where($whereField, $whereFormat)
@@ -171,7 +172,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnErrorGivenAMalformedDate()
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('after')
             ->where('dob', 'd/m/Y')
@@ -189,7 +190,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
 
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select('dob')
             ->condition('equals')
             ->where('name')
@@ -207,7 +208,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionIfSelectIsAnAssocArray()
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['a' => 'b'])
             ->condition('equals')
             ->where('name')
@@ -222,7 +223,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionIfFieldIsNotInSourceBeforeSource()
     {
         $query = new Query();
-        $query->select(['toaster'])->fromSource($this->mockSourceCSV);
+        $query->select(['toaster'])->from($this->mockSourceCSV);
     }
 
     /**
@@ -232,7 +233,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionIfFieldIsNotInSourceAfterSource()
     {
         $query = new Query();
-        $query->fromSource($this->mockSourceCSV)->select(['toaster']);
+        $query->from($this->mockSourceCSV)->select(['toaster']);
     }
 
     /**
@@ -245,7 +246,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     public function testItShouldThrowAnExceptionIfWhereIsNotAPrimitive()
     {
         $query = new Query();
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('equals')
             ->where(['name'])
@@ -263,7 +264,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
 
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['dob'])
             ->condition('might be like')
             ->where('name')
@@ -280,12 +281,13 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
 
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['email'])
             ->where('name')
             ->condition('contains')
             ->value('matt')
-            ->execute($this->mockOutCSV);
+            ->out($this->mockOutCSV)
+            ->execute();
 
         $this->assertEquals(
             ['rows' => 2],
@@ -303,16 +305,46 @@ class QueryTest extends \PHPUnit_Framework_TestCase
     {
         $query = new Query();
 
-        $result = $query->fromSource($this->mockSourceCSV)
+        $result = $query->from($this->mockSourceCSV)
             ->select(['email'])
             ->where('name')
             ->condition('contains')
             ->value('matt')
-            ->execute(null, null, true);
+            ->timer()
+            ->execute();
         $this->assertArrayHasKey('data', $result);
         $this->assertArrayHasKey('timer', $result);
         $this->assertTrue(is_integer($result['timer']['elapsed']));
     }
+
+    /**
+     * Tests that a wildcard can be used to get all the fields
+     * @return null
+    **/
+    public function testItShouldAllowWildCardSelect()
+    {
+        $query = new Query();
+
+        $result = $query->from($this->mockSourceCSV)
+            ->select()
+            ->where('name')
+            ->condition('contains')
+            ->value('tony')
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'email' => 'tony.stark@avengers.com',
+                    'name' => 'tony',
+                    'colour' => 'red, gold',
+                    'dob' => '02/05/1990',
+                    'age' => '25'
+                ]
+            ]
+        );
+    }
+
     /**
      * Data provider for executeContains
      *
