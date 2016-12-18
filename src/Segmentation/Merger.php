@@ -13,12 +13,11 @@ namespace mfmbarber\DataCruncher\Segmentation;
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
 use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Runner as Runner;
 
-class Merger
+class Merger extends Runner
 {
     private $_sources = [];
-    private $_out = null;
-    private $_timer = null;
 
     /**
      * Set a data source to Merge, and add this to an array of sources
@@ -47,31 +46,6 @@ class Merger
         return $this;
     }
 
-    /**
-     * Switches on a timer for the execution process
-     *
-     * @return Query
-    **/
-    public function timer() : Merger
-    {
-        $this->_timer = new Stopwatch();
-        return $this;
-    }
-
-    /**
-     * Set the output resource for this method
-     *
-     * @param DataInterface     $out    The data interface to write to
-     *
-     * @return Query
-    **/
-    public function out(DataInterface $out) : Merger
-    {
-        // TODO change the openDataFile signature
-        Validation::openDataFile($out, true);
-        $this->_out = $out;
-        return $this;
-    }
     /**
      * Runs the merging of the data sets
      *

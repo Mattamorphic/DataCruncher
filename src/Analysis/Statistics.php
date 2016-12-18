@@ -10,38 +10,23 @@
 declare(strict_types=1);
 namespace mfmbarber\DataCruncher\Analysis;
 
-use Symfony\Component\Stopwatch\Stopwatch;
 use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
-
 use mfmbarber\DataCruncher\Config\Validation as Validation;
 use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Runner as Runner;
 
-class Statistics
+
+class Statistics extends Runner
 {
-    private $_source;
     private $_type;
     private $_round;
     private $_rules = [];
-    private $_out = null;
-    private $_timer = null;
 
     public function __construct()
     {
         $this->_type = 'TOTAL';
         $this->_option = null;
-    }
-    /**
-     * Sets the data source for the query
-     *
-     * @param DataInterface $sourceFile The data source for the query
-     *
-     * @return Statistics
-     **/
-    public function from(DataInterface $sourceFile) : Statistics
-    {
-        $this->_source = $sourceFile;
-        return $this;
     }
     /**
      * Sets the type of response to percentage rather than totals
@@ -63,32 +48,6 @@ class Statistics
     public function addRule(Rule $rule) : Statistics
     {
         $this->_rules[] = $rule->get();
-        return $this;
-    }
-
-    /**
-     * Switches on a timer for the execution process
-     *
-     * @return Query
-    **/
-    public function timer() : Statistics
-    {
-        $this->_timer = new Stopwatch();
-        return $this;
-    }
-
-    /**
-     * Set the output resource for this method
-     *
-     * @param DataInterface     $out    The data interface to write to
-     *
-     * @return Query
-    **/
-    public function out(DataInterface $out) : Statistics
-    {
-        // TODO change the openDataFile signature
-        Validation::openDataFile($out, true);
-        $this->_out = $out;
         return $this;
     }
 

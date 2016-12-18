@@ -8,24 +8,22 @@
  *
  */
 declare(strict_types=1);
+
 namespace mfmbarber\DataCruncher\Segmentation;
 
-use Symfony\Component\Stopwatch\Stopwatch;
 use mfmbarber\DataCruncher\Config\Validation as Validation;
 use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
 use mfmbarber\DataCruncher\Exceptions;
+use mfmbarber\DataCruncher\Runner as Runner;
 
-class Query
+class Query extends Runner
 {
-    private $_source = null;
     private $_isdb = false;
     private $_fields = [];
     private $_where = '';
     private $_condition = '';
     private $_value = '';
     private $_limit = -1;
-    private $_timer = null;
-    private $_out = null;
     private $_mappings = null;
 
     /**
@@ -37,7 +35,7 @@ class Query
     **/
     public function from(DataInterface $source)
     {
-        $this->_source = $source;
+        parent::from($source);
         if (get_class($source) === 'mfmbarber\DataCruncher\Helpers\Databases\Database') {
             $this->_isdb = true;
         }
@@ -172,32 +170,6 @@ class Query
     public function limit(int $size) : Query
     {
         $this->_limit = $size;
-        return $this;
-    }
-
-    /**
-     * Switches on a timer for the execution process
-     *
-     * @return Query
-    **/
-    public function timer() : Query
-    {
-        $this->_timer = new Stopwatch();
-        return $this;
-    }
-
-    /**
-     * Set the output resource for this method
-     *
-     * @param DataInterface     $out    The data interface to write to
-     *
-     * @return Query
-    **/
-    public function out(DataInterface $out) : Query
-    {
-        // TODO change the openDataFile signature
-        Validation::openDataFile($out, true);
-        $this->_out = $out;
         return $this;
     }
 
