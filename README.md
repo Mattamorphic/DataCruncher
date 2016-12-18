@@ -4,7 +4,7 @@
 
 # DataCruncher :page_facing_up:
 
-##Version : 0.0.5
+##Version : 0.0.6
 
 DataCruncher is a PHP library allowing Database Tables, XML and CSV files (currently) to be queried as you might query a standard database table (with added extras).
 This allows you to segment your data efficiently and pipe this to other outsources. There is support as well for returning arrays - but beware this will require loading the array into memory and blarg.
@@ -232,7 +232,9 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 5. Push to the branch: `git push origin my-new-feature`
 6. Submit a pull request :D
 
-## Upcoming Release 0.0.5
+## History
+
+18/12/2016
 - Factory Processor
 - Removed Manipulator
 - Rounding percentages when calculating stats
@@ -243,7 +245,7 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 - Massive refactor of Processors to account for complexity and simplify usage
 - Processors now have a parent class called Runner - that holds the common methods
 
-## History
+
 03/12/2016
 - Refactored to use PHP Generators
 - Re-written integration testing
