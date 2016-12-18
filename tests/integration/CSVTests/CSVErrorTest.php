@@ -106,7 +106,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
     public function testItShouldFailQueryingAHeaderThatDoesntExist()
     {
         $query = Processor::generate('segmentation', 'query');
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['fandangle'])
             ->where('email')
             ->condition('CONTAINS')

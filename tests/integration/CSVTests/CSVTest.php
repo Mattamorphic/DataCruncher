@@ -85,7 +85,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     public function testItShouldReturnAnArrayOnceQueried()
     {
         $query = Processor::generate('segmentation', 'query');
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id', 'first_name'])
             ->where('email')
             ->condition('CONTAINS')
@@ -108,12 +108,13 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
             ['modifier' => 'w']
         );
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id', 'first_name'])
             ->where('email')
             ->condition('CONTAINS')
             ->value('stumbleupon')
-            ->execute($out);
+            ->out($out)
+            ->execute();
         $this->assertEquals(
             file_get_contents(
                 "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv"
@@ -140,12 +141,14 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
             ['modifier' => 'w']
         );
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id', 'first_name', 'ip_address'])
             ->where('email')
             ->condition('CONTAINS')
             ->value('stumbleupon')
-            ->execute($out, null, true);
+            ->timer()
+            ->out($out)
+            ->execute();
         $this->assertTrue(isset($result['timer']));
         $this->assertTrue(
             isset($result['timer']['elapsed']) &&
@@ -170,12 +173,13 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.xml",
             ['modifier' => 'w']
         );
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id', 'first_name'])
             ->where('email')
             ->condition('CONTAINS')
             ->value('stumbleupon')
-            ->execute($out);
+            ->out($out)
+            ->execute();
         $xml = preg_replace('/\s+/', '', file_get_contents(
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.xml"
         ));
@@ -213,7 +217,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact();
         $stats->addRule($rule);
-        $result = $stats->fromSource($this->sourceCSV)
+        $result = $stats->from($this->sourceCSV)
             ->execute();
         $result = array_pop($result);
         $this->assertEquals(
@@ -243,7 +247,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
         $rule = $rule->setField('email')->groupRegex('/(((?<=\.)\w{2,4}\.\w{2,4}|(?<=\.)\w{2,4}))$/i');
         $stats->addRule($rule);
 
-        $result = $stats->fromSource($this->sourceCSV)
+        $result = $stats->from($this->sourceCSV)
             ->execute();
         $this->assertEquals(
             $result[0]['Male'],
@@ -270,15 +274,17 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv",
             ['modifier' => 'w']
         );
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id', 'first_name', 'ip_address'])
             ->where('email')
             ->condition('CONTAINS')
             ->value('stumbleupon')
-            ->execute($out, [
+            ->out($out)
+            ->mappings([
                 'first_name' => 'Forename',
                 'ip_address' => 'IP'
-            ]);
+            ])
+            ->execute();
         $this->assertEquals(
                 file_get_contents("{$this->dir}/OutputFiles/EmailContainsStumbleUpon.csv"),
                 "id,Forename,IP\n".
@@ -325,7 +331,7 @@ class CSVTest extends \PHPUnit_Framework_TestCase
     public function testItShouldLimitTheAmountOfResults()
     {
         $query = Processor::generate('segmentation', 'query');
-        $result = $query->fromSource($this->sourceCSV)
+        $result = $query->from($this->sourceCSV)
             ->select(['id'])
             ->where('email')
             ->condition('CONTAINS')
@@ -352,8 +358,8 @@ class CSVTest extends \PHPUnit_Framework_TestCase
             "{$this->dir}/InputFiles/MergeRows.csv",
             ['modifier' => 'r']
         );
-        $result = $merger->fromSource($this->sourceCSV)
-            ->fromSource($csv)
+        $result = $merger->from($this->sourceCSV)
+            ->from($csv)
             ->using('email')
             ->execute();
         $this->assertEquals(
