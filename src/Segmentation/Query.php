@@ -210,7 +210,7 @@ class Query extends Runner
                 $this->_value
             );
         }
-        foreach ($this->_source->getNextDataRow() as $row) {
+        foreach ($this->_source->getNextDataRow() as $ln => $row) {
             // If this is executed on a DB it will only contain valid results
             ($this->_isdb) ? $valid = true : $valid = $this->test(trim($row[$this->_where]));
             if ($valid) {
