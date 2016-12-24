@@ -290,7 +290,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->execute();
 
         $this->assertEquals(
-            ['rows' => 2],
+            ['data' => 2],
             $result,
             "Execute did not return the expected results"
         );

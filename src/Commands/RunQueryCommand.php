@@ -1,20 +1,25 @@
 <?php
-
+/**
+ * Query CLI Command
+ *
+ * @package DataCruncher
+ * @subpackage Commands
+ * @author matt barber <mfmbarber@gmail.com>
+ *
+ */
 namespace mfmbarber\DataCruncher\Commands;
 
+// Bootstrap DataCruncher
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Processor;
 use mfmbarber\DataCruncher\Config\Validation;
 
+// Use symfony console component
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption};
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\{Question, ChoiceQuestion};
 
 class RunQueryCommand extends Command
 {
@@ -23,24 +28,21 @@ class RunQueryCommand extends Command
     **/
     protected function configure()
     {
-        //...
         $this->setName('query')
             ->setDescription('Run query')
             ->setHelp('Run a query and return the results');
 
         $this->addArgument('source', InputArgument::REQUIRED, 'The source to query (currently only files)');
 
-        // TODO make this optional once we finish the streaming to the output (CSV string)
-        $this->addArgument('destination', InputArgument::REQUIRED, 'The destination for the result (currently only files)');
+        $this->addOption('destination', 'd', InputOption::VALUE_REQUIRED, 'The destination for the result (currently only files)');
 
         $this->addOption('select', 's', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The fields to select from the source', []);
         $this->addOption('timer', 't', InputOption::VALUE_NONE, 'Time the process');
-
+        $this->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the amount of rows');
         $this->addOption('node', null, InputOption::VALUE_REQUIRED, 'The name of the node element that represents a row');
         $this->addOption('parent', null, InputOption::VALUE_REQUIRED, 'The name of the parent element to the node rows');
-
-
     }
+
     /**
      * Execute the console command, and run through the procedural process
      *
@@ -51,30 +53,22 @@ class RunQueryCommand extends Command
     **/
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // Let's begin
         $io = new SymfonyStyle($input, $output);
-        $io->section('Execute DataCruncher Query');
+        $io->text(Validation::CLI_LOGO);
         $query = Processor::generate('segmentation', 'query');
 
         // Get the source and destination
-        $source = $this->validateData($input, 'source', 'rb');
-        $destination = $this->validateData($input, 'destination', 'wb+');
-
+        $source = $this->validateData($input, $input->getArgument('source'), 'rb');
+        if ($input->getOption('destination')) {
+            $destination = $this->validateData($input, $input->getOption('destination'), 'wb+');
+        } else {
+            $destination = DataSource::generate('system', 'csv');
+            $destination->setSource('', ['modifier' => 'wb+']);
+        }
         // setup the query
-        $where = $this->askChoiceQuestion(
-            $input,
-            $output,
-            'Please select a field to query: ',
-            $source->getHeaders(),
-            'Condition invalid, please try again'
-        );
-        $condition = $this->askChoiceQuestion(
-            $input,
-            $output,
-            'Please select the condition you\'d like applied to the field (leave blank for equals): ',
-            Validation::CONDITIONS,
-            'Condition invalid, please try again',
-            0
-        );
+        $where = $this->askChoiceQuestion($input, $output, 'Please select a field to query: ', $source->getHeaders(), 'Condition invalid, please try again');
+        $condition = $this->askChoiceQuestion($input, $output, 'Please select the condition you\'d like applied to the field (leave blank for equals): ', Validation::CONDITIONS, 'Condition invalid, please try again', 0);
         $value = $this->askQuestion($input, $output, 'Please enter the value: ');
 
         $io->section('Processing, Standby');
@@ -86,22 +80,26 @@ class RunQueryCommand extends Command
             ->condition($condition)
             ->value($value)
             ->out($destination);
+
+        // Add our optional parameters
         if ($input->getOption('timer')) $query->timer();
+        if ($input->getOption('limit')) $query->limit((int) $input->getOption('limit'));
 
         $results = $query->execute();
 
-        $rows = (isset($results['data'])) ? $results['data']['rows'] : $results['rows'];
-        $io->success([
+        // Are we dealing with a count of rows, or the actual rows.
+        if (is_integer($results['data'])) $data = "Rows: {$results['data']}";
+        if (is_string($results['data'])) $data = $results['data'];
+
+        $success = [
             'Process Completed',
-            "Rows : $rows",
-            "Destination: {$input->getArgument('destination')}",
-            (isset($results['timer'])) ? 'Time: '.round($results['timer']['elapsed'] / 1000, 2).' seconds' : ''
-        ]);
+            $data
+        ];
 
-        if (array_key_exists('timer', $results)) $output->writeln([
+        if ($input->getOption('destination')) $success[] = "Destination: {$input->getOption('destination')}";
+        if (isset($results['timer'])) $success[] = 'Time: '.number_format(round($results['timer']['elapsed'] / 1000, 2), 2).' seconds';
 
-        ]);
-
+        $io->success($success);
     }
     /**
      * Validate data objects and return these from the source factory
@@ -116,7 +114,6 @@ class RunQueryCommand extends Command
     private function validateData(InputInterface $input, string $arg, string $modifier)
     {
         $data = null;
-        $arg = $input->getArgument($arg);
         if (stripos($modifier, 'w') !== false || file_exists($arg)) {
             switch (pathinfo($arg, PATHINFO_EXTENSION)) {
                 case 'csv':

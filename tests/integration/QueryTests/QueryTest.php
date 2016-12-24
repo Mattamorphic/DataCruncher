@@ -83,7 +83,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->out($system)
             ->execute();
         $this->assertEquals(
-            $result,
+            $result['data'],
             "id,email\n".
             "4,asimpson3@techcrunch.com\n"
 
@@ -108,7 +108,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->value(999)
             ->out($csv)
             ->execute();
-        $this->assertEquals($result['rows'], 1);
+        $this->assertEquals($result['data'], 1);
         $this->assertEquals(
             file_get_contents($o_file),
             "email\n".
@@ -130,7 +130,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ->value(999)
             ->out($xml)
             ->execute();
-        $this->assertEquals($result['rows'], 1);
+        $this->assertEquals($result['data'], 1);
         $this->assertEquals(
             file_get_contents($o_file),
             "<?xml version=\"1.0\"?>\n".

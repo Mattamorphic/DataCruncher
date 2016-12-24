@@ -210,7 +210,7 @@ class Query extends Runner
                 $this->_value
             );
         }
-        foreach ($this->_source->getNextDataRow() as $ln => $row) {
+        foreach ($this->_source->getNextDataRow() as $row) {
             // If this is executed on a DB it will only contain valid results
             ($this->_isdb) ? $valid = true : $valid = $this->test(trim($row[$this->_where]));
             if ($valid) {
@@ -404,19 +404,19 @@ class Query extends Runner
                 case 'stream':
                     $this->_out->flushBuffer();
                     $this->_out->reset();
-                    $result = stream_get_contents($this->_out->_fp);
+                    $result = ['data' => stream_get_contents($this->_out->_fp)];
                     $this->_out->close();
                     break;
                 case 'file':
                     $this->_out->close();
-                    $result = ['rows' => $rows];
+                    $result = ['data' => $rows];
                     break;
             }
         }
         if ($this->_timer) {
             $time = $this->_timer->stop('execute');
             $result = [
-                'data' => $result,
+                'data' => isset($result['data']) ? $result['data'] : $result,
                 'timer' => [
                     'elapsed' => $time->getDuration(), // milliseconds
                     'memory' => $time->getMemory() // bytes
