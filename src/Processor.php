@@ -11,7 +11,7 @@ namespace mfmbarber\DataCruncher;
 
 use mfmbarber\DataCruncher\Config\Validation as Validator;
 use mfmbarber\DataCruncher\Segmentation\{Query, Split, Merger};
-use mfmbarber\DataCruncher\Analysis\{Statistics, Config};
+use mfmbarber\DataCruncher\Analysis\{Statistics, Find, Config};
 
 class Processor
 {
@@ -70,6 +70,8 @@ class Processor
                 return new Statistics();
             case 'rule':
                 return new Config\Rule();
+            case 'find':
+                return new Find();
         }
     }
 }
