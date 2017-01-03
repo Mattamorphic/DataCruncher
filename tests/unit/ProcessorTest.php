@@ -6,7 +6,7 @@ use mfmbarber\DataCruncher\Processor as Processor;
 use Faker\Generator;
 
 use mfmbarber\DataCruncher\Segmentation\{Query, Split, Merger};
-use mfmbarber\DataCruncher\Analysis\{Statistics, Config};
+use mfmbarber\DataCruncher\Analysis\{Statistics, Find, Config};
 
 
 class ProcessorTest extends \PHPUnit_Framework_TestCase
@@ -26,6 +26,15 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             get_class($obj),
             get_class(new Statistics())
+        );
+    }
+
+    public function testItShouldGenerateAFindObject()
+    {
+        $obj = Processor::generate('analysis', 'find');
+        $this->assertEquals(
+            get_class($obj),
+            get_class(new Find())
         );
     }
 
