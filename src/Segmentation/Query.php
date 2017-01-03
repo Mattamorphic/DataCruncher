@@ -404,19 +404,19 @@ class Query extends Runner
                 case 'stream':
                     $this->_out->flushBuffer();
                     $this->_out->reset();
-                    $result = stream_get_contents($this->_out->_fp);
+                    $result = ['data' => stream_get_contents($this->_out->_fp)];
                     $this->_out->close();
                     break;
                 case 'file':
                     $this->_out->close();
-                    $result = ['rows' => $rows];
+                    $result = ['data' => $rows];
                     break;
             }
         }
         if ($this->_timer) {
             $time = $this->_timer->stop('execute');
             $result = [
-                'data' => $result,
+                'data' => isset($result['data']) ? $result['data'] : $result,
                 'timer' => [
                     'elapsed' => $time->getDuration(), // milliseconds
                     'memory' => $time->getMemory() // bytes

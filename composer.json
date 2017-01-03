@@ -30,6 +30,7 @@
     },
     "require": {
          "php": ">=7.0",
-        "symfony/stopwatch": "^3.1"
+        "symfony/stopwatch": "^3.1",
+        "symfony/console": "^3.2"
     }
 }

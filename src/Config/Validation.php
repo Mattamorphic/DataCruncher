@@ -30,6 +30,17 @@ class Validation
             'CONTAINS',
             'IN'
     ];
+
+    const CLI_LOGO = '
+        88888888ba,                  ,ad8888ba,   88           88
+        88      `"8b                d8"\'    `"8b  88           88
+        88        `8b              d8\'            88           88
+        88         88  ,adPPYYba,  88             88           88
+        88         88  ""     `Y8  88             88           88
+        88         8P  ,adPPPPP88  Y8,            88           88
+        88      .a8P   88,    ,88   Y8a.    .a8P  88           88
+        88888888Y"\'    `"8bbdP"Y8    `"Y8888Y"\'   88888888888  88
+    ';
     /**
      * Checks to see if this is a normal numerical array and not associative
      * @param mixed $arr     The array to check (this is type hinted)
@@ -188,4 +199,5 @@ class Validation
         );
         return ($filter) ? count(array_filter(array_values($found), function ($item) { return $item !== false; })) > 0 : $found;
     }
+
 }

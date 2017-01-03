@@ -41,6 +41,17 @@ class Statistics extends Runner
     }
 
     /**
+     * Generates a new rule that is returned
+     *
+     * @return Rule
+    **/
+    public function getRule() : Rule
+    {
+        $rule = new Rule();
+        return $rule;
+    }
+
+    /**
      * Adds a rule to the rule stack
      *
      * @return Statistics

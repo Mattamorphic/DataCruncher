@@ -41,6 +41,7 @@ use mfmbarber\DataCruncher\Helpers\DataSource;
 
 // our processor
 use mfmbarber\DataCruncher\Processor;
+```
 
 An example using a CSV input
 
@@ -220,6 +221,14 @@ The primary Front Controller component, if you'd like to use that is the Manipul
 
 Tests can be run on most base systems using the PHPUnit xml file, simply call phpunit from the top level directory. For setup of folders see the same commands run for travis in .travis.yml
 
+## Using the CLI : DaCLI
+This library is bundled with a CLI interface that allows you to run the library as a binary.
+Currently this is only using the Query object and only works on CSV and XML files.
+
+![Query example](http://i.imgur.com/IHiUiJ9.gif)
+
+This is built using the Symfony3 CLI component
+
 ## Issues?
 
 Please raise issues through the github :octocat: issues system, I'm always looking to improve this library so any feedback is always welcome! :smile:
@@ -233,6 +242,10 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 6. Submit a pull request :D
 
 ## History
+
+Upcoming 0.0.6
+- CLI binary examples
+- Moved rule generation into statistics as well as via processor
 
 18/12/2016
 - Factory Processor
