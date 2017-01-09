@@ -23,6 +23,7 @@ class CSVFile extends DataFile implements DataInterface
     // The amount of the file to load into memory in one chunk
     const CHUNK_SIZE = 100000;
     const SORT_CHUNK_SIZE = 10000000;
+
     // The amount of lines to store  in memory before writing to the output
     const WRITE_BUFFER_LIMIT = 500;
 
@@ -182,36 +183,6 @@ class CSVFile extends DataFile implements DataInterface
       * As the separator is ','
       *
     **/
-    // public function sort($key, $isInt = false, $backup = true)
-    // {
-    //     if (PHP_SHLIB_SUFFIX === 'dll') {
-    //         throw new \DomainException("Sorting can only be carried out on a *nix system");
-    //     }
-    //     $headers = array_flip($this->getHeaders());
-    //     $key = (int) $headers[trim($key)] + 1;
-    //     $cmd = "(head -n 1 {$this->_filename} ; tail -n +2 {$this->_filename} | sort ".($isInt ? "-n" : "")." --field-separator=',' --key=$key) > {$this->_filename}.bak && \cp {$this->_filename}.bak {$this->_filename}";
-    //     $res = shell_exec($cmd);
-    //     if (!$backup) {
-    //         unlink("{$this->_filename}.bak");
-    //     }
-    //     if ($res !== null) {
-    //         throw new \Exception("Couldn't execute sort, error : $res");
-    //     }
-    // }
-
-    /**
-      * Sorts a data file using the unix sort command
-      * unfortunately this is not compatible with Windows systems
-      * just *nix
-      *
-      * @param $key   The header to sort by
-      *
-      *
-      * Note: Currently this only supports numeric and string sorting
-      * NOT dates, nor does it operate with multiple enclosed values in a field
-      * As the separator is ','
-      *
-    **/
     public function sort(string $key) : array
     {
         // Timing
@@ -255,9 +226,14 @@ class CSVFile extends DataFile implements DataInterface
                 unset($csvs[$i]);
             }
             // update any moved pointers (for low)
-            if (isset($csvs[$low['index']])) $csvs[$low['index']]->getNextDataRow()->current();
+            if (isset($csvs[$low['index']]))
+            {
+                $csvs[$low['index']]->getNextDataRow()->current();
+            }
             // write the output row as the low
-            if ($low['data'] !== []) $output->writeDataRow($low['data']);
+            if ($low['data'] !== []) {
+                $output->writeDataRow($low['data'])
+            };
             ++$lines;
             // remove the line from the comparisons array (so a new one is fetched)
             $cmps[$low['index']] = false;
@@ -339,7 +315,15 @@ class CSVFile extends DataFile implements DataInterface
              // write the headers
              fwrite($csv->_fp, implode(",", $this->_headers) . "\n");
              // write the lines to the file
-             fwrite($csv->_fp, implode("\n", array_filter($this->_chunk, function ($line) { return (bool) strlen($line); })));
+             fwrite($csv->_fp, implode(
+                 "\n",
+                 array_filter(
+                     $this->_chunk,
+                     function ($line) { 
+                         return (bool) strlen($line);
+                     }
+                 )
+             ));
              // close the CSVFile
              $csv->close();
              // Create a new CSVFile from the same file in read mode
