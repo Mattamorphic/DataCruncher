@@ -15,10 +15,10 @@ use mfmbarber\DataCruncher\Exceptions;
 abstract class DataFile
 {
 
-    protected $_modifier = 'r';
     public $_fp = null;
-    protected $_filename = '';
 
+    protected $_modifier = 'r';
+    protected $_filename = '';
     /**
      * Sets the source  file of the Manipulator object, if valid sets attributes
      *
@@ -53,6 +53,16 @@ abstract class DataFile
         if (isset($properties['encloser'])) {
             $this->_encloser = $properties['encloser'];
         }
+    }
+
+    /**
+     * Update the modifier
+     *
+     * @param string $modifier  The modifier to apply
+    **/
+    public function setModifier(string $modifier)
+    {
+        $this->setSource($this->_filename, ['modifer' => $modifier]);
     }
 
     /**
