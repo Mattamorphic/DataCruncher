@@ -232,7 +232,7 @@ class CSVFile extends DataFile implements DataInterface
             }
             // write the output row as the low
             if ($low['data'] !== []) {
-                $output->writeDataRow($low['data'])
+                $output->writeDataRow($low['data']);
             };
             ++$lines;
             // remove the line from the comparisons array (so a new one is fetched)
@@ -319,7 +319,7 @@ class CSVFile extends DataFile implements DataInterface
                  "\n",
                  array_filter(
                      $this->_chunk,
-                     function ($line) { 
+                     function ($line) {
                          return (bool) strlen($line);
                      }
                  )
