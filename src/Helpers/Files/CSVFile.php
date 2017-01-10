@@ -77,7 +77,7 @@ class CSVFile extends DataFile implements DataInterface
      *
      * @return array
     **/
-    public function getNextDataRow(bool $peek = false)
+    public function getNextDataRow(bool $peek = false) : \Generator
     {
         if (false === stripos($this->_modifier, 'r')) {
             throw new Exceptions\InvalidFileException("File is not set to read mode");
@@ -188,7 +188,11 @@ class CSVFile extends DataFile implements DataInterface
         // Timing
         $timer = new Stopwatch();
         $timer->start('sort');
-        $this->open();
+        try {
+            $this->open();
+        } catch (\Exception $e) {
+            $this->reset();
+        }
         // dump the headers and load chunk 1
         $a = $this->getNextDataRow(true)->current();
         // Sort this csv into a set of sorted files
@@ -203,10 +207,7 @@ class CSVFile extends DataFile implements DataInterface
         $lines = 0;
         // while there are still more than 1 sorted files
         while (count($csvs) > 1) {
-            // references to finished files will be stored here
             $remove = [];
-            // store a current reference to the file pointer location for each open file
-            // create a base low state
             $low = ['index' => null, 'data' => []];
             foreach ($csvs as $i => $csv) {
                 if (!$cmps[$i]) {
@@ -219,26 +220,21 @@ class CSVFile extends DataFile implements DataInterface
                     $low = ['index' => $i, 'data' => $cmps[$i]];
                 }
             }
-            // close any complete csvs - as we don't need them
             foreach ($remove as $i) {
                 $csvs[$i]->close();
                 unlink($csvs[$i]->getSourceName());
                 unset($csvs[$i]);
             }
-            // update any moved pointers (for low)
             if (isset($csvs[$low['index']]))
             {
                 $csvs[$low['index']]->getNextDataRow()->current();
             }
-            // write the output row as the low
             if ($low['data'] !== []) {
                 $output->writeDataRow($low['data']);
             };
             ++$lines;
-            // remove the line from the comparisons array (so a new one is fetched)
             $cmps[$low['index']] = false;
         }
-        // write any remaining lines
         $csv = array_pop($csvs);
         foreach ($csv->getNextDataRow() as $line) {
             $output->writeDataRow($line);

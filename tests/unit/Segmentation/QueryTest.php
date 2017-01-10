@@ -345,6 +345,31 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testItShouldOrderResults()
+    {
+        $query = new Query();
+        $result = $query->from($this->mockSourceCSV)
+            ->select(['name', 'age'])
+            ->where('colour')
+            ->condition('contains')
+            ->value('red')
+            ->orderBy('age')
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'name' => 'tony',
+                    'age' => 25
+                ],
+                [
+                    'name' => 'matthew',
+                    'age' => 35
+                ]
+            ]
+        );
+    }
+
     /**
      * Data provider for executeContains
      *

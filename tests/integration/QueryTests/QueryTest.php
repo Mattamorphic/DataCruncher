@@ -115,7 +115,83 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             "jboydrr@unesco.org\n"
         );
     }
-    public function testItShouldOutputToXML(){
+
+    public function testItShouldOutputToOrderedCSV()
+    {
+        $query = Processor::generate('segmentation', 'query');
+        $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
+        $csv = DataSource::generate('file', 'csv');
+        $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
+        $o_file = $this->dir . 'QueryTests/OutputFiles/id990to1000.xml';
+        $xml->setSource($file, ['modifier' => 'r']);
+        $csv->setSource($o_file, ['modifier' => 'w']);
+        $result = $query->from($xml)
+            ->select(['email', 'first_name'])
+            ->where('id')
+            ->condition('GREATER')
+            ->value(950)
+            ->orderBy('first_name')
+            ->out($csv)
+            ->execute();
+        $this->assertEquals($result['data'], 50);
+        $this->assertEquals(
+            file_get_contents($o_file),
+            "first_name,email\n".
+            "Aaron,abennettqe@ed.gov\n".
+            "Alan,akingrd@tiny.cc\n".
+            "Alan,asmithrm@wikimedia.org\n".
+            "Anne,agarzaqt@msu.edu\n".
+            "Benjamin,btaylorqg@hexun.com\n".
+            "Bonnie,brodriguezr4@irs.gov\n".
+            "Brandon,bhenryrk@gravatar.com\n".
+            "Brenda,breynoldsrh@redcross.org\n".
+            "Bruce,bmillsqn@technorati.com\n".
+            "Bruce,bgibsonre@state.gov\n".
+            "Carlos,cjacksonr1@youku.com\n".
+            "Carolyn,cstewartra@arizona.edu\n".
+            "Catherine,cturnerqs@admin.ch\n".
+            "Charles,claneqz@plala.or.jp\n".
+            "Chris,chenryqf@networksolutions.com\n".
+            "Christopher,cdeanqh@themeforest.net\n".
+            "Debra,djamesrb@indiatimes.com\n".
+            "Diana,dwallaceql@deliciousdays.com\n".
+            "Donald,dharveyrq@bbc.co.uk\n".
+            "Donald,dlaner0@washington.edu\n".
+            "Douglas,dpalmerqj@thetimes.co.uk\n".
+            "Emily,ehicksqm@wix.com\n".
+            "Ernest,ebakerqr@un.org\n".
+            "Frank,ffieldsr9@businessinsider.com\n".
+            "George,gwillisrg@ask.com\n".
+            "Gerald,gjacksonqw@wufoo.com\n".
+            "James,jkellyqv@utexas.edu\n".
+            "Jean,jboydrr@unesco.org\n".
+            "Jeffrey,jbanksqp@canalblog.com\n".
+            "Jeremy,jgreenqy@joomla.org\n".
+            "Jeremy,jgrahamr6@unesco.org\n".
+            "Joan,jmoorequ@mayoclinic.com\n".
+            "John,jcolemanr2@123-reg.co.uk\n".
+            "Johnny,jgrahamrc@drupal.org\n".
+            "Kathy,kgreenrn@cbc.ca\n".
+            "Kimberly,klopezrl@pinterest.com\n".
+            "Larry,lfowlerrj@sohu.com\n".
+            "Lillian,lsanchezrf@usda.gov\n".
+            "Lillian,lgrantrp@ning.com\n".
+            "Lori,lbarnesr5@a8.net\n".
+            "Mark,mfrazierqo@constantcontact.com\n".
+            "Martha,mhallr3@aol.com\n".
+            "Martha,mbellqk@washington.edu\n".
+            "Philip,ptuckerro@time.com\n".
+            "Richard,rrodriguezqq@cam.ac.uk\n".
+            "Ruth,rcarterqx@wordpress.org\n".
+            "Scott,sburtonr8@icio.us\n".
+            "Shawn,sberryri@bandcamp.com\n".
+            "Shirley,sperkinsr7@adobe.com\n".
+            "Timothy,tcastilloqi@weather.com\n"
+        );
+    }
+
+    public function testItShouldOutputToXML()
+    {
         $query = Processor::generate('segmentation', 'query');
         $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
         $csv = DataSource::generate('file', 'csv');
@@ -138,7 +214,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
 
     }
+
     public function testItShouldOutputToDBTable(){}
+
     public function testItShouldQueryEquals()
     {
         $query = Processor::generate('segmentation', 'query');
