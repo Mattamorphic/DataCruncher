@@ -223,6 +223,9 @@ class Query extends Runner
         ($this->_timer) ? $this->_timer->start('execute') : null;
         // if this will be executed on a DB, then fire it off
         if ($this->_isdb) {
+            if ($this->_orderBy) {
+                $this->_source->sort($this->_orderBy);
+            }
             $this->_source->query(
                 $this->_fields,
                 $this->_where,
@@ -424,7 +427,7 @@ class Query extends Runner
                 case 'stream':
                     $this->_out->flushBuffer();
                     $this->_out->reset();
-                    if ($this->_orderBy) {
+                    if ($this->_orderBy && !$this->_isdb) {
                         $this->_out->setModifier('r');
                         $this->_out->sort($this->_orderBy);
                         $this->_out->reset();
@@ -434,7 +437,7 @@ class Query extends Runner
                     break;
                 case 'file':
                     $this->_out->close();
-                    if ($this->_orderBy) {
+                    if ($this->_orderBy && !$this->_isdb) {
                         $this->_out->setSource($this->_out->getSourceName(), ['modifier' => 'r']);
                         //$this->_out->setModifier('r');
                         $this->_out->sort($this->_orderBy);
@@ -443,7 +446,7 @@ class Query extends Runner
                     break;
             }
         } else {
-            if ($this->_orderBy) {
+            if ($this->_orderBy && !$this->_isdb) {
                 $key = $this->_orderBy;
                 usort($result, function (array $a, array $b) use ($key) {
                     return $a[$key] <=> $b[$key];
