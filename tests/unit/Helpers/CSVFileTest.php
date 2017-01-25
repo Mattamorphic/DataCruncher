@@ -199,4 +199,12 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $this->mockSourceCSV->setSource('vfs://home/invalidCSV', ['modifier' => 'r']);
 
     }
+    public function testItShouldAllowUsToPeekAtData()
+    {
+        $this->mockSourceCSV->open();
+        $a = $this->mockSourceCSV->getNextDataRow(true)->current();
+        $b = $this->mockSourceCSV->getNextDataRow()->current();
+        $this->mockSourceCSV->close();
+        $this->assertEquals($a, $b);
+    }
 }

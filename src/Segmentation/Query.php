@@ -25,6 +25,7 @@ class Query extends Runner
     private $_value = '';
     private $_limit = -1;
     private $_mappings = null;
+    private $_orderBy = null;
 
     /**
      * Sets the data source for the query
@@ -188,6 +189,25 @@ class Query extends Runner
     }
 
     /**
+     * Order the results by a specific key
+     *
+     * @param string    $key    The key to order the results by
+     *
+     * @return Query
+    **/
+    public function orderBy(string $key) : Query
+    {
+        if ($this->_source !== null) {
+            $headers = $this->_source->getHeaders();
+            if (!in_array($key, $headers)) {
+                throw new \Exception("$key is not in " . implode(', ', $headers));
+            }
+        }
+        $this->_orderBy = $key;
+        return $this;
+    }
+
+    /**
      * Execute the query, returning an array of arrays, where each sub array
      * is a row of headers and values
      *
@@ -203,6 +223,9 @@ class Query extends Runner
         ($this->_timer) ? $this->_timer->start('execute') : null;
         // if this will be executed on a DB, then fire it off
         if ($this->_isdb) {
+            if ($this->_orderBy) {
+                $this->_source->sort($this->_orderBy);
+            }
             $this->_source->query(
                 $this->_fields,
                 $this->_where,
@@ -404,13 +427,30 @@ class Query extends Runner
                 case 'stream':
                     $this->_out->flushBuffer();
                     $this->_out->reset();
+                    if ($this->_orderBy && !$this->_isdb) {
+                        $this->_out->setModifier('r');
+                        $this->_out->sort($this->_orderBy);
+                        $this->_out->reset();
+                    }
                     $result = ['data' => stream_get_contents($this->_out->_fp)];
                     $this->_out->close();
                     break;
                 case 'file':
                     $this->_out->close();
+                    if ($this->_orderBy && !$this->_isdb) {
+                        $this->_out->setSource($this->_out->getSourceName(), ['modifier' => 'r']);
+                        //$this->_out->setModifier('r');
+                        $this->_out->sort($this->_orderBy);
+                    }
                     $result = ['data' => $rows];
                     break;
+            }
+        } else {
+            if ($this->_orderBy && !$this->_isdb) {
+                $key = $this->_orderBy;
+                usort($result, function (array $a, array $b) use ($key) {
+                    return $a[$key] <=> $b[$key];
+                });
             }
         }
         if ($this->_timer) {

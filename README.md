@@ -246,6 +246,8 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 Upcoming 0.0.6
 - CLI binary examples
 - Moved rule generation into statistics as well as via processor
+- Rebuilt sorting using external merge sort algorithm - eek!
+- Added Find analysis option that can calculate standard dev, max and min
 
 18/12/2016
 - Factory Processor
