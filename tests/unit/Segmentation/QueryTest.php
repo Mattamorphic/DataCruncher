@@ -548,7 +548,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                     'select' => ['email'],
                     'where' => ['dob', 'd/m/Y'],
                     'condition' => 'between',
-                    'value' => [['1980', '2000'], 'Y']
+                    'value' => [['1980', '1999'], 'Y']
                 ],
                 [
                     ['email' => 'mfmbarber@test.com'],

@@ -40,6 +40,13 @@ class CSVFile extends DataFile implements DataInterface
     private $_write_buffer = [];
     private $_write_buffer_counter = 0;
 
+    /**
+     * Sets the source for this CSV object, by specifying the file name and properties
+     * @param string    $filename   The name and path of the file
+     * @param array     $properties The properties for the source (i.e. ['modifier' => 'r'])
+     *
+     * @return void
+    **/
     public function setSource(string $filename, array $properties = [])
     {
         parent::setSource($filename, $properties);
