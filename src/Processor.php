@@ -70,8 +70,6 @@ class Processor
                 return new Statistics();
             case 'rule':
                 return new Config\Rule();
-            case 'find':
-                return new Find();
         }
     }
 }

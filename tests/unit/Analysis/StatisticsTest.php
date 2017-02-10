@@ -105,7 +105,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     {
         $stats = new Statistics();
         $rule = new Rule();
-        $rule = $rule->setField('dob') ->groupDate('d/m/Y', 'Y');
+        $rule = $rule->setField('dob')->groupDate('d/m/Y', 'Y');
         $stats->addRule($rule);
         $result = $stats->from($this->mockSourceCSV)
             ->percentages()
@@ -127,7 +127,7 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     /**
      * @t/est
     **/
-    public function ____testItShouldWritePercentagesToOutfile()
+    public function ___testItShouldWritePercentagesToOutfile()
     {
         $stats = new Statistics();
         $rule = new Rule();
@@ -178,10 +178,10 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     public function testItShouldReturnMultipleSetsOfResultsGivenMultipleRules()
     {
         $stats = new Statistics();
-        $rules = [];
         $rule = new Rule();
         $rule->setField('phone')->groupRegex('/^([\w\-]+)/i');
         $stats->addRule($rule);
+        $rule = new Rule();
         $rule->setField('colour')->groupRegex('/([^,]+)/');
         $stats->addRule($rule);
         $result = $stats->from($this->mockSourceCSV)
@@ -213,7 +213,6 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
     public function testItShouldReturnMultipleSetsOfResultsGivenMultipleRulesWithLabels()
     {
         $stats = new Statistics();
-        $rules = [];
         $rule = new Rule();
         $rule->setField('phone')->groupRegex('/^([\w\-]+)/i')->setLabel('company');
         $stats->addRule($rule);
@@ -287,6 +286,95 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
                     'samsung' => 50.0,
                     'htc' => 25.0
                 ]
+            ]
+        );
+    }
+
+    /**
+     * Unit test, The field given is not a valid type for the rule
+     *
+     * @expectedException        \Exception
+     * @expectedExceptionMessage age is int expects date
+     *
+     * @return null
+    **/
+    public function testItShouldValidateTheRuleAgainstTheField()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('age')->groupDate('d/m/Y', 'Y');
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->percentages()
+            ->execute();
+    }
+
+    /**
+     * Unit test, The field given for the rule is not in the source
+     *
+     * @expectedException       \Exception
+     * @expectedExceptionMessage test is not in the source, ensure one of email, name, colour, dob, age, phone
+     *
+     * @return null
+    **/
+    public function testItShouldValidateTheRuleFieldExists()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('test')->groupExact();
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->percentages()
+            ->execute();
+    }
+
+    public function testItShouldReturnTheMinValue()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('age')->setLabel('youngest')->getMin();
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->execute();
+        $this->assertEquals($result['youngest'], 15);
+    }
+
+    public function testItShouldReturnTheMaxValue()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('age')->setLabel('oldest')->getMax();
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->execute();
+        $this->assertEquals($result['oldest'], 35);
+    }
+
+    public function testItShouldReturnTheAverageValue()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('age')->setLabel('average age')->getAverage();
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->execute();
+        $this->assertEquals($result['average age'], 25.75);
+    }
+    public function testItShouldReturnTheStandardDeviation()
+    {
+        $stats = new Statistics();
+        $rule = new Rule();
+        $rule->setField('age')->setLabel('standard deviation')->getDeviation(1);
+        $stats->addRule($rule);
+        $result = $stats->from($this->mockSourceCSV)
+            ->execute();
+        $this->assertEquals(
+            $result['standard deviation'],
+            [
+                28 => 2.25,
+                35 => 9.25,
+                25 => -0.75,
+                15 => -10.75
             ]
         );
     }

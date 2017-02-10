@@ -22,7 +22,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
      *
      * @return mock
     **/
-    private function _generateMockFile($class_name)
+    private function generateMockFile($class_name)
     {
         $file = $this->getMockBuilder($class_name)
         ->setMethods(['fileExists', 'readable', 'writable'])
@@ -47,9 +47,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
         vfsStream::url('home/test_out', 0777);
-        $this->mockSourceCSV = $this->_generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
+        $this->mockSourceCSV = $this->generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
         $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV = $this->_generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
+        $this->mockOutCSV = $this->generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
         $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
     }
 
@@ -319,7 +319,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that a wildcard can be used to get all the fields
-     * @return null
+     * @return void
     **/
     public function testItShouldAllowWildCardSelect()
     {
@@ -345,6 +345,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Test that ordering the results is valid
+     *
+     * @return void
+    **/
     public function testItShouldOrderResults()
     {
         $query = new Query();
@@ -367,6 +372,36 @@ class QueryTest extends \PHPUnit_Framework_TestCase
                     'age' => 35
                 ]
             ]
+        );
+    }
+    /**
+     * Test that the results are distinct
+     *
+     * @return void
+    **/
+    public function testItShouldReturnDistinct()
+    {
+        $query = new Query();
+        $result = $query->from($this->mockSourceCSV)
+            ->select(['name', 'age'])
+            ->where('colour')
+            ->condition('contains')
+            ->value('red')
+            ->distinct()
+            ->execute();
+        $this->assertEquals(
+            [
+                [
+                    'name' => 'matthew',
+                    'age' => 35
+                ],
+                [
+                    'name' => 'tony',
+                    'age' => 25
+                ]
+
+            ],
+            $result
         );
     }
 

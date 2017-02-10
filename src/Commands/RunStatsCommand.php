@@ -1,6 +1,6 @@
 <?php
 /**
- * Query CLI Command
+ * Statistics CLI Command
  *
  * @package DataCruncher
  * @subpackage Commands
@@ -22,24 +22,22 @@ use Symfony\Component\Console\Input\{InputInterface, InputArgument, InputOption}
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\{Question, ChoiceQuestion};
 
-class RunQueryCommand extends Command
+class RunStatsCommand extends Command
 {
     /**
      * Configure the command and optional arguments / help text
     **/
     protected function configure() : void
     {
-        $this->setName('query')
-            ->setDescription('Run query')
-            ->setHelp('Run a query and return the results');
+        $this->setName('statistics')
+            ->setDescription('Run Statistical Check')
+            ->setHelp('Run a statistical check and return the results');
 
         $this->addArgument('source', InputArgument::REQUIRED, 'The source to query (currently only files)');
 
-        $this->addOption('destination', 'd', InputOption::VALUE_REQUIRED, 'The destination for the result (currently only files)');
-
-        $this->addOption('select', 's', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'The fields to select from the source', []);
+        $this->addOption('field', 'f', InputOption::VALUE_REQUIRED, 'The field to test', []);
         $this->addOption('timer', 't', InputOption::VALUE_NONE, 'Time the process');
-        $this->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the amount of rows');
+
         $this->addOption('node', null, InputOption::VALUE_REQUIRED, 'The name of the node element that represents a row');
         $this->addOption('parent', null, InputOption::VALUE_REQUIRED, 'The name of the parent element to the node rows');
     }
@@ -57,47 +55,73 @@ class RunQueryCommand extends Command
         // Let's begin
         $io = new SymfonyStyle($input, $output);
         $io->text(Validation::CLI_LOGO);
-        $query = Processor::generate('segmentation', 'query');
+        $statistics = Processor::generate('analysis', 'statistics');
 
         // Get the source and destination
         $source = $this->validateData($input, $input->getArgument('source'), 'rb');
-        if ($input->getOption('destination')) {
-            $destination = $this->validateData($input, $input->getOption('destination'), 'wb+');
-        } else {
-            $destination = DataSource::generate('system', 'csv');
-            $destination->setSource('', ['modifier' => 'wb+']);
+
+        // what field do we want to analyse
+        $field = $input->getOption('field');
+
+        // how do we want to group the results
+        $group = $this->askChoiceQuestion(
+            $input,
+            $output,
+            'Please select the group type: ',
+            [
+                'Exact',
+                'Numeric',
+                'Regex',
+                'Date'
+            ],
+            'Condition invalid, please try again'
+        );
+
+        // Do we want percentages back, or a count?
+        $return = $this->askChoiceQuestion(
+            $input,
+            $output,
+            'Percentages or count: ',
+            ['Percentages', 'Actual Count'],
+            'Please select valid return form'
+        );
+
+        // Create our statistics rule
+        $rule = $statistics->getRule();
+        switch ($group) {
+            case 'Exact':
+                $rule->setField($field)->groupExact();
+                break;
+            case 'Numeric':
+                do {
+                    $value = (int) $this->askQuestion($input, $output, 'Please enter an integer value: ');
+                } while (!$value);
+                $rule->setField($field)->groupNumeric($value);
+                break;
+            case 'Regex':
+                break;
+            case 'Date':
+                break;
         }
-        // setup the query
-        $where = $this->askChoiceQuestion($input, $output, 'Please select a field to query: ', $source->getHeaders(), 'Condition invalid, please try again');
-        $condition = $this->askChoiceQuestion($input, $output, 'Please select the condition you\'d like applied to the field (leave blank for equals): ', Validation::CONDITIONS, 'Condition invalid, please try again', 0);
-        $value = $this->askQuestion($input, $output, 'Please enter the value: ');
+        $statistics->addRule($rule);
+
 
         $io->section('Processing, Standby');
 
         // run
-        $query->from($source)
-            ->select($input->getOption('select'))
-            ->where($where)
-            ->condition($condition)
-            ->value($value)
-            ->out($destination);
+        $statistics->from($source);
+
+        if ($return === 'Percentages') $statistics->percentages();
 
         // Add our optional parameters
-        if ($input->getOption('timer')) $query->timer();
-        if ($input->getOption('limit')) $query->limit((int) $input->getOption('limit'));
+        if ($input->getOption('timer')) $statistics->timer();
 
-        $results = $query->execute();
+        $results = $statistics->execute();
+        $success = ['Process Completed'];
 
-        // Are we dealing with a count of rows, or the actual rows.
-        if (is_integer($results['data'])) $data = "Rows: {$results['data']}";
-        if (is_string($results['data'])) $data = $results['data'];
-
-        $success = [
-            'Process Completed',
-            $data
-        ];
-
-        if ($input->getOption('destination')) $success[] = "Destination: {$input->getOption('destination')}";
+        foreach ($results[0] as $key => $value) {
+            $success[] = "$key : $value";
+        }
         if (isset($results['timer'])) $success[] = 'Time: '.number_format(round($results['timer']['elapsed'] / 1000, 2), 2).' seconds';
 
         $io->success($success);

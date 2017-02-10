@@ -17,8 +17,8 @@ class XMLFile extends DataFile implements DataInterface
 {
     private $node_name;
     private $start_element;
-    private $_read;
-    private $_fields = [];
+    private $read;
+    private $fields = [];
 
     public function __construct(string $node_name, string $start_element)
     {
@@ -37,27 +37,27 @@ class XMLFile extends DataFile implements DataInterface
     **/
     public function getHeaders($force = true) : array
     {
-        if ($force || $this->_headers === []) {
+        if ($force || $this->headers === []) {
             $this->open(true, $this->node_name, $this->start_element);
             $this->getNextDataRow()->current();
             $this->close();
         }
-        return $this->_fields;
+        return $this->fields;
     }
 
     /**
      * Returns the next row of data from a file, if there are no rows locale_accept_from_http
      * this returns false
      *
-     * @return mixed
+     * @return Generator
      */
-    public function getNextDataRow()
+    public function getNextDataRow() : \Generator
     {
         $row = [];
-        while ($this->_fp->name === $this->node_name) {
-            $row = $this->_toArray(new \SimpleXMLElement($this->_fp->readOuterXML()));
-            $this->_fields  = ($this->_fields === []) ? array_keys($row) : $this->_fields;
-            $this->_fp->next($this->node_name);
+        while ($this->fp->name === $this->node_name) {
+            $row = $this->toArray(new \SimpleXMLElement($this->fp->readOuterXML()));
+            $this->fields  = ($this->fields === []) ? array_keys($row) : $this->fields;
+            $this->fp->next($this->node_name);
             yield $row;
         }
 
@@ -69,20 +69,20 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return boolean
      */
-    public function writeDataRow(array $row)
+    public function writeDataRow(array $row) : bool
     {
-        if ($this->_fp !== null) {
+        if ($this->fp !== null) {
             if (count($row) === 0) {
                 return false;
             }
-            $this->_fp->startElement($this->node_name);
+            $this->fp->startElement($this->node_name);
             foreach ($row as $key => $value) {
-                $this->_fp->writeElement($key, $value);
+                $this->fp->writeElement($key, $value);
             }
-            $this->_fp->endElement();
-            $this->_fp->flush();
-            if ($this->_fields === []) {
-                $this->_fields = array_keys($row);
+            $this->fp->endElement();
+            $this->fp->flush();
+            if ($this->fields === []) {
+                $this->fields = array_keys($row);
             }
             return true;
         } else {
@@ -95,23 +95,25 @@ class XMLFile extends DataFile implements DataInterface
     /**
      * open the file and set the file pointer
      *
+     * @param bool  $read   Should we open this in READ mode?
+     *
      * @return void
      */
-    public function open(bool $read = true)
+    public function open(bool $read = true) : void
     {
-        if ($this->_fp === null) {
+        if ($this->fp === null) {
             if ($read) {
-                $this->_fp = new \XMLReader();
-                $this->_read = $read;
-                $this->_fp->open($this->_filename);
-                while ($this->_fp->read() && $this->_fp->name !== $this->node_name);
+                $this->fp = new \XMLReader();
+                $this->read = $read;
+                $this->fp->open($this->filename);
+                while ($this->fp->read() && $this->fp->name !== $this->node_name);
             } else {
-                $this->_fp = new \XMLWriter();
-                $this->_read = false;
-                $this->_fp->openURI($this->_filename);
-                $this->_fp->startDocument('1.0');
+                $this->fp = new \XMLWriter();
+                $this->read = false;
+                $this->fp->openURI($this->filename);
+                $this->fp->startDocument('1.0');
                 if (null !== $this->start_element) {
-                    $this->_fp->startElement($this->start_element);
+                    $this->fp->startElement($this->start_element);
                 }
             }
         } else {
@@ -126,16 +128,16 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return void
      */
-    public function close()
+    public function close() : void
     {
-        if ($this->_fp !== null) {
-            if (get_class($this->_fp) === 'XMLReader') {
+        if ($this->fp !== null) {
+            if (get_class($this->fp) === 'XMLReader') {
 
             } else {
-                $this->_fp->endDocument();
-                $this->_fp->flush();
+                $this->fp->endDocument();
+                $this->fp->flush();
             }
-            $this->_fp = null;
+            $this->fp = null;
         } else {
             throw new Exceptions\FilePointerInvalidException(
                 'The filepointer is null on this object, use class::open'
@@ -148,12 +150,12 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return void
      */
-    public function reset()
+    public function reset() : void
     {
-        if ($this->_fp !== null) {
+        if ($this->fp !== null) {
             // we have to close and reopen
             $this->close();
-            $this->open($this->_read, $this->node_name, $this->start_element);
+            $this->open($this->read, $this->node_name, $this->start_element);
         } else {
             throw new Exceptions\FilePointerInvalidException(
                 'The filepointer is null on this object, use class::open'
@@ -161,6 +163,7 @@ class XMLFile extends DataFile implements DataInterface
             );
         }
     }
+
     /**
      * Converts simpleXMLObject to array
      *
@@ -169,7 +172,7 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return array
      */
-    private function _toArray($xml, array $row = [])
+    private function toArray($xml, array $row = [])
     {
         // if the data is an object, we get this as an array, else we return the xml
         $data = (is_object($xml)) ? get_object_vars($xml) : $xml;
@@ -178,7 +181,7 @@ class XMLFile extends DataFile implements DataInterface
             // we loop across building our equivelent with recursive calls
             foreach ($data as $key => $value) {
                 $res = [];
-                $res = $this->_toArray($value, $res);
+                $res = $this->toArray($value, $res);
                 if (($key == '@attribute') && ($key)) {
                     $row = $res;
                 } else {
