@@ -16,7 +16,7 @@ use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
 
 class Database implements DataInterface
 {
-    const CONDITIONS = [
+    private const CONDITIONS = [
         'EQUALS' => '=',
         'GREATER' => '>',
         'LESS' => '<',
@@ -29,16 +29,16 @@ class Database implements DataInterface
         'IN'    => 'IN'
     ];
 
-    public $_connection = null;
-    public $_dsn;
+    public $connection = null;
+    public $dsn;
 
-    private $_username;
-    private $_password;
-    private $_table;
+    private $username;
+    private $password;
+    private $table;
 
-    private $_query = null;
-    private $_headers = [];
-    private $_sortKey = null;
+    private $query = null;
+    private $headers = [];
+    private $sortKey = null;
 
     /**
      * Sets the source for the DATABASE manipulator object.
@@ -49,7 +49,7 @@ class Database implements DataInterface
      *                                  This must contain username, password and table
      * @return null
     **/
-    public function setSource(string $db, array $properties)
+    public function setSource(string $db, array $properties) : void
     {
         $type = $properties['type'] ?? 'mysql';
         $host = $properties['host'] ?? 'localhost';
@@ -70,8 +70,8 @@ class Database implements DataInterface
             "The key password must be set in the properties array to a string '' is valid"
         );
 
-        $this->_username = $properties['username'] ?? '';
-        $this->_password = $properties['password'] ?? '';
+        $this->username = $properties['username'] ?? '';
+        $this->password = $properties['password'] ?? '';
 
         $this->setTable($properties['table']);
     }
@@ -84,9 +84,9 @@ class Database implements DataInterface
      *
      * @return null
     **/
-    public function setTable(string $table)
+    public function setTable(string $table) : void
     {
-        $this->_table = $table;
+        $this->table = $table;
     }
 
     /**
@@ -99,18 +99,28 @@ class Database implements DataInterface
     **/
     public function getHeaders(bool $force = true) : array
     {
-        if ($force || $this->_headers === []) {
+        if ($force || $this->headers === []) {
             // TODO : fix and stuff
             // You wouldn't be using this on an empty table - so 'fuck it'
             // there isn't a cross compliant way of handling this across SQLLITE
             // mysql and postgres - I should probably write a wrapper or something
-            $sql = "SELECT * FROM {$this->_table} LIMIT 1";
-            $desc = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+            $sql = "SELECT * FROM {$this->table} LIMIT 1";
+            $desc = $this->connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
             $desc->execute();
-            $this->_headers = array_keys($desc->fetch(\PDO::FETCH_ASSOC));
+            $this->headers = array_keys($desc->fetch(\PDO::FETCH_ASSOC));
         }
-        return $this->_headers;
+        return $this->headers;
     }
+
+
+    public function getFieldType(string $field) : string
+    {
+        $sql = "SELECT $field FROM {$this->table} LIMIT 1";
+        $desc = $this->connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $desc->execute();
+        return Validation::getType($desc->fetch(\PDO::FETCH_OBJ)->{$field});
+    }
+
 
     /**
      * Create a DB connection and store it in the state of the object using PDO
@@ -120,14 +130,14 @@ class Database implements DataInterface
      *
      * @return null
     **/
-    public function open(bool $reconnect = false)
+    public function open(bool $reconnect = false) : void
     {
-        if ($this->_connection === null || $reconnect) {
+        if ($this->connection === null || $reconnect) {
             try {
-                $this->_connection = new \PDO($this->_dsn, $this->_username, $this->_password);
+                $this->connection = new \PDO($this->dsn, $this->username, $this->password);
             } catch (\PDOException $e) {
                 throw new \PDOException(
-                    "Couldn't establish connection using {$this->_dsn} is the server running?"
+                    "Couldn't establish connection using {$this->dsn} is the server running?"
                 );
             }
         } else {
@@ -141,10 +151,10 @@ class Database implements DataInterface
      *
      * @return null
     **/
-    public function close()
+    public function close() : void
     {
-        if ($this->_connection !== null) {
-            $this->_connection = null;
+        if ($this->connection !== null) {
+            $this->connection = null;
         } else {
             throw new \PDOException("No connection active");
         }
@@ -154,10 +164,10 @@ class Database implements DataInterface
      * Sort the data by a given key for each query
      * @param string    $key    A valid key in the table
     **/
-    public function sort($key)
+    public function sort($key) : void
     {
         if (in_array($key, $this->getHeaders())) {
-            $this->_sortKey = $key;
+            $this->sortKey = $key;
         } else {
             throw new \PDOException("$key is not a header in the table");
         }
@@ -176,7 +186,7 @@ class Database implements DataInterface
     **/
     public function query($fields, $where = null, $condition = null, $value = null)
     {
-        $sql = 'SELECT ' . implode(', ', array_keys($fields)) . " FROM {$this->_table}";
+        $sql = 'SELECT ' . implode(', ', array_keys($fields)) . " FROM {$this->table}";
         // TODO a fuck tonne of parsing of where  condition and value based on constant CONDITIOND
         if (isset($where)) {
             $condition = self::CONDITIONS[$condition];
@@ -194,11 +204,11 @@ class Database implements DataInterface
                 $sql .= " :value";
             }
         }
-        if ($this->_sortKey !== null) {
-            $sql .= " ORDER BY $this->_sortKey";
+        if ($this->sortKey !== null) {
+            $sql .= " ORDER BY $this->sortKey";
         }
-        $this->_query = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
-        $this->_query->execute((isset($value)) ? [':value' => $value] : null);
+        $this->query = $this->connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $this->query->execute((isset($value)) ? [':value' => $value] : null);
 
     }
 
@@ -209,7 +219,7 @@ class Database implements DataInterface
     **/
     public function getSourceName() : string
     {
-        return $this->_dsn;
+        return $this->dsn;
     }
 
     /**
@@ -217,9 +227,9 @@ class Database implements DataInterface
      *
      * @return array
     **/
-    public function getNextDataRow()
+    public function getNextDataRow() : \Generator
     {
-        if ($this->_query !== null && ($line = $this->_query->fetch(\PDO::FETCH_ASSOC))) {
+        if ($this->query !== null && ($line = $this->query->fetch(\PDO::FETCH_ASSOC))) {
             yield $line;
         } else {
             return [];
@@ -231,7 +241,7 @@ class Database implements DataInterface
      *
      * @param array $row
     **/
-    public function writeDataRow(array $row)
+    public function writeDataRow(array $row) : bool
     {
         // Create an array of substitutions
         $subs = array_map(
@@ -241,12 +251,12 @@ class Database implements DataInterface
             array_keys($row)
         );
         // Create the prepared insert phrase
-        $sql = "INSERT INTO {$this->_table} (" .
+        $sql = "INSERT INTO {$this->table} (" .
             implode(', ', array_keys($row)) .
         ") VALUES (" .
             implode(', ', $subs) .
         ")";
-        $insert = $this->_connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
+        $insert = $this->connection->prepare($sql, [\PDO::ATTR_CURSOR => \PDO::CURSOR_FWDONLY]);
         // execute combining our values with our substitutions
         // If this fails it'll through an SQL exception
         $insert->execute(array_combine($subs, array_values($row)));
@@ -255,13 +265,15 @@ class Database implements DataInterface
 
     /**
      * Sets the DSN for the PDO object held in connection
+     *
      * @param string    $type   The DB type, i.e. mysql
      * @param string    $db     The name of the target DB
      * @param string    $host   The location of the DB
+     *
     **/
-    private function setDSN(string $type, string $db, string $host)
+    private function setDSN(string $type, string $db, string $host) : void
     {
-        $this->_dsn = "$type:dbname=$db;host=$host";
+        $this->dsn = "$type:dbname=$db;host=$host";
     }
 
 

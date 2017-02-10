@@ -29,15 +29,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testItShouldGenerateAFindObject()
-    {
-        $obj = Processor::generate('analysis', 'find');
-        $this->assertEquals(
-            get_class($obj),
-            get_class(new Find())
-        );
-    }
-
     public function testItShouldGenerateAMergerObject()
     {
         $obj = Processor::generate('segmentation', 'merge');

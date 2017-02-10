@@ -50,7 +50,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
             'password' => '',
             'table' => 'users'
         ]);
-        $this->mockDB->_connection = $this->getConnection()->getConnection();
+        $this->mockDB->connection = $this->getConnection()->getConnection();
     }
 
     public function tearDown()
@@ -160,5 +160,10 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                 $this->mockDB->getNextDataRow()->current()
             );
         }
+    }
+
+    public function testItShouldReturnTheFieldType()
+    {
+        $this->assertEquals('int', $this->mockDB->getFieldType('age'));
     }
 }
