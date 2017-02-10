@@ -243,11 +243,18 @@ Please raise issues through the github :octocat: issues system, I'm always looki
 
 ## History
 
-Upcoming 0.0.6
-- CLI binary examples
+10/02/2017
+
+- CLI binary examples (Query and Statistics (initial))
 - Moved rule generation into statistics as well as via processor
 - Rebuilt sorting using external merge sort algorithm - eek!
-- Added Find analysis option that can calculate standard dev, max and min
+- Added find analysis options to rules so that Statistics calculate standard dev, max and min
+- Added rule validation to the Statistics Processor
+- Select distinct added to query analyser
+- PHP 7.1 void return types
+- Added string variable type validator
+- Updated private attribute naming to be in line with best practices
+
 
 18/12/2016
 - Factory Processor
