@@ -127,4 +127,5 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+
 }

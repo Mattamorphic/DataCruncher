@@ -32,6 +32,19 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $this->mockSourceCSV = null;
     }
     /**
+     * @expectedException           mfmbarber\DataCruncher\Exceptions\InvalidFileException
+     * @expectedExceptionMessage    File is not readable
+    **/
+    public function testItShouldFailIfNoReadPrivilages()
+    {
+        vfsStream::newFile('locked', 0000)
+            ->withContent('Locked File')
+            ->at($this->root);
+        $csv = new CSVFile();
+        $csv->setSource('vfs://home/locked', ['modifier' => 'r']);    
+    }
+
+    /**
      * Tests that once assigned the source name can be retrieved
      *
      * @return null
@@ -44,6 +57,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
             'Name isn\'t set correctly'
         );
     }
+
     /**
      * Unit test, retrieving associative array of headers & values from a
      * data stream
@@ -90,6 +104,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
             $result
         );
     }
+
     /**
      * Unit test, Either a file doesn't exist, or isn't readable - throws
      * matching exception with message
@@ -104,6 +119,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $sourceFile = new CSVFile();
         $sourceFile->setSource('FakeFile.csv', ['modifier' => 'r']);
     }
+
     /**
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
@@ -117,6 +133,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $sourceFile = new CSVFile();
         $sourceFile->close();
     }
+
     /**
      * Unit test, If a file pointer hasn't been opened and a close is attempted
      *
@@ -132,6 +149,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
         $csv->open();
         $csv->open();
     }
+
     /**
      * Unit test, If a file pointer hasn't been opened and a reset is attempted
      *
