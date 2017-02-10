@@ -12,5 +12,6 @@ use Symfony\Component\Console\Application;
 $application = new Application();
 
 $application->add(new Commands\RunQueryCommand());
+$application->add(new Commands\RunStatsCommand());
 
 $application->run();
