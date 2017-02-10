@@ -10,6 +10,7 @@
 namespace mfmbarber\DataCruncher\Commands;
 
 // Bootstrap DataCruncher
+use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface;
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Processor;
 use mfmbarber\DataCruncher\Config\Validation;
@@ -26,7 +27,7 @@ class RunQueryCommand extends Command
     /**
      * Configure the command and optional arguments / help text
     **/
-    protected function configure()
+    protected function configure() : void
     {
         $this->setName('query')
             ->setDescription('Run query')
@@ -51,7 +52,7 @@ class RunQueryCommand extends Command
      *
      * @return null
     **/
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output) : void
     {
         // Let's begin
         $io = new SymfonyStyle($input, $output);
@@ -111,7 +112,7 @@ class RunQueryCommand extends Command
      *
      * @return DataInterface
     **/
-    private function validateData(InputInterface $input, string $arg, string $modifier)
+    private function validateData(InputInterface $input, string $arg, string $modifier) : ?DataInterface
     {
         $data = null;
         if (stripos($modifier, 'w') !== false || file_exists($arg)) {
@@ -127,8 +128,8 @@ class RunQueryCommand extends Command
                     throw new \InvalidArgumentException('Only CSV / XML files allowed');
             }
             $data->setSource($arg, ['modifier' => $modifier]);
-            return $data;
         }
+        return $data;
     }
 
     /**
