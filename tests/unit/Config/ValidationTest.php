@@ -73,6 +73,46 @@ class ValidationTest extends \PHPUnit_Framework_TestCase
     **/
     public function testItShouldReturnFalseForInvalidDateParams()
     {
-        $this->assertFalse(Validation::getDateTime('a', 'Y'));
+        $this->assertEquals(null, Validation::getDateTime('a', 'Y'));
+    }
+
+    /**
+     * Test the get type method
+    **/
+    public function testItShouldReturnFloatForFloatType()
+    {
+        $this->assertEquals('float', Validation::getType('2.3'));
+    }
+
+    /**
+     * Test the get type method (int)
+    **/
+    public function testItShouldReturnIntForIntType()
+    {
+        $this->assertEquals('int', Validation::getType('2'));
+    }
+
+    /**
+     * Test the get type method (date)
+    **/
+    public function testItShouldReturnDateForDateType()
+    {
+        $this->assertEquals('date', Validation::getType('11/12/24'));
+    }
+
+    /**
+     * Test the get type method boolean
+    **/
+    public function testItShouldReturnBoolForBoolType()
+    {
+        $this->assertEquals('bool', Validation::getType('false'));
+    }
+
+    /**
+     * Test the get type method string
+    **/
+    public function testItShouldReturnStringForStringType()
+    {
+        $this->assertEquals('string', Validation::getType('Matt'));
     }
 }

@@ -18,9 +18,8 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         $rule = new Rule();
         $rule->setField('test');
-        $result = $rule->get();
         $this->assertEquals(
-            $result->field,
+            $rule->field,
             'test'
         );
     }
@@ -34,9 +33,8 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         $rule = new Rule();
         $rule->setLabel('test');
-        $result = $rule->get();
         $this->assertEquals(
-            $result->label,
+            $rule->label,
             'test'
         );
     }
@@ -50,8 +48,7 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         $rule = new Rule();
         $rule->groupExact();
-        $result = $rule->get();
-        $func = $result->func;
+        $func = $rule->function;
         $this->assertEquals(
             $func('a', null),
             'a'
@@ -67,8 +64,7 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         $rule = new Rule();
         $rule->groupNumeric(10);
-        $result = $rule->get();
-        $func = $result->func;
+        $func = $rule->function;
         $this->assertEquals(
             $func(8, 10),
             '0, 10'
@@ -84,11 +80,21 @@ class RuleTest extends \PHPUnit_Framework_TestCase
     {
         $rule = new Rule();
         $rule->groupRegex('/^([\w\-]+)/i');
-        $result = $rule->get();
-        $func = $result->func;
+        $func = $rule->function;
         $this->assertEquals(
             $func('apple iphone', '/^([\w\-]+)/i'),
             'apple'
         );
+    }
+
+    public function testItShouldReturnTheMinValue()
+    {
+        $rule = new Rule();
+        $rule->getMin();
+        $func = $rule->function;
+        foreach (range(1, 100, 10) as $value) {
+            $func($value);
+        }
+        $this->assertEquals($rule->min, 1);
     }
 }
