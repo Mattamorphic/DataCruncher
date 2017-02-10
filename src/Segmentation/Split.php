@@ -15,7 +15,7 @@ use mfmbarber\DataCruncher\Helpers\Interfaces\DataInterface as DataInterface;
 
 class Split
 {
-    private $_source;
+    private $source;
 
     /**
      * Sets the data source for the split
@@ -24,11 +24,12 @@ class Split
      *
      * @return Split
     **/
-    public function fromSource(DataInterface $source)
+    public function fromSource(DataInterface $source) : Split
     {
-        $this->_source= $source;
+        $this->source= $source;
         return $this;
     }
+
     /**
      * Split the data horizontally into chunks of X size
      *
@@ -36,13 +37,13 @@ class Split
      *
      * @return Split
      **/
-    public function horizontal($size)
+    public function horizontal($size) : Split
     {
-        $this->_direction = 'HORIZONTAL';
+        $this->direction = 'HORIZONTAL';
         if (!is_int($size)) {
             throw new \InvalidArgumentException("Size expected to be an integer");
         }
-        $this->_size = (int) $size;
+        $this->size = (int) $size;
         return $this;
     }
 
@@ -53,12 +54,12 @@ class Split
      *
      * @return Split
      **/
-    public function vertical($groupings = [])
+    public function vertical($groupings = []) : Split
     {
-        $this->_direction = 'VERTICAL';
+        $this->direction = 'VERTICAL';
         // Groupings provided as [['name', 'colour'], ['name', 'age']] where each element
         // defines a groups headers
-        $this->_groups = $this->_setGroupings($groupings);
+        $this->groups = $this->setGroupings($groupings);
         return $this;
     }
 
@@ -70,27 +71,27 @@ class Split
      *
      * @return array
     **/
-    public function execute(array $outfiles = [], $node_name = '', $start_element = '')
+    public function execute(array $outfiles = [], $node_name = '', $start_element = '') : array
     {
         $result = [];
         $set = [];
         $ticker = false; // horizontal ticker
 
-        Validation::openDataFile($this->_source, $node_name, $start_element);
-        if (($writeOutFiles = $this->_openOutFiles($outfiles, $node_name, $start_element, true))) {
+        Validation::openDataFile($this->source, $node_name, $start_element);
+        if (($writeOutFiles = $this->openOutFiles($outfiles, $node_name, $start_element, true))) {
             $result = array_fill(0, count($outfiles), 0);
         }
-        if ($this->_direction === 'VERTICAL') {
-            $result = array_fill(0, count($this->_groups)-1, []);
+        if ($this->direction === 'VERTICAL') {
+            $result = array_fill(0, count($this->groups)-1, []);
         }
-        foreach ($this->_source->getNextDataRow() as $row) {
-            switch ($this->_direction) {
+        foreach ($this->source->getNextDataRow() as $row) {
+            switch ($this->direction) {
                 // TODO move processing of out files into functions that handle this
                 case 'HORIZONTAL':
                     // push the row on to our array of lines
                     $set[] = $row;
                     // if we're at the chunk size then...
-                    if (count($set) === $this->_size) {
+                    if (count($set) === $this->size) {
                         // Decide on output mode
                         if ($writeOutFiles) {
                             foreach ($set as $row) {
@@ -105,14 +106,14 @@ class Split
                     }
                     break;
                 case 'VERTICAL':
-                    foreach ($this->_groups as $idx => $group) {
+                    foreach ($this->groups as $idx => $group) {
                         $out_row = array_intersect_key($row, $group);
                         ($writeOutFiles) ? $outfiles[$idx]->writeDataRow($out_row) : $result[$idx][] = $out_row;
                     }
                     break;
             }
         }
-        $this->_source->close();
+        $this->source->close();
         if ($writeOutFiles) {
             foreach ($outfiles as &$outfile) {
                 $outfile->close();
@@ -120,6 +121,7 @@ class Split
         }
         return $result;
     }
+
     /**
      * Opens an array of data sources
      * @param array     $outfiles       to open (by reference)
@@ -129,7 +131,7 @@ class Split
      * @throws InvalidArgumentException
      * @return Boolean
     **/
-    private function _openOutFiles(&$outfiles, $node_name = '', $start_element = '')
+    private function openOutFiles(&$outfiles, $node_name = '', $start_element = '') : bool
     {
         if ($outfiles == []) {
             return false;
@@ -139,10 +141,10 @@ class Split
         if ($count <= 1) {
             $error = true;
         }
-        if ($this->_direction === 'HORIZONTAL' && $count !== $this->_size) {
+        if ($this->direction === 'HORIZONTAL' && $count !== $this->size) {
             $error = true;
         }
-        if ($this->_direction === 'VERTICAL' && $count != count($this->_groups)) {
+        if ($this->direction === 'VERTICAL' && $count != count($this->groups)) {
             $error = true;
         }
         if ($error) {
@@ -156,6 +158,7 @@ class Split
         }
         return true;
     }
+
     /**
      * Set groupings creates an array of arrays, where each array represents a vertical group
      *
@@ -164,7 +167,7 @@ class Split
      *
      * @return array
     **/
-    private function _setGroupings($groupings)
+    private function setGroupings($groupings) : array
     {
         $groups = [];
         foreach ($groupings as $group) {
