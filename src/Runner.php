@@ -20,9 +20,9 @@ use mfmbarber\DataCruncher\Exceptions;
 
 abstract class Runner
 {
-    protected $_source = null;
-    protected $_timer = null;
-    protected $_out = null;
+    protected $source = null;
+    protected $timer = null;
+    protected $out = null;
 
     /**
      * Sets the data source
@@ -33,7 +33,7 @@ abstract class Runner
     **/
     public function from(DataInterface $source)
     {
-        $this->_source = $source;
+        $this->source = $source;
         return $this;
     }
 
@@ -47,7 +47,7 @@ abstract class Runner
     public function out(DataInterface $out)
     {
         Validation::openDataFile($out, true);
-        $this->_out = $out;
+        $this->out = $out;
         return $this;
     }
     /**
@@ -57,7 +57,7 @@ abstract class Runner
     **/
     public function timer()
     {
-        $this->_timer = new Stopwatch();
+        $this->timer = new Stopwatch();
         return $this;
     }
 

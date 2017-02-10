@@ -17,11 +17,15 @@ use mfmbarber\DataCruncher\Exceptions;
 
 class Rule
 {
-    private $_field;
-    private $_function;
-    private $_option;
-    private $_label = null;
-
+    public $field;
+    public $type;
+    public $function;
+    public $option;
+    public $label = null;
+    public $min = null;
+    public $max = null;
+    public $deviation_threshold = null;
+    public $product = null;
   /**
      * Sets the field to calculate statistics on
      *
@@ -31,14 +35,93 @@ class Rule
     **/
     public function setField(string $field) : Rule
     {
-        $this->_field = $field;
+        $this->field = $field;
         return $this;
     }
 
+    /**
+     * Set the reference label
+     *
+     * @param string    $label  The label to reference the result in the results array
+     *
+     * @return Rule
+    **/
     public function setLabel(string $label) : Rule
     {
-        $this->_label = $label;
+        $this->label = $label;
         return $this;
+    }
+
+    /**
+     * Sets the rule to return the minimum value
+     *
+     * @return Rule
+    **/
+    public function getMin() : Rule
+    {
+        $this->function = function ($value) {
+            if (null === $this->min) {
+                $this->min = $value;
+            }
+            if ($value < $this->min) {
+                $this->min = $value;
+            }
+            return false;
+        };
+        $this->type = null; // make this numeric
+        return $this;
+    }
+
+    /**
+     * Sets the rule to return the maximum value
+     *
+     * @return Rule
+    **/
+    public function getMax() : Rule
+    {
+        $this->function = function ($value) {
+            if (null ===$this->max) {
+                $this->max = $value;
+            }
+            if ($value > $this->max) {
+                $this->max = $value;
+            }
+            return false;
+        };
+        $this->type = null; // make this numeric
+        return $this;
+    }
+
+    /**
+     * Sets the rule to store the product, if this is set,
+     * the statistics object will infer the average from it
+     *
+     * @return Rule
+    **/
+    public function getAverage() : Rule
+    {
+        $this->function = function ($value) {
+            if (!$this->product) {
+                $this->product = 0;
+            }
+            $this->product += $value;
+            return $value;
+        };
+        return $this;
+    }
+
+    /**
+     * Sets the rule to store the deviation treshold, if this is set
+     * the Statistics object will infer the standard deviation from it
+     * As it needs the average, it will have to use that function to generate
+     * the product
+     *
+     * @return Rule
+    **/
+    public function getDeviation(int $threshold) : Rule
+    {
+        $this->deviation_threshold = $threshold;
+        return $this->getAverage();
     }
 
     /**
@@ -50,9 +133,10 @@ class Rule
     **/
     public function groupExact() : Rule
     {
-        $this->_function = function ($value, $option) {
+        $this->function = function ($value, $option) {
             return $value;
         };
+        $this->type = null;
         return $this;
     }
 
@@ -68,12 +152,13 @@ class Rule
     **/
     public function groupNumeric(int $step) : Rule
     {
-        $this->_option = $step;
-        $this->_function = function($value, $step) {
+        $this->option = $step;
+        $this->function = function($value, $step) {
             $lower = ((int) ($value / $step)) * $step;
             $upper = (((int) ($value / $step)) + 1) * $step;
             return "$lower, $upper";
         };
+        $this->type = 'int';
         return $this;
     }
 
@@ -87,12 +172,13 @@ class Rule
     **/
     public function groupRegex($regex) : Rule
     {
-        $this->_option = $regex;
-        $this->_function = function ($value, $regex) {
+        $this->option = $regex;
+        $this->function = function ($value, $regex) {
             $result = [];
             preg_match($regex, trim($value), $result, PREG_OFFSET_CAPTURE);
             return $result[0][0];
         };
+        $this->type = 'string';
         return $this;
     }
     /**
@@ -108,30 +194,13 @@ class Rule
     **/
     public function groupDate(string $dataFormat, string $returnFormat) : Rule
     {
-        $this->_option = $returnFormat;
-        $this->_dataFormat = $dataFormat;
-        $this->_function = function ($value, $format) {
-            $date = Validation::getDateTime($value, $this->_dataFormat);
-            if (!$date) {
-                return false;
-            }
-            return $date->format($format);
+        $this->option = $returnFormat;
+        $this->dataFormat = $dataFormat;
+        $this->function = function ($value, $format) {
+            $date = Validation::getDateTime($value, $this->dataFormat);
+            return (!$date) ? false : $date->format($format);
         };
+        $this->type = 'date';
         return $this;
-    }
-
-    /**
-     * Returns the rule as a structured array
-     *
-     * @return object
-    **/
-    public function get()
-    {
-        return (object)[
-            'field' => $this->_field,
-            'func' => $this->_function,
-            'option' => $this->_option,
-            'label' => $this->_label
-        ];
     }
 }
