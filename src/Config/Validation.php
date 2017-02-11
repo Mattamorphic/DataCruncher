@@ -15,7 +15,7 @@ use mfmbarber\DataCruncher\Exceptions as CSV_Exceptions;
 
 class Validation
 {
-    const CONDITIONS = [
+    public const CONDITIONS = [
             'EQUALS',
             'GREATER',
             'LESS',
@@ -30,6 +30,17 @@ class Validation
             'CONTAINS',
             'IN'
     ];
+
+    public const CLI_LOGO = '
+        88888888ba,                  ,ad8888ba,   88           88
+        88      `"8b                d8"\'    `"8b  88           88
+        88        `8b              d8\'            88           88
+        88         88  ,adPPYYba,  88             88           88
+        88         88  ""     `Y8  88             88           88
+        88         8P  ,adPPPPP88  Y8,            88           88
+        88      .a8P   88,    ,88   Y8a.    .a8P  88           88
+        88888888Y"\'    `"8bbdP"Y8    `"Y8888Y"\'   88888888888  88
+    ';
     /**
      * Checks to see if this is a normal numerical array and not associative
      * @param mixed $arr     The array to check (this is type hinted)
@@ -76,7 +87,7 @@ class Validation
      *
      * @return mixed
     **/
-    public static function getDateTime($value, string $dateFormat)
+    public static function getDateTime($value, string $dateFormat) : ?\DateTime
     {
         $dateFormat = trim($dateFormat);
         // If they just need the year then assume from 01/01 of year
@@ -85,7 +96,7 @@ class Validation
             if (is_numeric($value)) {
                 $dateObj->setDate((int) $value, 1, 1);
             } else {
-                $dateObj = false;
+                $dateObj = null;
             }
         } else {
             $dateObj = \DateTime::createFromFormat($dateFormat, $value);
@@ -148,7 +159,7 @@ class Validation
      *
      * @return null
     **/
-    public static function deleteFiles(string $dir, array $dontDeleteExtensions = [])
+    public static function deleteFiles(string $dir, array $dontDeleteExtensions = []) : void
     {
         if (false !== ($files = scandir($dir))) {
             array_map(
@@ -188,4 +199,69 @@ class Validation
         );
         return ($filter) ? count(array_filter(array_values($found), function ($item) { return $item !== false; })) > 0 : $found;
     }
+
+    /**
+     * Returns a string representation of the type based on the variable value
+     * The variable in this case is always going to be a string
+     *
+     * @param string    $var    The variable
+     *
+     * @return string
+    **/
+    public static function getType(string $var) : string
+    {
+        // it's easy to determine a number, so we check that first
+        if (is_numeric($var)) return (is_float($var + 0) === true) ? 'float' : 'int';
+        // next we determine if it's a bool
+        if (
+            in_array(
+                strtolower($var),
+                [
+                    '0',
+                    'false',
+                    'null',
+                    'none'
+                ]
+            )
+        ) return 'bool';
+        // date times are difficult - we can guess to a degree?
+        if (self::testDates(
+            $var,
+            [
+                'd/m/y',
+                'd/m/Y',
+                'm/d/y',
+                'm/d/Y',
+                'U',
+                'd.m.y',
+                'd.m.Y',
+                'm.d.y',
+                'm.d.Y'
+            ]
+        )) {
+            return 'date';
+        }
+        return 'string';
+    }
+
+    /**
+     * given a date and a list of valid formats, see if the date conforms to any
+     * of these.
+     *
+     * @param string    $date       The date string to test
+     * @param array     $dateList   The list of dates to test
+     *
+     * @return bool
+    **/
+    public static function testDates(string $date, array $dateList) : bool
+    {
+        if (!count($dateList)) return false;
+        if (\DateTime::createFromFormat(array_pop($dateList), $date)) {
+            return true;
+        } else {
+            return self::testDates($date, $dateList);
+        }
+
+    }
+
 }

@@ -18,13 +18,15 @@ use mfmbarber\DataCruncher\Runner as Runner;
 
 class Query extends Runner
 {
-    private $_isdb = false;
-    private $_fields = [];
-    private $_where = '';
-    private $_condition = '';
-    private $_value = '';
-    private $_limit = -1;
-    private $_mappings = null;
+    private $isdb = false;
+    private $fields = [];
+    private $where = '';
+    private $condition = '';
+    private $value = '';
+    private $limit = -1;
+    private $mappings = null;
+    private $orderBy = null;
+    private $distinct = null;
 
     /**
      * Sets the data source for the query
@@ -33,15 +35,15 @@ class Query extends Runner
      *
      * @return Query
     **/
-    public function from(DataInterface $source)
+    public function from(DataInterface $source) : Query
     {
         parent::from($source);
         if (get_class($source) === 'mfmbarber\DataCruncher\Helpers\Databases\Database') {
-            $this->_isdb = true;
+            $this->isdb = true;
         }
-        if ($this->_fields !== []) {
-            $headers = $this->_source->getHeaders();
-            $fields = array_keys($this->_fields);
+        if ($this->fields !== []) {
+            $headers = $this->source->getHeaders();
+            $fields = array_keys($this->fields);
             if (Validation::areArraysDifferent($fields, $headers)) {
                 throw new \Exception(
                     'One or more of '.implode(', ', $fields) . ' is not in ' .
@@ -51,6 +53,7 @@ class Query extends Runner
         }
         return $this;
     }
+
     /**
      * Select the fields to return from the SourceFile
      *
@@ -69,8 +72,8 @@ class Query extends Runner
                 .'expected a normal array'
             );
         }
-        if ($this->_source !== null) {
-            $headers = $this->_source->getHeaders();
+        if ($this->source !== null) {
+            $headers = $this->source->getHeaders();
             if (Validation::areArraysDifferent($fields, $headers)) {
                 throw new \Exception(
                     'One or more of '.implode(', ', $fields) . ' is not in ' .
@@ -78,9 +81,10 @@ class Query extends Runner
                 );
             }
         }
-        $this->_fields = array_flip($fields);
+        $this->fields = array_flip($fields);
         return $this;
     }
+
     /**
      * Condition for the query to execute on the SourceFile
      *
@@ -97,9 +101,10 @@ class Query extends Runner
                 .implode(",\n", Validation::CONDITIONS)
             );
         }
-        $this->_condition = $condition;
+        $this->condition = $condition;
         return $this;
     }
+
     /**
      * Which field to use to match the condition and value against
      *
@@ -110,12 +115,13 @@ class Query extends Runner
     **/
     public function where(string $field, $dateFormat = null) : Query
     {
-        $this->_where = $field;
+        $this->where = $field;
         if ($dateFormat !== null) {
-            $this->_dateFormat = $dateFormat;
+            $this->dateFormat = $dateFormat;
         }
         return $this;
     }
+
     /**
      * The value for the condition against the where
      *
@@ -137,13 +143,13 @@ class Query extends Runner
                     $value
                 );
                 if (!in_array(false, $value)) {
-                    $this->_value = $value;
+                    $this->value = $value;
                     $valid = true;
                 }
             } elseif (is_string($value)) {
                 $datetime = Validation::getDateTime($value, $dateFormat);
                 if ($datetime) {
-                    $this->_value = $datetime;
+                    $this->value = $datetime;
                     $valid = true;
                 }
             }
@@ -154,9 +160,9 @@ class Query extends Runner
                 );
             }
         } elseif (is_numeric($value)) {
-            $this->_value = (float) $value;
+            $this->value = (float) $value;
         } else {
-            $this->_value = $value;
+            $this->value = $value;
         }
         return $this;
     }
@@ -169,7 +175,7 @@ class Query extends Runner
     **/
     public function limit(int $size) : Query
     {
-        $this->_limit = $size;
+        $this->limit = $size;
         return $this;
     }
 
@@ -183,7 +189,32 @@ class Query extends Runner
     **/
     public function mappings(array $mappings) : Query
     {
-        $this->_mappings = $mappings;
+        $this->mappings = $mappings;
+        return $this;
+    }
+
+    /**
+     * Order the results by a specific key
+     *
+     * @param string    $key    The key to order the results by
+     *
+     * @return Query
+    **/
+    public function orderBy(string $key) : Query
+    {
+        if ($this->source !== null) {
+            $headers = $this->source->getHeaders();
+            if (!in_array($key, $headers)) {
+                throw new \Exception("$key is not in " . implode(', ', $headers));
+            }
+        }
+        $this->orderBy = $key;
+        return $this;
+    }
+
+    public function distinct() : Query
+    {
+        $this->distinct = [];
         return $this;
     }
 
@@ -199,36 +230,47 @@ class Query extends Runner
     {
         $result = [];
         $validRowCount = 0;
-        Validation::openDataFile($this->_source);
-        ($this->_timer) ? $this->_timer->start('execute') : null;
+        Validation::openDataFile($this->source);
+        ($this->timer) ? $this->timer->start('execute') : null;
         // if this will be executed on a DB, then fire it off
-        if ($this->_isdb) {
-            $this->_source->query(
-                $this->_fields,
-                $this->_where,
-                $this->_condition,
-                $this->_value
+        if ($this->isdb) {
+            if ($this->orderBy) {
+                $this->source->sort($this->orderBy);
+            }
+            $this->source->query(
+                $this->fields,
+                $this->where,
+                $this->condition,
+                $this->value
             );
         }
-        foreach ($this->_source->getNextDataRow() as $row) {
+        foreach ($this->source->getNextDataRow() as $row) {
             // If this is executed on a DB it will only contain valid results
-            ($this->_isdb) ? $valid = true : $valid = $this->test(trim($row[$this->_where]));
+            ($this->isdb) ? $valid = true : $valid = $this->test(trim($row[$this->where]));
             if ($valid) {
                 ++$validRowCount;
-                if ($this->_fields !== []) {
-                    $row = array_intersect_key($row, $this->_fields);
+                if ($this->fields !== []) {
+                    $row = array_intersect_key($row, $this->fields);
                 }
                 $this->remap($row);
-                ($this->_out) ? $this->_out->writeDataRow($row) : $result[] = $row;
-                if ($this->_limit > 0 && ($validRowCount === $this->_limit)) {
+                if ($this->distinct !== null) {
+                    $hash = base64_encode(serialize($row));
+                    if (array_key_exists($hash, $this->distinct)) {
+                        continue;
+                    }
+                    $this->distinct[$hash] = true;
+                }
+                ($this->out) ? $this->out->writeDataRow($row) : $result[] = $row;
+                if ($this->limit > 0 && ($validRowCount === $this->limit)) {
                     break;
                 }
             }
         }
-        $this->_source->close();
+        $this->source->close();
         $this->closeOut($result, $validRowCount);
         return $result;
     }
+
     /**
      * Checks to see if a row value is in query values
      *
@@ -237,7 +279,7 @@ class Query extends Runner
      *
      * @return bool
     **/
-    private function _in($rValue, $queryValue)
+    private function in($rValue, $queryValue)
     {
         if (gettype($queryValue) !== 'array') {
             $queryValue = str_getcsv($queryValue);
@@ -245,6 +287,7 @@ class Query extends Runner
         $queryValue = array_map('trim', $queryValue);
         return in_array($rValue, $queryValue);
     }
+
     /**
      * Checks to see if the rValue is in the query value (equiv to %like%)
      *
@@ -253,10 +296,11 @@ class Query extends Runner
      *
      * @return bool
     **/
-    private function _contains($rValue, $queryValue)
+    private function contains($rValue, $queryValue)
     {
         return false !== strpos($rValue, $queryValue);
     }
+
     /**
      * Equality checks between the rValue and queryValue
      *
@@ -266,7 +310,7 @@ class Query extends Runner
      *
      * @return bool
     **/
-    private function _equality($operator, $rValue, $queryValue)
+    private function equality($operator, $rValue, $queryValue)
     {
         // if match value is numeric try and cast the rValue
         if (is_numeric($queryValue) && (false === ($rValue = (float) $rValue))) {
@@ -289,6 +333,7 @@ class Query extends Runner
         }
         return $result;
     }
+
     /**
      * Check to see if the string is empty or not empty
      *
@@ -297,11 +342,12 @@ class Query extends Runner
      *
      * @return bool
     **/
-    private function _empty($condition, $rValue)
+    private function empty($condition, $rValue)
     {
         $result = $rValue === '';
         return ($condition === 'EMPTY') ? $result : !$result;
     }
+
     /**
      * Completes a comparison between a query date and a row date
      *
@@ -311,9 +357,9 @@ class Query extends Runner
      *
      * @return bool
     **/
-    private function _date($condition, $rValue, $queryValue)
+    private function date($condition, $rValue, $queryValue)
     {
-        $dateValue = \DateTime::createFromFormat($this->_dateFormat, $rValue);
+        $dateValue = \DateTime::createFromFormat($this->dateFormat, $rValue);
         $result = false;
 
         switch ($condition) {
@@ -345,25 +391,25 @@ class Query extends Runner
     **/
     private function test($value) : bool
     {
-        switch ($this->_condition) {
+        switch ($this->condition) {
             case 'EQUALS':
             case 'GREATER':
             case 'LESS':
             case 'NOT':
-                return $this->_equality($this->_condition, $value, $this->_value);
+                return $this->equality($this->condition, $value, $this->value);
             case 'AFTER':
             case 'BEFORE':
             case 'ON':
             case 'BETWEEN':
             case 'NOT_BETWEEN':
-                return $this->_date($this->_condition, $value, $this->_value);
+                return $this->date($this->condition, $value, $this->value);
             case 'EMPTY':
             case 'NOT_EMPTY':
-                return $this->_empty($this->_condition, $value);
+                return $this->empty($this->condition, $value);
             case 'CONTAINS':
-                return $this->_contains($value, $this->_value);
+                return $this->contains($value, $this->value);
             case 'IN':
-                return $this->_in($value, $this->_value);
+                return $this->in($value, $this->value);
         }
     }
 
@@ -376,12 +422,12 @@ class Query extends Runner
     **/
     private function remap(array &$row)
     {
-        if ($this->_mappings) {
+        if ($this->mappings) {
             foreach ($row as $header => $value) {
                 // if the mappings are not equal, then pull out the value we want
                 // and unset the old value
-                if (isset($this->_mappings[$header]) && $header !== $this->_mappings[$header]) {
-                    $row[$this->_mappings[$header]] = $value;
+                if (isset($this->mappings[$header]) && $header !== $this->mappings[$header]) {
+                    $row[$this->mappings[$header]] = $value;
                     unset($row[$header]);
                 }
             }
@@ -399,24 +445,41 @@ class Query extends Runner
     **/
     private function closeOut(array &$result, int $rows)
     {
-        if ($this->_out) {
-            switch ($this->_out->getType()) {
+        if ($this->out) {
+            switch ($this->out->getType()) {
                 case 'stream':
-                    $this->_out->flushBuffer();
-                    $this->_out->reset();
-                    $result = stream_get_contents($this->_out->_fp);
-                    $this->_out->close();
+                    $this->out->flushBuffer();
+                    $this->out->reset();
+                    if ($this->orderBy && !$this->isdb) {
+                        $this->out->setModifier('r');
+                        $this->out->sort($this->orderBy);
+                        $this->out->reset();
+                    }
+                    $result = ['data' => stream_get_contents($this->out->fp)];
+                    $this->out->close();
                     break;
                 case 'file':
-                    $this->_out->close();
-                    $result = ['rows' => $rows];
+                    $this->out->close();
+                    if ($this->orderBy && !$this->isdb) {
+                        $this->out->setSource($this->out->getSourceName(), ['modifier' => 'r']);
+                        //$this->out->setModifier('r');
+                        $this->out->sort($this->orderBy);
+                    }
+                    $result = ['data' => $rows];
                     break;
             }
+        } else {
+            if ($this->orderBy && !$this->isdb) {
+                $key = $this->orderBy;
+                usort($result, function (array $a, array $b) use ($key) {
+                    return $a[$key] <=> $b[$key];
+                });
+            }
         }
-        if ($this->_timer) {
-            $time = $this->_timer->stop('execute');
+        if ($this->timer) {
+            $time = $this->timer->stop('execute');
             $result = [
-                'data' => $result,
+                'data' => isset($result['data']) ? $result['data'] : $result,
                 'timer' => [
                     'elapsed' => $time->getDuration(), // milliseconds
                     'memory' => $time->getMemory() // bytes

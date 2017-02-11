@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+// run the script indefinitely?
+set_time_limit(0);
+
+require_once '__DIR__/../vendor/autoload.php';
+
+use mfmbarber\DataCruncher\Commands;
+
+use Symfony\Component\Console\Application;
+
+$application = new Application();
+
+$application->add(new Commands\RunQueryCommand());
+$application->add(new Commands\RunStatsCommand());
+
+$application->run();

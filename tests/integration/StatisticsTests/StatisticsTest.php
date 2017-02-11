@@ -67,6 +67,7 @@ class StatisticTest extends \PHPUnit_Framework_TestCase
         $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('gender')->groupExact()->setLabel('gender');
         $statistics->addRule($rule);
+        $rule = Processor::generate('analysis', 'rule');
         $rule = $rule->setField('age')->groupNumeric(10)->setLabel('age_in_10s');
         $statistics->addRule($rule);
         $csv = DataSource::generate('file', 'csv');
