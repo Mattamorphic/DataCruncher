@@ -19,53 +19,53 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         Validation::deleteFiles($this->dir.'QueryTests/OutputFiles', ['md']);
     }
 
-    // public function testItShouldQueryACSVFile()
-    // {
-    //     $query = Processor::generate('segmentation', 'query');
-    //     $csv = DataSource::generate('file', 'csv');
-    //     $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
-    //     $csv->setSource($file, ['fileMode' => 'r']);
-    //     $result = $query->from($csv)
-    //         ->select(['id', 'email'])
-    //         ->where('ip_address')
-    //         ->condition('CONTAINS')
-    //         ->value('140.11.')
-    //         ->execute();
-    //     $this->assertEquals(
-    //         $result,
-    //         [
-    //             [
-    //                 'id' => 4,
-    //                 'email' => 'asimmons3@infoseek.co.jp'
-    //             ]
-    //         ]
-    //
-    //     );
-    // }
-    //
-    // public function testItShouldQueryAXMLFile()
-    // {
-    //     $query = Processor::generate('segmentation', 'query');
-    //     $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
-    //     $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
-    //     $xml->setSource($file, ['fileMode' => 'r']);
-    //     $result = $query->from($xml)
-    //         ->select(['id', 'email'])
-    //         ->where('ip_address')
-    //         ->condition('CONTAINS')
-    //         ->value('106.209.')
-    //         ->execute();
-    //     $this->assertEquals(
-    //         $result,
-    //         [
-    //             [
-    //                 'id' => 4,
-    //                 'email' => 'asimpson3@techcrunch.com'
-    //             ]
-    //         ]
-    //
-    //     );
-    // }
+    public function testItShouldQueryACSVFile()
+    {
+        $query = Processor::generate('segmentation', 'query');
+        $csv = DataSource::generate('file', 'csv');
+        $file = $this->dir . 'CSVTests/InputFiles/1000row6columndata.csv';
+        $csv->setSource($file, ['fileMode' => 'r']);
+        $result = $query->from($csv)
+            ->select(['id', 'email'])
+            ->where('ip_address')
+            ->condition('CONTAINS')
+            ->value('140.11.')
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'id' => 4,
+                    'email' => 'asimmons3@infoseek.co.jp'
+                ]
+            ]
+
+        );
+    }
+
+    public function testItShouldQueryAXMLFile()
+    {
+        $query = Processor::generate('segmentation', 'query');
+        $xml = DataSource::generate('file', 'xml', 'record', 'dataset');
+        $file = $this->dir . 'XMLTests/InputFiles/1000row6fielddata.xml';
+        $xml->setSource($file, ['fileMode' => 'r']);
+        $result = $query->from($xml)
+            ->select(['id', 'email'])
+            ->where('ip_address')
+            ->condition('CONTAINS')
+            ->value('106.209.')
+            ->execute();
+        $this->assertEquals(
+            $result,
+            [
+                [
+                    'id' => 4,
+                    'email' => 'asimpson3@techcrunch.com'
+                ]
+            ]
+
+        );
+    }
 
 
     public function testItShouldOutputCSVString()
@@ -89,7 +89,7 @@ class QueryTest extends \PHPUnit_Framework_TestCase
 
         );
     }
-/**
+
     public function testItShouldQueryADatabaseTable(){}
 
     public function testItShouldOutputToCSV()
@@ -237,5 +237,5 @@ class QueryTest extends \PHPUnit_Framework_TestCase
             ]
         );
     }
-    public function testItShouldQueryDates(){}**/
+    public function testItShouldQueryDates(){}
 }
