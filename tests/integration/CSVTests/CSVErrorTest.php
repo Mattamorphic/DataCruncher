@@ -21,7 +21,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->sourceCSV = DataSource::generate('file', 'csv');
-        $this->sourceCSV->setSource($this->file, ['modifier' => 'r']);
+        $this->sourceCSV->setSource($this->file, ['fileMode' => 'r']);
         $this->sourceCSV->sort('id');
     }
 
@@ -39,7 +39,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $csv->setSource(
             'FakeFile.csv',
-            ['modifier' => 'r']
+            ['fileMode' => 'r']
         );
     }
 
@@ -52,7 +52,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $csv->setSource(
             "{$this->dir}/InputFiles/Empty.csv",
-            ['modifier' => 'r']
+            ['fileMode' => 'r']
         );
 
     }
@@ -66,7 +66,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
     //     $csv = DataSource::generate('file', 'csv');
     //     $csv->setSource(
     //         "{$this->dir}/InputFiles/NonEmpty.csv",
-    //         ['modifier' => 'w']
+    //         ['fileMode' => 'w']
     //     );
     // }
 
@@ -79,7 +79,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $csv->setSource(
             "{$this->dir}/InputFiles/NonEmpty.csv",
-            ['modifier' => 'w']
+            ['fileMode' => 'w']
         );
         $csv->getNextDataRow()->current();
 
@@ -94,7 +94,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $csv->setSource(
             "{$this->dir}/InputFiles/NonCSV.csv",
-            ['modifier' => 'r']
+            ['fileMode' => 'r']
         );
 
     }
@@ -123,7 +123,7 @@ class CSVErrorTest extends \PHPUnit_Framework_TestCase
         $csv = DataSource::generate('file', 'csv');
         $csv->setSource(
             "{$this->dir}/InputFiles/EmptyWriteProtected.csv",
-            ['modifier' => 'w']
+            ['fileMode' => 'w']
         );
     }
 

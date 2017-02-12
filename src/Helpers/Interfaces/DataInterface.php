@@ -12,7 +12,7 @@ namespace mfmbarber\DataCruncher\Helpers\Interfaces;
 
 interface DataInterface
 {
-    public function setSource(string $location, array $properties);
+    public function setSource(string $path, array $properties);
     public function getSourceName() : string;
     public function getNextDataRow();
     public function writeDataRow(array $row);

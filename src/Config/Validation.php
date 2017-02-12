@@ -107,19 +107,13 @@ class Validation
      * Given a data file object, open this - by reference
      *
      * @param DataInterface &$file          The file to open
-     * @param string        $node_name      The name of the nodes we want to look at
-     * @param string        $start_element  The name of the element that is at the root
      *
      * @return void
      */
-    public static function openDataFile(DataInterface &$file, bool $write = false)
+    public static function openDataFile(DataInterface &$file)
     {
         try {
-            if (false !== strpos(get_class($file), 'XMLFile')) {
-                $file->open(!$write);
-            } else {
-                $file->open();
-            }
+            $file->open();
         } catch (Exceptions\FilePointerExistsException $e) {
             // The stream is already open
         }

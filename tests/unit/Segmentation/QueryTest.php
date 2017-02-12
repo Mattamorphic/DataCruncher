@@ -48,9 +48,9 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
         vfsStream::url('home/test_out', 0777);
         $this->mockSourceCSV = $this->generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
-        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+        $this->mockSourceCSV->setSource('vfs://home/test', ['fileMode' => 'r']);
         $this->mockOutCSV = $this->generateMockFile('mfmbarber\DataCruncher\Helpers\Files\CSVFile');
-        $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
+        $this->mockOutCSV->setSource('vfs://home/test_out', ['fileMode' => 'w']);
     }
 
     public function tearDown()

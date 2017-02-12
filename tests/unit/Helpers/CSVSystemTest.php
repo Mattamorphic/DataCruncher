@@ -25,7 +25,7 @@ class CSVSystemTest extends \PHPUnit_Framework_TestCase
             ."tony.stark@avengers.com, tony, \"red, gold\", 02/05/1990, 25\n"
         );
         $this->mockSourceCSV = new CSV();
-        //$this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+        //$this->mockSourceCSV->setSource('vfs://home/test', ['fileMode' => 'r']);
     }
 
     public function tearDown()

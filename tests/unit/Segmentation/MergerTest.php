@@ -37,8 +37,8 @@ class MergerTest extends \PHPUnit_Framework_TestCase
         );
         $this->mockSourceCSV = new CSVFile();
         $this->mockMergeCSV = new CSVFile();
-        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockMergeCSV->setSource('vfs://home/test_out', ['modifier' => 'r']);
+        $this->mockSourceCSV->setSource('vfs://home/test', ['fileMode' => 'r']);
+        $this->mockMergeCSV->setSource('vfs://home/test_out', ['fileMode' => 'r']);
     }
 
     public function tearDown()

@@ -461,7 +461,7 @@ class Query extends Runner
                 case 'file':
                     $this->out->close();
                     if ($this->orderBy && !$this->isdb) {
-                        $this->out->setSource($this->out->getSourceName(), ['modifier' => 'r']);
+                        $this->out->setSource($this->out->getSourceName(), ['fileMode' => 'r']);
                         //$this->out->setModifier('r');
                         $this->out->sort($this->orderBy);
                     }

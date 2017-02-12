@@ -28,11 +28,11 @@ class SplitTest extends \PHPUnit_Framework_TestCase
             ."no_name@something.com, , \"green\", 01/01/2000, fifteen"
         );
         $this->mockSourceCSV = new CSVFile();
-        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
+        $this->mockSourceCSV->setSource('vfs://home/test', ['fileMode' => 'r']);
         foreach (range(0, 4) as $number) {
             vfsStream::url("home/test_out_$number", 0777);
             $outfile = new CSVFile();
-            $outfile->setSource("vfs://home/test_out_$number", ['modifier' => 'w']);
+            $outfile->setSource("vfs://home/test_out_$number", ['fileMode' => 'w']);
             $this->mockOutFiles[] = $outfile;
         }
     }

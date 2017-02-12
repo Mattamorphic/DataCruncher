@@ -32,8 +32,8 @@ class StatisticsTest extends \PHPUnit_Framework_TestCase
         $this->mockSourceCSV = new CSVFile;
         $this->mockOutCSV = new CSVFile;
 
-        $this->mockSourceCSV->setSource('vfs://home/test', ['modifier' => 'r']);
-        $this->mockOutCSV->setSource('vfs://home/test_out', ['modifier' => 'w']);
+        $this->mockSourceCSV->setSource('vfs://home/test', ['fileMode' => 'r']);
+        $this->mockOutCSV->setSource('vfs://home/test_out', ['fileMode' => 'w']);
     }
 
     public function tearDown()
