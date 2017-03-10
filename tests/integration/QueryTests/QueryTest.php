@@ -67,7 +67,6 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
     public function testItShouldOutputCSVString()
     {
         $query = Processor::generate('segmentation', 'query');

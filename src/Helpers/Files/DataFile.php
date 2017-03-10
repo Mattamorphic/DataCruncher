@@ -16,7 +16,7 @@ use mfmbarber\DataCruncher\Config\Validation;
 abstract class DataFile
 {
 
-    public $fp = null;
+    public $_fp = null;
 
     protected $fileMode;
     protected $path;
@@ -32,7 +32,7 @@ abstract class DataFile
      * @param string $path   The name of the file to set as the source
      * @param array  $properties Data properties, fileMode, encloser, delimiter
      *
-     * @return null
+     * @return void
     **/
     public function setSource(string $path, array $properties = []) : void
     {
@@ -130,19 +130,18 @@ abstract class DataFile
     /**
      * Open is a method that sets a local file pointer
      *
-     * @return null
+     * @return void
     **/
     public function open() : bool
     {
-        if ($this->fp === null) {
-            $this->fp = fopen($this->path, $this->fileMode);
+        if ($this->_fp === null) {
+            $this->_fp = fopen($this->path, $this->fileMode);
             return true;
-        } else {
-            throw new Exceptions\FilePointerExistsException(
-                'A filepointer exists on this object, use class::close to'
-                .' close the current pointer'
-            );
         }
+        throw new Exceptions\FilePointerExistsException(
+            'A filepointer exists on this object, use class::close to'
+            .' close the current pointer'
+        );
     }
 
     /**
@@ -152,14 +151,14 @@ abstract class DataFile
      */
     public function reset() : void
     {
-        if ($this->fp !== null) {
-            rewind($this->fp);
-        } else {
-            throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use class::open'
-                .' to open a new filepointer'
-            );
+        if ($this->_fp !== null) {
+            rewind($this->_fp);
+            return;
         }
+        throw new Exceptions\FilePointerInvalidException(
+            'The filepointer is null on this object, use class::open'
+            .' to open a new filepointer'
+        );
     }
 
     /**
@@ -169,15 +168,15 @@ abstract class DataFile
     **/
     public function close() : void
     {
-        if ($this->fp !== null) {
-            fclose($this->fp);
-            $this->fp = null;
-        } else {
-            throw new Exceptions\FilePointerInvalidException(
-                'The filepointer is null on this object, use class::open'
-                .' to open a new filepointer'
-            );
+        if ($this->_fp !== null) {
+            fclose($this->_fp);
+            $this->_fp = null;
+            return;
         }
+        throw new Exceptions\FilePointerInvalidException(
+            'The filepointer is null on this object, use class::open'
+            .' to open a new filepointer'
+        );
     }
 
     /**

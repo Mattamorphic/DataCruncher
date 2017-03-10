@@ -33,15 +33,14 @@ class CSV extends CSVFile
     **/
     public function open() : bool
     {
-        if (!$this->fp) {
-            $this->fp = tmpfile();
-            return true;
-        } else {
+        if ($this->_fp) {
             throw new Exceptions\FilePointerExistsException(
                 'A filepointer exists on this object, use class::close to'
                 .' close the current pointer '
             );
         }
+        $this->_fp = tmpfile();
+        return true;
     }
 
     /**

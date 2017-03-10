@@ -90,18 +90,17 @@ class Validation
     public static function getDateTime($value, string $dateFormat) : ?\DateTime
     {
         $dateFormat = trim($dateFormat);
-        // If they just need the year then assume from 01/01 of year
-        if ($dateFormat === 'Y' || $dateFormat === 'YY' || $dateFormat === 'YYYY') {
-            $dateObj = new \DateTime();
-            if (is_numeric($value)) {
-                $dateObj->setDate((int) $value, 1, 1);
-            } else {
-                $dateObj = null;
-            }
-        } else {
-            $dateObj = \DateTime::createFromFormat($dateFormat, $value);
+        $type = self::getType($value);
+        if (!in_array($type, ['int', 'date'])) {
+            return null;
         }
-        return $dateObj;
+        // If they just need the year then assume from 01/01 of year
+        if ($type === 'int' && stripos('y', $dateFormat) !== false) {
+            $dateObj = new \DateTime();
+            $dateObj->setDate((int) $value, 1, 1);
+            return $dateObj;
+        }
+        return \DateTime::createFromFormat($dateFormat, $value);
     }
     /**
      * Given a data file object, open this - by reference
@@ -151,7 +150,7 @@ class Validation
      * @param string    $dir                    The directory to delete the files from
      * @param array     $dontDeleteExtensions   Don't delete files with these extensions
      *
-     * @return null
+     * @return void
     **/
     public static function deleteFiles(string $dir, array $dontDeleteExtensions = []) : void
     {
@@ -252,10 +251,8 @@ class Validation
         if (!count($dateList)) return false;
         if (\DateTime::createFromFormat(array_pop($dateList), $date)) {
             return true;
-        } else {
-            return self::testDates($date, $dateList);
         }
-
+        return self::testDates($date, $dateList);
     }
 
 }

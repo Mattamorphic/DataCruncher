@@ -50,7 +50,7 @@ class RunQueryCommand extends Command
      * @param InputInterface    $input      The input interface for the console object
      * @param OutputInterface   $output     The output interface for the console object
      *
-     * @return null
+     * @return void
     **/
     protected function execute(InputInterface $input, OutputInterface $output) : void
     {

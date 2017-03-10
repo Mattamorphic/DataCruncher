@@ -34,7 +34,7 @@ class XMLFile extends DataFile implements DataInterface
      *
      * @return array
     **/
-    public function getHeaders($force = true) : array
+    public function getHeaders(bool $force = true) : array
     {
         if ($force || $this->headers === []) {
             $this->open(true, $this->nodeName, $this->startElement);
@@ -53,10 +53,10 @@ class XMLFile extends DataFile implements DataInterface
     public function getNextDataRow() : \Generator
     {
         $row = [];
-        while ($this->fp->name === $this->nodeName) {
-            $row = $this->toArray(new \SimpleXMLElement($this->fp->readOuterXML()));
+        while ($this->_fp->name === $this->nodeName) {
+            $row = $this->toArray(new \SimpleXMLElement($this->_fp->readOuterXML()));
             $this->fields  = ($this->fields === []) ? array_keys($row) : $this->fields;
-            $this->fp->next($this->nodeName);
+            $this->_fp->next($this->nodeName);
             yield $row;
         }
 
@@ -70,16 +70,16 @@ class XMLFile extends DataFile implements DataInterface
      */
     public function writeDataRow(array $row) : bool
     {
-        if ($this->fp) {
+        if ($this->_fp) {
             if (!count($row)) {
                 return false;
             }
-            $this->fp->startElement($this->nodeName);
+            $this->_fp->startElement($this->nodeName);
             foreach ($row as $key => $value) {
-                $this->fp->writeElement($key, $value);
+                $this->_fp->writeElement($key, $value);
             }
-            $this->fp->endElement();
-            $this->fp->flush();
+            $this->_fp->endElement();
+            $this->_fp->flush();
             if ($this->fields === []) {
                 $this->fields = array_keys($row);
             }
@@ -100,17 +100,17 @@ class XMLFile extends DataFile implements DataInterface
      */
     public function open() : bool
     {
-        if (!$this->fp) {
+        if (!$this->_fp) {
             if ($this->read) {
-                $this->fp = new \XMLReader();
-                $this->fp->open($this->path);
-                while ($this->fp->read() && $this->fp->name !== $this->nodeName);
+                $this->_fp = new \XMLReader();
+                $this->_fp->open($this->path);
+                while ($this->_fp->read() && $this->_fp->name !== $this->nodeName);
             } elseif ($this->write) {
-                $this->fp = new \XMLWriter();
-                $this->fp->openURI($this->path);
-                $this->fp->startDocument('1.0');
+                $this->_fp = new \XMLWriter();
+                $this->_fp->openURI($this->path);
+                $this->_fp->startDocument('1.0');
                 if ($this->startElement !== null) {
-                    $this->fp->startElement($this->startElement);
+                    $this->_fp->startElement($this->startElement);
                 }
             }
             return true;
@@ -128,12 +128,12 @@ class XMLFile extends DataFile implements DataInterface
      */
     public function close() : void
     {
-        if ($this->fp) {
-            if (get_class($this->fp) !== 'XMLReader') {
-                $this->fp->endDocument();
-                $this->fp->flush();
+        if ($this->_fp) {
+            if (get_class($this->_fp) !== 'XMLReader') {
+                $this->_fp->endDocument();
+                $this->_fp->flush();
             }
-            $this->fp = null;
+            $this->_fp = null;
         } else {
             throw new Exceptions\FilePointerInvalidException(
                 'The filepointer is null on this object, use class::open'
@@ -148,7 +148,7 @@ class XMLFile extends DataFile implements DataInterface
      */
     public function reset() : void
     {
-        if ($this->fp) {
+        if ($this->_fp) {
             // we have to close and reopen
             $this->close();
             $this->open($this->read, $this->nodeName, $this->startElement);
@@ -158,6 +158,18 @@ class XMLFile extends DataFile implements DataInterface
                 .' to open a new filepointer'
             );
         }
+    }
+
+    /**
+     * Sort the XML object
+     *
+     * @param string  $key  The key to sort the data on
+     *
+     * @return ?array
+    **/
+    public function sort(string $key) : ?array
+    {
+        throw new Exception('Not yet implemented');
     }
 
     /**
