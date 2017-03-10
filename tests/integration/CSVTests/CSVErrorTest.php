@@ -1,6 +1,6 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Integration\CSVTests;
-
+use PHPUnit\Framework\TestCase;
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Processor;
@@ -8,7 +8,7 @@ use mfmbarber\DataCruncher\Processor;
 use mfmbarber\DataCruncher\Exceptions\InvalidFileException;
 
 
-class CSVErrorTest extends \PHPUnit_Framework_TestCase
+class CSVErrorTest extends TestCase
 {
     private $file;
 

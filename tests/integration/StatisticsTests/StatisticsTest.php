@@ -1,12 +1,12 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Integration\StatisticsTests;
-
+use PHPUnit\Framework\TestCase;
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Processor;
 
 
-class StatisticTest extends \PHPUnit_Framework_TestCase
+class StatisticTest extends TestCase
 {
     private $dir;
 

@@ -1,6 +1,8 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Unit\Segmentation;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Segmentation\Split as Split;
 use mfmbarber\DataCruncher\Segmentation\Query as Query;
 use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
@@ -8,7 +10,7 @@ use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class SplitTest extends \PHPUnit_Framework_TestCase
+class SplitTest extends TestCase
 {
     private $root;
 

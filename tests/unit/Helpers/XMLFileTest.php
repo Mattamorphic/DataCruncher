@@ -10,12 +10,14 @@
 
 namespace mfmbarber\DataCruncher\Tests\Unit\Helpers;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Tests\Mocks as Mocks;
 use mfmbarber\DataCruncher\Helpers\Files\XMLFile as XMLFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class XMLFileTest extends \PHPUnit_Framework_TestCase
+class XMLFileTest extends TestCase
 {
 
     private $root;

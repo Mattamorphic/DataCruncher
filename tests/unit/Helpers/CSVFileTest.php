@@ -1,11 +1,13 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Unit\Helpers;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class CSVFileTest extends \PHPUnit_Framework_TestCase
+class CSVFileTest extends TestCase
 {
     private $root;
 
@@ -41,7 +43,7 @@ class CSVFileTest extends \PHPUnit_Framework_TestCase
             ->withContent('Locked File')
             ->at($this->root);
         $csv = new CSVFile();
-        $csv->setSource('vfs://home/locked', ['fileMode' => 'r']);    
+        $csv->setSource('vfs://home/locked', ['fileMode' => 'r']);
     }
 
     /**

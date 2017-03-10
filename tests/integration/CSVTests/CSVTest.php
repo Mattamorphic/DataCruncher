@@ -1,6 +1,6 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Integration\CSVTests;
-
+use PHPUnit\Framework\TestCase;
 use mfmbarber\DataCruncher\Config\Validation;
 use mfmbarber\DataCruncher\Helpers\DataSource;
 use mfmbarber\DataCruncher\Processor;
@@ -12,7 +12,7 @@ use mfmbarber\DataCruncher\Processor;
  * @package DataCruncher : Integration Tests
  *
 **/
-class CSVTest extends \PHPUnit_Framework_TestCase
+class CSVTest extends TestCase
 {
     private $file;
 

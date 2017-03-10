@@ -1,13 +1,17 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Unit\Helpers;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Helpers\System\CSV as CSV;
 use mfmbarber\DataCruncher\Helpers\Files\CSVFile;
+
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
+
 use mfmbarber\DataCruncher\Segmentation\Query as Query;
 
-class CSVSystemTest extends \PHPUnit_Framework_TestCase
+class CSVSystemTest extends TestCase
 {
     private $root;
 

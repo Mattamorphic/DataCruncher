@@ -1,6 +1,8 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Unit\Analysis;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Analysis\Statistics as Statistics;
 
 use mfmbarber\DataCruncher\Analysis\Config\Rule as Rule;
@@ -9,7 +11,7 @@ use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class StatisticsTest extends \PHPUnit_Framework_TestCase
+class StatisticsTest extends TestCase
 {
     private $root;
 

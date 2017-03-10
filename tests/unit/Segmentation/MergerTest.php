@@ -1,13 +1,15 @@
 <?php
 namespace mfmbarber\DataCruncher\Tests\Unit\Segmentation;
 
+use PHPUnit\Framework\TestCase;
+
 use mfmbarber\DataCruncher\Segmentation\Merger as Merger;
 use mfmbarber\DataCruncher\Helpers\Files\CSVFile as CSVFile;
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
 
-class MergerTest extends \PHPUnit_Framework_TestCase
+class MergerTest extends TestCase
 {
     private $root;
 
